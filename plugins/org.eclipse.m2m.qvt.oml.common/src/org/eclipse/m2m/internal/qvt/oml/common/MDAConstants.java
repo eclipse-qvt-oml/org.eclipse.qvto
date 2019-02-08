@@ -25,7 +25,7 @@ public interface MDAConstants {
 
 	public static final String QVTO_TRACEFILE_EXTENSION_WITH_DOT = "." + QVTO_TRACEFILE_EXTENSION; //$NON-NLS-1$
 
-	public static final String ANOTHER_ONE_FOR_TEST = "ANOTHER_ONE_FOR_TEST"; //$NON-NLS-1$
+	public static final String ANOTHER_TWO_FOR_TEST = "ANOTHER_ONE_FOR_TEST"; //$NON-NLS-1$
 
 
 }
