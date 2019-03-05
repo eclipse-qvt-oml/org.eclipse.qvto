@@ -5985,7 +5985,7 @@ CallOperationAction, SendSignalAction, Constraint, EClass, EObject> { 	// FIXME 
 		return annotation;
 	}
 
-	private static URI getSourceURI(QvtOperationalModuleEnv env) {
+	public static URI getSourceURI(QvtOperationalModuleEnv env) {
 		if(env instanceof QvtOperationalFileEnv) {
 			QvtOperationalFileEnv fileEnv = (QvtOperationalFileEnv) env;
 			return fileEnv.getFile();
