@@ -65,3 +65,27 @@ Publish JUnit test report: tests/*.test*/target/surefire-reports/*.xml,tests/*.t
 Archive the artefacts: releng/org.eclipse.qvto.releng.build-site/target/*.zip,releng/org.eclipse.qvto.releng.build-site/target/publisher.properties,releng/org.eclipse.qvto.releng.build-site/target/downloads.sh,releng/org.eclipse.qvto.releng.build-site/target/updates.sh
 
 Trigger Promoter when stable using releng/org.eclipse.qvto.releng.build-site/target/publisher.properties
+
+-- Drops maintenance
+ssh genie.qvt-oml@projects-storage.eclipse.org ls -la /home/data/httpd/download.eclipse.org/mmt/qvto/downloads/drops/3.10.1
+ssh genie.qvt-oml@projects-storage.eclipse.org rm -rf  /home/data/httpd/download.eclipse.org/mmt/qvto/downloads/drops/3.10.1/N201909*
+
+-- Updates maintenance
+ssh genie.qvt-oml@projects-storage.eclipse.org ls -la /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases
+ssh genie.qvt-oml@projects-storage.eclipse.org pwd ; cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases ; pwd ; ls -la
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases ; ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.1
+ssh genie.qvt-oml@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases/3.4.1
+
+-- Drops archiving ---- and edit GIT\mmt\downloads\extras-qvto.php
+ssh genie.qvt-oml@projects-storage.eclipse.org ls -la /home/data/httpd/archive.eclipse.org/mmt/qvto/downloads/drops
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/downloads/drops ; mv 3.9.0 /home/data/httpd/archive.eclipse.org/mmt/qvto/downloads/drops
+
+-- Updates archiving
+ssh genie.qvt-oml@projects-storage.eclipse.org ls -la /home/data/httpd/archive.eclipse.org/mmt/qvto/updates/releases
+ssh genie.qvt-oml@projects-storage.eclipse.org rm -rf /home/data/httpd/archive.eclipse.org/mmt/qvto/updates/releases/zz*
+
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases ; ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.0
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases ; mv 3.4.0 /home/data/httpd/archive.eclipse.org/mmt/qvto/updates/releases
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/archive.eclipse.org/mmt/qvto/updates/releases ; ant -f /shared/modeling/tools/promotion/manage-composite.xml add -Dchild.repository=3.4.0
+
+

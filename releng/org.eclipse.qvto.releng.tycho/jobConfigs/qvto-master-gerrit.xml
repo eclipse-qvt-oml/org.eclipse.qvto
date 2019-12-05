@@ -1,0 +1,185 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>&lt;p&gt;GERRIT development stream: Eclipse QVTo build using Tycho to build from GIT master and a GERRIT.&lt;/p&gt;</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.security.AuthorizationMatrixProperty>
+      <inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritParentStrategy"/>
+      <permission>hudson.model.Item.Build:ed@willink.me.uk</permission>
+      <permission>hudson.model.Item.Build:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Item.Configure:ed@willink.me.uk</permission>
+      <permission>hudson.model.Item.Configure:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Item.Delete:ed@willink.me.uk</permission>
+      <permission>hudson.model.Item.Delete:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Item.Read:anonymous</permission>
+      <permission>hudson.model.Item.Read:ed@willink.me.uk</permission>
+      <permission>hudson.model.Item.Read:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Item.Workspace:anonymous</permission>
+      <permission>hudson.model.Item.Workspace:ed@willink.me.uk</permission>
+      <permission>hudson.model.Item.Workspace:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Run.Delete:ed@willink.me.uk</permission>
+      <permission>hudson.model.Run.Delete:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Run.Update:ed@willink.me.uk</permission>
+      <permission>hudson.model.Run.Update:serg.boyko2011@gmail.com</permission>
+    </hudson.security.AuthorizationMatrixProperty>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>5</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.31">
+      <autoRebuild>false</autoRebuild>
+      <rebuildDisabled>false</rebuildDisabled>
+    </com.sonyericsson.rebuild.RebuildSettings>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>GERRIT_REFSPEC</name>
+          <description>Ensure that &quot;Build Now&quot; does a build of the current master.
+</description>
+          <defaultValue>refs/heads/master</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.12.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name>origin</name>
+        <refspec>$GERRIT_REFSPEC</refspec>
+        <url>git://git.eclipse.org/gitroot/mmt/org.eclipse.qvto.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <assignedNode>migration</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>oracle-jdk8-latest</jdk>
+  <triggers>
+    <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger plugin="gerrit-trigger@2.30.0">
+      <spec></spec>
+      <gerritProjects>
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+          <compareType>PLAIN</compareType>
+          <pattern>mmt/org.eclipse.qvto</pattern>
+          <branches>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+              <compareType>ANT</compareType>
+              <pattern>master</pattern>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+          </branches>
+          <disableStrictForbiddenFileVerification>false</disableStrictForbiddenFileVerification>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+      </gerritProjects>
+      <dynamicGerritProjects class="empty-list"/>
+      <skipVote>
+        <onSuccessful>false</onSuccessful>
+        <onFailed>false</onFailed>
+        <onUnstable>false</onUnstable>
+        <onNotBuilt>false</onNotBuilt>
+      </skipVote>
+      <silentMode>false</silentMode>
+      <notificationLevel></notificationLevel>
+      <silentStartMode>false</silentStartMode>
+      <escapeQuotes>true</escapeQuotes>
+      <nameAndEmailParameterMode>PLAIN</nameAndEmailParameterMode>
+      <dependencyJobsNames></dependencyJobsNames>
+      <commitMessageParameterMode>BASE64</commitMessageParameterMode>
+      <changeSubjectParameterMode>PLAIN</changeSubjectParameterMode>
+      <commentTextParameterMode>BASE64</commentTextParameterMode>
+      <buildStartMessage></buildStartMessage>
+      <buildFailureMessage></buildFailureMessage>
+      <buildSuccessfulMessage></buildSuccessfulMessage>
+      <buildUnstableMessage></buildUnstableMessage>
+      <buildNotBuiltMessage></buildNotBuiltMessage>
+      <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+      <customUrl></customUrl>
+      <serverName>Eclipse Gerrit</serverName>
+      <triggerOnEvents>
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.events.PluginPatchsetCreatedEvent>
+          <excludeDrafts>false</excludeDrafts>
+          <excludeTrivialRebase>false</excludeTrivialRebase>
+          <excludeNoCodeChange>false</excludeNoCodeChange>
+          <excludePrivateState>false</excludePrivateState>
+          <excludeWipState>false</excludeWipState>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.events.PluginPatchsetCreatedEvent>
+      </triggerOnEvents>
+      <dynamicTriggerConfiguration>false</dynamicTriggerConfiguration>
+      <triggerConfigURL></triggerConfigURL>
+      <triggerInformationAction/>
+    </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Maven>
+      <targets>--show-version clean verify -Pnightly</targets>
+      <mavenName>apache-maven-latest</mavenName>
+      <pom>releng/org.eclipse.qvto.releng.tycho/pom.xml</pom>
+      <properties>BUILD_TYPE=$BUILD_TYPE
+BUILD_ALIAS=$BUILD_ALIAS</properties>
+      <usePrivateRepository>true</usePrivateRepository>
+      <settings class="jenkins.mvn.DefaultSettingsProvider"/>
+      <globalSettings class="jenkins.mvn.DefaultGlobalSettingsProvider"/>
+      <injectBuildVariables>true</injectBuildVariables>
+    </hudson.tasks.Maven>
+  </builders>
+  <publishers>
+    <hudson.plugins.buckminster.targetPlatform.TargetPlatformPublisher plugin="buckminster@1.1.1">
+      <artifacts>releng/org.eclipse.qvto.releng.build-site/target/repository</artifacts>
+      <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
+      <onlyIfSuccessful>false</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+      <targetPlatformName>QVTo Tycho %BUILD_TYPE Repository</targetPlatformName>
+    </hudson.plugins.buckminster.targetPlatform.TargetPlatformPublisher>
+    <hudson.tasks.Mailer plugin="mailer@1.28">
+      <recipients>ed@willink.me.uk serg.boyko2011@gmail.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.28">
+      <testResults>tests/*.test*/target/surefire-reports/*.xml,tests/*.test*/target/surefire-reports/*/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <healthScaleFactor>1.0</healthScaleFactor>
+      <allowEmptyResults>false</allowEmptyResults>
+    </hudson.tasks.junit.JUnitResultArchiver>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>releng/org.eclipse.qvto.releng.build-site/target/*.zip,releng/org.eclipse.qvto.releng.build-site/target/publisher.properties,releng/org.eclipse.qvto.releng.build-site/target/downloads.sh,releng/org.eclipse.qvto.releng.build-site/target/updates.sh</artifacts>
+      <allowEmptyArchive>false</allowEmptyArchive>
+      <onlyIfSuccessful>false</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+    </hudson.tasks.ArtifactArchiver>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper plugin="build-timeout@1.19">
+      <strategy class="hudson.plugins.build_timeout.impl.AbsoluteTimeOutStrategy">
+        <timeoutMinutes>60</timeoutMinutes>
+      </strategy>
+      <operationList/>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+    <hudson.plugins.xvnc.Xvnc plugin="xvnc@1.24">
+      <takeScreenshot>false</takeScreenshot>
+      <useXauthority>true</useXauthority>
+    </hudson.plugins.xvnc.Xvnc>
+  </buildWrappers>
+</project>

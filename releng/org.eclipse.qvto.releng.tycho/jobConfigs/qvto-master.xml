@@ -1,0 +1,190 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>&lt;p&gt;Main development stream: Eclipse QVTo build using Tycho to build from GIT master and a downstream job to promote.&lt;/p&gt;</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.security.AuthorizationMatrixProperty>
+      <inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritParentStrategy"/>
+      <permission>hudson.model.Item.Build:ed@willink.me.uk</permission>
+      <permission>hudson.model.Item.Build:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Item.Configure:ed@willink.me.uk</permission>
+      <permission>hudson.model.Item.Configure:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Item.Delete:ed@willink.me.uk</permission>
+      <permission>hudson.model.Item.Delete:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Item.ExtendedRead:anonymous</permission>
+      <permission>hudson.model.Item.ExtendedRead:authenticated</permission>
+      <permission>hudson.model.Item.Read:anonymous</permission>
+      <permission>hudson.model.Item.Read:ed@willink.me.uk</permission>
+      <permission>hudson.model.Item.Read:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Item.Workspace:anonymous</permission>
+      <permission>hudson.model.Item.Workspace:ed@willink.me.uk</permission>
+      <permission>hudson.model.Item.Workspace:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Run.Delete:ed@willink.me.uk</permission>
+      <permission>hudson.model.Run.Delete:serg.boyko2011@gmail.com</permission>
+      <permission>hudson.model.Run.Update:ed@willink.me.uk</permission>
+      <permission>hudson.model.Run.Update:serg.boyko2011@gmail.com</permission>
+    </hudson.security.AuthorizationMatrixProperty>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>5</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.31">
+      <autoRebuild>false</autoRebuild>
+      <rebuildDisabled>false</rebuildDisabled>
+    </com.sonyericsson.rebuild.RebuildSettings>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>BUILD_TYPE</name>
+          <description>&lt;ul&gt;
+&lt;li&gt; N - Nightly build
+&lt;li&gt; I - Integration build
+&lt;li&gt; S - Stable build
+&lt;li&gt; R - Release build
+&lt;/ul&gt;</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>nightly</string>
+              <string>interim</string>
+              <string>stable</string>
+              <string>release</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>BUILD_ALIAS</name>
+          <description>Set an alias like 3.10.1M1 and BUILD_TYPE = S to build a milestone.
+or an alias like 3.10.1 and BUILD_TYPE = R to build the final release.
+</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>JAVADOC</name>
+          <description>Select the &quot;javadoc&quot; profile to generate and consequently promote Javadoc.
+Javadoc should normally be regenerated as part of a final RC build.</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string></string>
+              <string>-Pjavadoc</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.12.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name>origin</name>
+        <refspec>+refs/heads/*:refs/remotes/origin/*</refspec>
+        <url>git://git.eclipse.org/gitroot/mmt/org.eclipse.qvto.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>origin/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <assignedNode>migration</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>oracle-jdk8-latest</jdk>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>H 3 * * 0</spec>
+    </hudson.triggers.TimerTrigger>
+    <hudson.triggers.SCMTrigger>
+      <spec>H */6 * * 1-6</spec>
+      <ignorePostCommitHooks>false</ignorePostCommitHooks>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Maven>
+      <targets>--show-version clean verify -P$BUILD_TYPE -Psign $JAVADOC</targets>
+      <mavenName>apache-maven-3.5.4</mavenName>
+      <pom>releng/org.eclipse.qvto.releng.tycho/pom.xml</pom>
+      <properties>BUILD_TYPE=$BUILD_TYPE
+BUILD_ALIAS=$BUILD_ALIAS</properties>
+      <usePrivateRepository>true</usePrivateRepository>
+      <settings class="jenkins.mvn.DefaultSettingsProvider"/>
+      <globalSettings class="jenkins.mvn.DefaultGlobalSettingsProvider"/>
+      <injectBuildVariables>true</injectBuildVariables>
+    </hudson.tasks.Maven>
+  </builders>
+  <publishers>
+    <hudson.plugins.buckminster.targetPlatform.TargetPlatformPublisher plugin="buckminster@1.1.1">
+      <artifacts>releng/org.eclipse.qvto.releng.build-site/target/repository</artifacts>
+      <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
+      <onlyIfSuccessful>false</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+      <targetPlatformName>QVTo Tycho %BUILD_TYPE Repository</targetPlatformName>
+    </hudson.plugins.buckminster.targetPlatform.TargetPlatformPublisher>
+    <hudson.tasks.Mailer plugin="mailer@1.28">
+      <recipients>ed@willink.me.uk serg.boyko2011@gmail.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.28">
+      <testResults>tests/*.test*/target/surefire-reports/*.xml,tests/*.test*/target/surefire-reports/*/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <healthScaleFactor>1.0</healthScaleFactor>
+      <allowEmptyResults>false</allowEmptyResults>
+    </hudson.tasks.junit.JUnitResultArchiver>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>releng/org.eclipse.qvto.releng.build-site/target/*.zip,releng/org.eclipse.qvto.releng.build-site/target/publisher.properties,releng/org.eclipse.qvto.releng.build-site/target/*.sh</artifacts>
+      <allowEmptyArchive>false</allowEmptyArchive>
+      <onlyIfSuccessful>false</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.35.2">
+      <configs>
+        <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.FileBuildParameters>
+              <propertiesFile>releng/org.eclipse.qvto.releng.build-site/target/publisher.properties</propertiesFile>
+              <failTriggerOnMissing>false</failTriggerOnMissing>
+              <textParamValueOnNewLine>false</textParamValueOnNewLine>
+              <useMatrixChild>false</useMatrixChild>
+              <onlyExactRuns>false</onlyExactRuns>
+            </hudson.plugins.parameterizedtrigger.FileBuildParameters>
+          </configs>
+          <projects>promoter</projects>
+          <condition>SUCCESS</condition>
+          <triggerWithNoParameters>false</triggerWithNoParameters>
+          <triggerFromChildProjects>false</triggerFromChildProjects>
+        </hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+      </configs>
+    </hudson.plugins.parameterizedtrigger.BuildTrigger>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper plugin="build-timeout@1.19">
+      <strategy class="hudson.plugins.build_timeout.impl.AbsoluteTimeOutStrategy">
+        <timeoutMinutes>60</timeoutMinutes>
+      </strategy>
+      <operationList/>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+    <hudson.plugins.xvnc.Xvnc plugin="xvnc@1.24">
+      <takeScreenshot>false</takeScreenshot>
+      <useXauthority>true</useXauthority>
+    </hudson.plugins.xvnc.Xvnc>
+  </buildWrappers>
+</project>
