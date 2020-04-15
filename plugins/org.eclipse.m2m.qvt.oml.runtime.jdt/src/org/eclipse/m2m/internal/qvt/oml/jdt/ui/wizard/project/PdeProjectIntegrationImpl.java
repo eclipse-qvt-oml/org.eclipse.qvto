@@ -21,18 +21,25 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.m2m.internal.qvt.oml.runtime.project.PlatformPluginUnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.ui.wizards.project.NewProjectData;
 import org.eclipse.m2m.internal.qvt.oml.ui.wizards.project.ProjectIntegration;
 import org.eclipse.osgi.service.resolver.VersionRange;
 import org.eclipse.pde.core.build.IBuildEntry;
+import org.eclipse.pde.core.plugin.IPluginElement;
+import org.eclipse.pde.core.plugin.IPluginExtension;
 import org.eclipse.pde.core.plugin.IPluginReference;
 import org.eclipse.pde.core.project.IBundleProjectDescription;
 import org.eclipse.pde.core.project.IBundleProjectService;
 import org.eclipse.pde.internal.core.build.WorkspaceBuildModel;
+import org.eclipse.pde.internal.core.plugin.WorkspacePluginModel;
+import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
 import org.eclipse.pde.internal.core.project.PDEProject;
 import org.eclipse.pde.internal.core.project.RequiredBundleDescription;
 import org.eclipse.pde.internal.core.util.CoreUtility;
@@ -70,15 +77,18 @@ public abstract class PdeProjectIntegrationImpl implements ProjectIntegration {
 		try {
 			if (data.isPlugin()) {
 				
-				SubMonitor subMonitor = SubMonitor.convert(monitor, 3);
+				SubMonitor subMonitor = SubMonitor.convert(monitor, 4);
 				
 				fGenerator = new PluginClassCodeGenerator(project, data.getClassName(), toFieldData(data), false);
 				
 				// add plugin nature to project
 				CoreUtility.addNatureToProject(project, IBundleProjectDescription.PLUGIN_NATURE, subMonitor.split(1));
 					    			    	
-				// generate the manifest file
+				// generate the manifest.mf file
 				createManifest(project, data, subMonitor.split(1));
+				
+				// generate the plugin.xml file
+				createPluginXml(project, data, subMonitor.split(1));
 				
 				// generate the build.properties file
 				createBuildProperties(project, data, subMonitor.split(1));
@@ -188,6 +198,30 @@ public abstract class PdeProjectIntegrationImpl implements ProjectIntegration {
 		finally {
 			SubMonitor.done(monitor);
 		}
+	}
+	
+	private void createPluginXml(IProject project, NewProjectData data, IProgressMonitor monitor) throws CoreException {
+		
+		try {
+			// register QVT source container in plugin.xml
+			IFile pluginXml = PDEProject.getPluginXml(project);
+	    	WorkspacePluginModelBase pluginModel = new WorkspacePluginModel(pluginXml, false);
+	    	pluginModel.load();
+	    	pluginModel.setEditable(true);
+	    	IPluginExtension pluginExtension = pluginModel.createExtension();
+	    	IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(PlatformPluginUnitResolver.SOURCE_CONTAINER_POINT);
+	    	pluginExtension.setPoint(extensionPoint.getUniqueIdentifier());
+	    	IPluginElement element = pluginModel.createElement(pluginExtension);
+	    	element.setName(PlatformPluginUnitResolver.SOURCE_CONTAINER);
+	    	element.setAttribute(PlatformPluginUnitResolver.CONTAINER_PATH, data.getQVTSourceFolderName());
+	    	pluginExtension.add(element);
+	    	pluginModel.getExtensions().add(pluginExtension);
+	    	pluginModel.save();
+		}
+		finally {
+			SubMonitor.done(monitor);
+		}
+		
 	}
 		
 	private IPath asBinIncludesFolder(IContainer container) {
