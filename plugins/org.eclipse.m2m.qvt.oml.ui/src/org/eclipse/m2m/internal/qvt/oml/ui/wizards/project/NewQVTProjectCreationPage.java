@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2007, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,7 +8,7 @@
  * 
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bug 319078
+ *     Christopher Gerking - bugs 319078, 562175
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.ui.wizards.project;
 
@@ -193,7 +193,7 @@ public class NewQVTProjectCreationPage extends WizardNewProjectCreationPage {
 		fSimplePlugin.setLayoutData(gd);
 		
 		// select simple plugin type by default
-		if (JdtProjectIntegrationHelper.isJdtIntegration()) {
+		if (ProjectIntegrationHelper.isProjectIntegration()) {
 			fSimplePlugin.setSelection(true);
 		}
 		else {
@@ -212,7 +212,7 @@ public class NewQVTProjectCreationPage extends WizardNewProjectCreationPage {
         
         fJavaPlugin.setLayoutData(gd);
         
-        fJavaPlugin.setEnabled(JdtProjectIntegrationHelper.isJdtIntegration());
+        fJavaPlugin.setEnabled(ProjectIntegrationHelper.isProjectIntegration());
         
         fJavaSettingsGroup = new Group(projectTypeGroup, SWT.NONE);
         fJavaSettingsGroup.setText(Messages.ProjectStructurePage_JavaProjectSettings); 

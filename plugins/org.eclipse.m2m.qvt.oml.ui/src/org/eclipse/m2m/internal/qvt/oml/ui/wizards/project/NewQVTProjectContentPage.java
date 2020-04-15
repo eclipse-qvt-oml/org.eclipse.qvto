@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2007, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
+ *     Christopher Gerking - bug 562175
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.ui.wizards.project;
 
@@ -128,10 +129,10 @@ public class NewQVTProjectContentPage extends WizardPage {
 		myExecEnvLabel.setText(Messages.ContentPage_executionenv); 
 		myExecEnvCombo = createCombo(propertiesGroup, SWT.READ_ONLY | SWT.BORDER, 1);
 		
-		myExecEnvLabel.setEnabled(JdtProjectIntegrationHelper.isJdtIntegration());
-		myExecEnvCombo.setEnabled(JdtProjectIntegrationHelper.isJdtIntegration());
+		myExecEnvLabel.setEnabled(ProjectIntegrationHelper.isProjectIntegration());
+		myExecEnvCombo.setEnabled(ProjectIntegrationHelper.isProjectIntegration());
 		
-		JdtProjectIntegrationHelper.fillExecutionEnvironments(myExecEnvCombo);
+		ProjectIntegrationHelper.fillExecutionEnvironments(myExecEnvCombo);
 	}
 
 	private void createPluginClassGroup(Composite container) {
@@ -226,7 +227,7 @@ public class NewQVTProjectContentPage extends WizardPage {
 		String errorMessage = validateProperties();
 
 		if (errorMessage == null && myGenerateClass.isEnabled() && myGenerateClass.getSelection()) {
-			IStatus status = JdtProjectIntegrationHelper.validateJavaTypeName(myClassText.getText());
+			IStatus status = ProjectIntegrationHelper.validateJavaTypeName(myClassText.getText());
 			if (status.getSeverity() == IStatus.ERROR) {
 				errorMessage = status.getMessage();
 			} else if (status.getSeverity() == IStatus.WARNING) {
@@ -293,7 +294,7 @@ public class NewQVTProjectContentPage extends WizardPage {
 			}
 			if ((myChangedGroups & CLASS_GROUP) == 0) {
 				int oldChanged = myChangedGroups;
-				String clsField = JdtProjectIntegrationHelper.getClassField(computeId(), "Activator"); //$NON-NLS-1$
+				String clsField = ProjectIntegrationHelper.getClassField(computeId(), "Activator"); //$NON-NLS-1$
 				myClassText.setText(clsField);
 				myChangedGroups = oldChanged;
 			}
