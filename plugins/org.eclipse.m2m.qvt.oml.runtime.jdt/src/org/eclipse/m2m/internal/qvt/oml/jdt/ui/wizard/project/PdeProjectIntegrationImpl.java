@@ -193,6 +193,8 @@ public abstract class PdeProjectIntegrationImpl implements ProjectIntegration {
 				binIncludesEntry.addToken(qvtFolder.toString());
 			}
 			
+			binIncludesEntry.addToken(PDEProject.getPluginXml(project).getProjectRelativePath().toString());
+			
 			buildModel.save();
 		}
 		finally {
