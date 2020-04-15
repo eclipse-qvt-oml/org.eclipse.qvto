@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2007, 2020 Borland Software Corporation and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,7 +8,7 @@
  *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bug 537041
+ *     Christopher Gerking - bugs 537041, 562177
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml;
 
@@ -32,7 +32,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -398,7 +397,7 @@ public class TestQvtParser extends TestCase {
 	private IContainer getIFolder(File folderUnderWorkspace) throws MalformedURLException, URISyntaxException {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IPath location = new Path(folderUnderWorkspace.getAbsolutePath());
-		IContainer[] containers = workspace.getRoot().findContainersForLocationURI(URIUtil.toURI(location.makeAbsolute().toFile().toURI().toURL()));
+		IContainer[] containers = workspace.getRoot().findContainersForLocationURI(location.makeAbsolute().toFile().toURI());
 		if(containers == null || containers.length != 1 || containers[0] instanceof IFolder == false) {
 			throw new RuntimeException("Folder not found: " + folderUnderWorkspace); //$NON-NLS-1$
 		}
