@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2007, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,7 +8,7 @@
  *   
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bugs 289982, 326871, 427237
+ *     Christopher Gerking - bugs 289982, 326871, 427237, 472482
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.blackbox;
 
@@ -18,12 +18,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.emf.common.util.Diagnostic;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.m2m.internal.qvt.oml.NLS;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
+import org.eclipse.m2m.internal.qvt.oml.ast.parser.QvtOperationalVisitorCS;
 import org.eclipse.m2m.internal.qvt.oml.ast.parser.ValidationMessages;
 import org.eclipse.m2m.internal.qvt.oml.compiler.BlackboxUnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModuleInstance;
@@ -113,9 +115,14 @@ public abstract class BlackboxProvider {
 		
 	}
 	
+	private ResolutionContext getResolutionContext(QvtOperationalModuleEnv env) {
+		URI sourceURI = QvtOperationalVisitorCS.getSourceURI(env);
+		return sourceURI != null ? new ResolutionContextImpl(sourceURI) : GLOBAL_RESOLUTION_CONTEXT;
+	}
+	
 	public Collection<CallHandler> getBlackboxCallHandler(ImperativeOperation operation, QvtOperationalModuleEnv env) {
 		Collection<CallHandler> result = Collections.emptyList();
-		for (BlackboxUnitDescriptor d : getUnitDescriptors(GLOBAL_RESOLUTION_CONTEXT)) {
+		for (BlackboxUnitDescriptor d : getUnitDescriptors(getResolutionContext(env))) {
 			if (env.getImportedNativeLibs().isEmpty()) {
 				try {
 					d.load(new LoadContext(env.getEPackageRegistry()));
@@ -144,7 +151,7 @@ public abstract class BlackboxProvider {
 	
 	public Collection<CallHandler> getBlackboxCallHandler(OperationalTransformation transformation, QvtOperationalModuleEnv env) {
 		Collection<CallHandler> result = Collections.emptyList();
-		for (BlackboxUnitDescriptor d : getUnitDescriptors(GLOBAL_RESOLUTION_CONTEXT)) {
+		for (BlackboxUnitDescriptor d : getUnitDescriptors(getResolutionContext(env))) {
 			if (env.getImportedNativeLibs().isEmpty()) {
 				try {
 					d.load(new LoadContext(env.getEPackageRegistry()));

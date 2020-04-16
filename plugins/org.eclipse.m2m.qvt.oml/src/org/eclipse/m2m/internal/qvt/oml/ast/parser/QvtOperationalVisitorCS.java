@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2019 Borland Software Corporation and others.
+ * Copyright (c) 2008, 2020 Borland Software Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *     Christopher Gerking - bugs 302594, 310991, 289982, 391289, 425634, 427237,
- *     						   433585, 433919, 438038, 536601
+ *     						   433585, 433919, 438038, 472482, 536601
  *     Alex Paperno - bugs 272869, 268636, 404647, 414363, 414363, 401521,
  *                         419299, 414619, 403440, 415024, 420970, 413391,
  *                         424584, 424869
@@ -5985,7 +5985,7 @@ CallOperationAction, SendSignalAction, Constraint, EClass, EObject> { 	// FIXME 
 		return annotation;
 	}
 
-	private static URI getSourceURI(QvtOperationalModuleEnv env) {
+	public static URI getSourceURI(QvtOperationalModuleEnv env) {
 		if(env instanceof QvtOperationalFileEnv) {
 			QvtOperationalFileEnv fileEnv = (QvtOperationalFileEnv) env;
 			return fileEnv.getFile();
