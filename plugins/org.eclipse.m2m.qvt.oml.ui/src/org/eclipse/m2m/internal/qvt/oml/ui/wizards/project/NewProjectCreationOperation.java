@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
-class NewProjectCreationOperation extends WorkspaceModifyOperation {
+public class NewProjectCreationOperation extends WorkspaceModifyOperation {
 		
 	// instance fields
 	private NewProjectData fData;
@@ -53,7 +53,7 @@ class NewProjectCreationOperation extends WorkspaceModifyOperation {
 	 * @see org.eclipse.ui.actions.WorkspaceModifyOperation#execute(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
+	public void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
 		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.NewProjectCreationOperation_createQVTProjectTask, 2);
 				
 		try {
