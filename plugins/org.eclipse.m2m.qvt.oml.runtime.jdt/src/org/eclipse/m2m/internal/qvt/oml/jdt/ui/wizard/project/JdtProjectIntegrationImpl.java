@@ -15,14 +15,12 @@ package org.eclipse.m2m.internal.qvt.oml.jdt.ui.wizard.project;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SubMonitor;
@@ -39,7 +37,7 @@ import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.m2m.internal.qvt.oml.jdt.debug.ui.launch.DebugPDEMessages;
 import org.eclipse.m2m.internal.qvt.oml.ui.wizards.project.NewProjectData;
-import org.eclipse.pde.internal.core.PDECore;
+import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.util.CoreUtility;
 import org.eclipse.swt.widgets.Combo;
 
@@ -79,9 +77,9 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 				IClasspathEntry[] entries = new IClasspathEntry[data.isPlugin() ? 3 : 1];
 				if (data.isPlugin()) {
 					String executionEnvironment = data.getfExecutionEnv();
-					setComplianceOptions(javaProject, executionEnvironment, true);
-					entries[0] = createJREEntry(executionEnvironment);
-					entries[1] = createContainerEntry();
+					ClasspathComputer.setComplianceOptions(javaProject, executionEnvironment, true);
+					entries[0] = ClasspathComputer.createJREEntry(executionEnvironment);
+					entries[1] = ClasspathComputer.createContainerEntry();
 				}
 		
 				entries[entries.length - 1] = JavaCore.newSourceEntry(srcContainer.getFullPath());
@@ -104,102 +102,12 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 		return executionEnv;
 	}
 
-	/**
-	 * Returns a classpath container entry for the given execution environment.
-	 * @param ee id of the execution environment
-	 * @return classpath container entry
-	 */
-	private static IClasspathEntry createJREEntry(String ee) {
-		return JavaCore.newContainerEntry(getEEPath(ee));
-	}
-
-	/**
-	 * Returns the JRE container path for the execution environment with the given id.
-	 * @param ee execution environment id
-	 * @return JRE container path for the execution environment
-	 */
-	private static IPath getEEPath(String ee) {
-		IPath path = null;
-		if (ee != null) {
-			IExecutionEnvironment env = getEEnv(ee);
-			if (env != null)
-				path = JavaRuntime.newJREContainerPath(env);
-		}
-		if (path == null) {
-			path = JavaRuntime.newDefaultJREContainerPath();
-		}
-		return path;
-	}
-
 	private static IExecutionEnvironment getEEnv(String ee) {
 		if (ee != null) {
 			IExecutionEnvironmentsManager manager = JavaRuntime.getExecutionEnvironmentsManager();
 			return manager.getEnvironment(ee);
 		}
 		return null;
-	}
-
-	private static IClasspathEntry createContainerEntry() {
-		return JavaCore.newContainerEntry(PDECore.REQUIRED_PLUGINS_CONTAINER_PATH);
-	}
-
-	private static void setComplianceOptions(IJavaProject project, String eeId, boolean overrideExisting) {
-		Map<String, String> projectMap = project.getOptions(false);
-		IExecutionEnvironment ee = null;
-		Map<String, String> options = null;
-		if (eeId != null) {
-			ee = JavaRuntime.getExecutionEnvironmentsManager().getEnvironment(eeId);
-			if (ee != null) {
-				options = ee.getComplianceOptions();
-			}
-		}
-		if (options == null) {
-			if (overrideExisting && projectMap.size() > 0) {
-				projectMap.remove(JavaCore.COMPILER_COMPLIANCE);
-				projectMap.remove(JavaCore.COMPILER_SOURCE);
-				projectMap.remove(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM);
-				projectMap.remove(JavaCore.COMPILER_PB_ASSERT_IDENTIFIER);
-				projectMap.remove(JavaCore.COMPILER_PB_ENUM_IDENTIFIER);
-			} else {
-				return;
-			}
-		} else {
-			String compliance = options.get(JavaCore.COMPILER_COMPLIANCE);
-			for (Entry<String, String> entry : options.entrySet()) {
-				String option = entry.getKey();
-				String value = entry.getValue();
-				if (JavaCore.VERSION_1_3.equals(compliance) || JavaCore.VERSION_1_4.equals(compliance)) {
-					if (JavaCore.COMPILER_PB_ASSERT_IDENTIFIER.equals(option) || JavaCore.COMPILER_PB_ENUM_IDENTIFIER.equals(option)) {
-						// for 1.3 & 1.4 projects, only override the existing setting if the default setting
-						// is a greater severity than the existing setting
-						setMinimumCompliance(projectMap, option, value, overrideExisting);
-					} else {
-						setCompliance(projectMap, option, value, overrideExisting);
-					}
-				} else {
-					setCompliance(projectMap, option, value, overrideExisting);
-				}
-			}
-		}
-
-		project.setOptions(projectMap);
-	}
-
-	private static void setMinimumCompliance(Map<String, String> map, String key, String minimumValue, boolean override) {
-		if (minimumValue != null && (override || !map.containsKey(key))) {
-			String currentValue = map.get(key);
-			int current = currentValue != null && fSeverityTable.containsKey(currentValue) ? fSeverityTable.get(currentValue) : 0;
-			int minimum = minimumValue != null && fSeverityTable.containsKey(minimumValue) ? fSeverityTable.get(minimumValue) : 0;
-			if (current < minimum) {
-				map.put(key, minimumValue);
-			}
-		}
-	}
-
-	private static void setCompliance(Map<String, String> map, String key, String value, boolean override) {
-		if (value != null && (override || !map.containsKey(key))) {
-			map.put(key, value);
-		}
 	}
 	
 	protected void createFolder(IFolder folder, IProgressMonitor monitor) throws CoreException {
@@ -295,7 +203,7 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 			if (defaultCC.endsWith(eeCompliance))
 				return environments[i].getId();
 		}
-
+		
 		return "J2SE-1.5"; //$NON-NLS-1$
 	}
 	

@@ -13,7 +13,6 @@
 package org.eclipse.m2m.internal.qvt.oml.jdt.ui.wizard.project;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -112,14 +111,14 @@ public abstract class PdeProjectIntegrationImpl implements ProjectIntegration {
 	
 	private void createManifest(IProject project, NewProjectData data, IProgressMonitor monitor) throws CoreException {
 		
-		SubMonitor subMonitor = SubMonitor.convert(monitor);
+ 		SubMonitor subMonitor = SubMonitor.convert(monitor);
 		
 		try {		
 	    	BundleContext context = FrameworkUtil.getBundle(getClass()).getBundleContext();
 	    	ServiceReference<IBundleProjectService> serviceReference = context.getServiceReference(IBundleProjectService.class);
 	    	IBundleProjectService service = context.getService(serviceReference);
 	    	IBundleProjectDescription description = service.getDescription(project);
-	    	
+	    		    		    	
 	    	description.setBundleName(data.getName());
 	    	description.setSymbolicName(data.getID());
 	    	description.setBundleVersion(new Version(data.getVersion()));
@@ -142,7 +141,7 @@ public abstract class PdeProjectIntegrationImpl implements ProjectIntegration {
 			if (data.isCreateJava()) {
 				String requiredEnv = getRequiredExecutionEnv(data.getfExecutionEnv());
 				if (requiredEnv != null) {
-					description.setExecutionEnvironments(Collections.singleton(requiredEnv).toArray(new String[] {}));
+					description.setExecutionEnvironments(new String[] {requiredEnv});
 				}
 			}
 			
