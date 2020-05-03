@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-SymbolicName: org.eclipse.m2m.qvt.oml.tools.coverage.ui;singleton:=true
-Bundle-Version: 1.5.3.qualifier
+Bundle-Version: 1.6.2.qualifier
 Bundle-Activator: org.eclipse.m2m.qvt.oml.tools.coverage.ui.CoveragePlugin
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.5.0,4.0.0)",
  org.eclipse.ui;bundle-version="[3.5.0,4.0.0)",
