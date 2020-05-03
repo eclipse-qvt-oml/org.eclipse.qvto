@@ -22,5 +22,5 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.m2m.internal.qvt.oml.ui;x-internal:=true,
  org.eclipse.m2m.internal.qvt.oml.ui.wizards;x-internal:=true,
  org.eclipse.m2m.internal.qvt.oml.ui.wizards.project;x-internal:=true
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.ui

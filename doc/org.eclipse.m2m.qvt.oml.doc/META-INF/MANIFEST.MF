@@ -9,5 +9,5 @@ Require-Bundle: org.eclipse.help;bundle-version="[3.4.0,4.0.0)",
  org.eclipse.m2m.qvt.oml.debug.ui,
  org.eclipse.m2m.qvt.oml.ui
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.doc

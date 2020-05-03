@@ -16,6 +16,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.5.0,4.0.0)",
  org.eclipse.m2m.qvt.oml.tools.coverage.ui;bundle-version="[1.1.0,2.0.0)"
 Export-Package: org.eclipse.m2m.internal.qvt.oml.tools.coverage.junit.launching;x-internal:=true,
  org.eclipse.m2m.qvt.oml.tools.coverage.junit
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.tools.coverage.junit

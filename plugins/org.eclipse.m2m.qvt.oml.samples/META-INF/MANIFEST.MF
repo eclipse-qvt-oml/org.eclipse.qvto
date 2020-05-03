@@ -46,5 +46,5 @@ Export-Package: org.eclipse.m2m.internal.qvt.oml.samples,
  simpleuml.provider,
  simpleuml.util
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.samples

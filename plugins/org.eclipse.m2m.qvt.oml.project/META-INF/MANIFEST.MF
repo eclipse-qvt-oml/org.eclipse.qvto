@@ -19,9 +19,9 @@ Export-Package: org.eclipse.m2m.internal.qvt.oml.project;
  org.eclipse.m2m.internal.qvt.oml.project.model;x-friends:="org.eclipse.m2m.qvt.oml.ui",
  org.eclipse.m2m.internal.qvt.oml.project.nature;x-friends:="org.eclipse.m2m.qvt.oml.ui,org.eclipse.m2m.tests.qvt.oml"
 Comment: org.eclipse.equinox.common 3.8 required to support org.eclipse.core.runtime.SubMonitor.split() and done(), see Bug 536601
-Require-Bundle: org.eclipse.equinox.common;bundle-version="[3.8.0,4.0.0)",
- org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
- org.eclipse.core.resources;bundle-version="[3.4.0,4.0.0)",
+Require-Bundle: org.eclipse.equinox.common;bundle-version="[3.8.0,4.0.0)";resolution:=optional,
+ org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)";resolution:=optional,
+ org.eclipse.core.resources;bundle-version="[3.4.0,4.0.0)";resolution:=optional,
  org.eclipse.m2m.qvt.oml;bundle-version="[3.0.0,4.0.0)",
  org.eclipse.m2m.qvt.oml.runtime;bundle-version="[3.0.0,4.0.0)"
 Bundle-ActivationPolicy: lazy

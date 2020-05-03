@@ -9,7 +9,7 @@ Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.m2m.internal.qvt.oml.trace.provider
-Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
+Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)";resolution:=optional,
  org.eclipse.m2m.qvt.oml;bundle-version="[3.0.0,4.0.0)";visibility:=reexport,
  org.eclipse.emf.edit;bundle-version="[2.4.0,3.0.0)";visibility:=reexport
 Bundle-ActivationPolicy: lazy

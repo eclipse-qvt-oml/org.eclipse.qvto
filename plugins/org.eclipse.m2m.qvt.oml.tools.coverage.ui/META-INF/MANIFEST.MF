@@ -16,7 +16,7 @@ Export-Package: org.eclipse.m2m.internal.qvt.oml.tools.coverage.ui;x-internal:=t
  org.eclipse.m2m.internal.qvt.oml.tools.coverage.ui.handlers;x-internal:=true,
  org.eclipse.m2m.internal.qvt.oml.tools.coverage.ui.launching;x-internal:=true,
  org.eclipse.m2m.qvt.oml.tools.coverage.ui
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.tools.coverage.ui
 Comment: See Bug 547454 for no version bounds motivation

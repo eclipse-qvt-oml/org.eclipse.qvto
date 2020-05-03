@@ -21,5 +21,5 @@ Export-Package: org.eclipse.m2m.internal.qvt.oml.emf.util.ui;x-friends:="org.ecl
  org.eclipse.m2m.internal.qvt.oml.emf.util.ui.controls;x-internal:=true,
  org.eclipse.m2m.internal.qvt.oml.emf.util.ui.metamodel;x-friends:="org.eclipse.m2m.qvt.oml.common.ui",
  org.eclipse.m2m.internal.qvt.oml.emf.util.ui.provider;x-friends:="org.eclipse.m2m.qvt.oml.runtime.ui,org.eclipse.m2m.qvt.oml.common.ui"
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.emf.util.ui
