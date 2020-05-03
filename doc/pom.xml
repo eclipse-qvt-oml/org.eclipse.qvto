@@ -15,6 +15,5 @@
   <modules>
     <module>org.eclipse.m2m.qvt.oml.doc</module>
     <module>org.eclipse.m2m.qvt.oml.tools.coverage.doc</module>
-    <module>org.eclipse.m2m.qvt.oml.tools.doc</module>
   </modules>
 </project>
