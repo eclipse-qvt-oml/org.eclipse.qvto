@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2007, 2020 Borland Software Corporation and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,7 +8,7 @@
  *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bug 537041
+ *     Christopher Gerking - bugs 472482, 537041
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml;
 
@@ -26,16 +26,21 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2m.internal.qvt.oml.QvtMessage;
 import org.eclipse.m2m.internal.qvt.oml.common.MDAConstants;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
@@ -44,6 +49,7 @@ import org.eclipse.m2m.internal.qvt.oml.compiler.QVTOCompiler;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QvtCompilerOptions;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitProxy;
 import org.eclipse.m2m.internal.qvt.oml.project.builder.WorkspaceUnitResolver;
+import org.eclipse.m2m.internal.qvt.oml.project.nature.NatureUtils;
 import org.eclipse.m2m.internal.qvt.oml.runtime.project.TransformationUtil;
 import org.eclipse.m2m.tests.qvt.oml.ParserTests.TestData;
 import org.eclipse.m2m.tests.qvt.oml.util.ProblemSourceAnnotationHelper;
@@ -223,6 +229,7 @@ public class TestQvtParser extends TestCase {
 						new TestData("bug488742", 0), //$NON-NLS-1$
 						TestData.createSourceChecked("bug490424", 4, 0).includeMetamodel("test1.ecore"), //$NON-NLS-1$ //$NON-NLS-2$
 						TestData.createSourceChecked("bug496181", 0, 3), //$NON-NLS-1$
+						TestData.createSourceChecked("bug472482", 1, 1), //$NON-NLS-1$
 				}
 				);
 	}
@@ -261,7 +268,9 @@ public class TestQvtParser extends TestCase {
 	@Test
 	public void runTest() throws Exception {
 		copyData("sources/" + myData.getDir(), "parserTestData/sources/" + myData.getDir()); //$NON-NLS-1$ //$NON-NLS-2$
-
+		
+		prepareJava();
+		
 		final File folder = getDestinationFolder();
 		assertTrue("Invalid folder " + folder, folder.exists() && folder.isDirectory()); //$NON-NLS-1$
 
@@ -412,6 +421,33 @@ public class TestQvtParser extends TestCase {
 		destFolder.mkdirs();
 		FileUtil.copyFolder(sourceFolder, destFolder);
 		myProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+	}
+	
+	private void prepareJava() throws CoreException {
+		IPath destPath = new Path(getDestinationFolder().getPath());
+
+		IWorkspace workspace = myProject.getProject().getWorkspace();
+		IPath workspacePath = workspace.getRoot().getLocation();
+
+		destPath = destPath.makeRelativeTo(workspacePath).makeAbsolute();
+
+		IPath binPath = destPath.append("bin"); //$NON-NLS-1$
+
+		if (workspace.getRoot().exists(binPath)) {
+			IProjectDescription desc = myProject.getProject().getDescription();
+
+			NatureUtils.addNature(desc, JavaCore.NATURE_ID);
+
+			myProject.getProject().setDescription(desc,
+					new NullProgressMonitor());
+
+			IJavaProject javaProject = JavaCore.create(myProject.getProject());
+
+			if (workspace.getRoot().exists(binPath)) {
+				javaProject.setOutputLocation(binPath,
+						new NullProgressMonitor());
+			}
+		}
 	}
 
 	private final TestData myData;

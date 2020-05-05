@@ -1,0 +1,12 @@
+import org.eclipse.m2m.tests.qvt.oml.Blackbox;
+
+import /*<error>*/org.eclipse.m2m.tests.qvt.oml.NoBlackbox/*</error>*/;
+
+
+transformation bug472482();
+
+main() {}
+
+blackbox query doEchoFromSimpleJavaLibrary(str : String) : String;
+
+blackbox /*<warn>*/query noEchoFromSimpleJavaLibrary(str : String) : String/*</warn>*/;
