@@ -48,7 +48,8 @@ Require-Bundle: org.junit;bundle-version="[4.5.0,5.0.0)",
  org.eclipse.compare,
  org.eclipse.m2m.tests.qvto.deployedTransfProject,
  org.eclipse.m2m.tests.qvto.pluginProject,
- org.eclipse.m2m.tests.qvto.transformationProject
+ org.eclipse.m2m.tests.qvto.transformationProject,
+ org.eclipse.jdt.core
 Eclipse-RegisterBuddy: org.eclipse.m2m.qvt.oml
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
