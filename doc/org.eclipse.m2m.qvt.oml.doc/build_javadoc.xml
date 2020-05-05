@@ -123,7 +123,6 @@
 			<!-- For PDE we enumerate the classpath; there must be a better way-->
 			<classpath>
 				<fileset dir="${target.platform}\plugins">
-			        <include name="com.ibm.icu_*.jar"/>
 			        <include name="lpg.runtime.java_*.jar"/>
 			        <include name="org.eclipse.core.commands_*.jar"/>
 			        <include name="org.eclipse.core.contenttype_*.jar"/>
