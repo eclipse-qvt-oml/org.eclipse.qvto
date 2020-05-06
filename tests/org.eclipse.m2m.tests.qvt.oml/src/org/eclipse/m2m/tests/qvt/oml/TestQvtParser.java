@@ -47,6 +47,7 @@ import org.eclipse.m2m.internal.qvt.oml.compiler.CompiledUnit;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QVTOCompiler;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QvtCompilerOptions;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitProxy;
+import org.eclipse.m2m.internal.qvt.oml.jdt.runtime.blackbox.JdtBlackboxProvider;
 import org.eclipse.m2m.internal.qvt.oml.project.builder.WorkspaceUnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.project.nature.NatureUtils;
 import org.eclipse.m2m.internal.qvt.oml.runtime.project.TransformationUtil;
@@ -257,6 +258,8 @@ public class TestQvtParser extends TestCase {
 		if (destinationFolder.exists()) {
 			FileUtil.delete(destinationFolder);
 		}
+		
+		JdtBlackboxProvider.clearDescriptors(myProject.getProject());
 	}
 
 	public TestProject getTestProject() {
