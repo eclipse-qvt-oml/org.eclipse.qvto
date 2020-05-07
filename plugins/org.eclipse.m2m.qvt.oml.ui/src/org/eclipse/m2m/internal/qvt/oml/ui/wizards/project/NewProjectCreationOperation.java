@@ -16,6 +16,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -24,6 +26,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.m2m.internal.qvt.oml.project.builder.QVTOBuilderConfig;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 public class NewProjectCreationOperation extends WorkspaceModifyOperation {
@@ -43,8 +46,23 @@ public class NewProjectCreationOperation extends WorkspaceModifyOperation {
 		fProjectHandle = projectHandle;
 	}
 	
-	protected void createContents(IProgressMonitor monitor, IProject project) throws CoreException, InterruptedException {
-		SubMonitor.done(monitor);
+	protected void createContents(IProgressMonitor monitor, IProject project) throws CoreException, InterruptedException {		
+		try {
+			SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.NewQVTProjectWizard_Create, 2);
+		
+	    	IContainer srcContainer = project.getFolder(fData.getQVTSourceFolderName());
+	    	if(srcContainer instanceof IFolder) {
+	        	SourceContainerUpdater.ensureDestinationExists((IFolder) srcContainer, subMonitor.split(1));
+	    	}
+	
+	    	QVTOBuilderConfig qvtConfig = QVTOBuilderConfig.getConfig(project);
+	    	qvtConfig.setSourceContainer(srcContainer);
+	    	qvtConfig.addTransformationNature();
+	    	
+	    	subMonitor.worked(1);
+		} finally {
+			SubMonitor.done(monitor);
+		}
 	}
 	
 	/*
