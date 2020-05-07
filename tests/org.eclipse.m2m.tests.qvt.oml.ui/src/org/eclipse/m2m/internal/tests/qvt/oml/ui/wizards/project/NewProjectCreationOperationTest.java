@@ -26,6 +26,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
+import org.eclipse.m2m.internal.qvt.oml.project.QVTOProjectPlugin;
+import org.eclipse.m2m.internal.qvt.oml.project.builder.QVTOBuilderConfig;
 import org.eclipse.m2m.internal.qvt.oml.runtime.project.PlatformPluginUnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.ui.wizards.project.NewProjectCreationOperation;
 import org.eclipse.m2m.internal.qvt.oml.ui.wizards.project.NewProjectData;
@@ -115,7 +117,13 @@ public class NewProjectCreationOperationTest {
 		
 		assertTrue(project.exists());
 		assertEquals(data.getName(), project.getName());
-				
+		assertTrue(project.hasNature(QVTOProjectPlugin.NATURE_ID));
+		assertTrue(project.getFolder(data.getQVTSourceFolderName()).exists());
+		
+		QVTOBuilderConfig config = QVTOBuilderConfig.getConfig(project);
+		assertNotNull(config);
+		assertTrue(config.getSourceContainer().exists());
+		
 		if (data.isPlugin()) {
 			
 			assertTrue(project.hasNature(IBundleProjectDescription.PLUGIN_NATURE));
