@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Christopher Gerking and others.
+ * Copyright (c) 2016, 2020 Christopher Gerking and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
+import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxException;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxUnitDescriptor;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.ResolutionContext;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.java.JavaBlackboxProvider;
@@ -83,7 +84,7 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 		
 		Map<String, JdtDescriptor> projectDescriptors = descriptors.get(project);
 		
-		if (projectDescriptors != null) {
+		if (projectDescriptors != null && projectDescriptors.containsKey(qualifiedName)) {
 			return projectDescriptors.get(qualifiedName);
 		}
 
@@ -117,6 +118,9 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 				return descriptor;
 			}
 			catch (ClassNotFoundException e) {
+				return null;
+			}
+			catch (NoClassDefFoundError e) {
 				return null;
 			}
 
@@ -181,6 +185,13 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 	
 	public static void clearDescriptors(IProject project) {
 		descriptors.remove(project);
+	}
+	
+	@Override
+	protected void handleBlackboxException(BlackboxException e,
+			BlackboxUnitDescriptor descriptor) {
+		
+		// do not report load errors for workspace blackboxes loaded through JDT	
 	}
 	
 	private class JdtDescriptor extends JavaBlackboxProvider.JavaUnitDescriptor {

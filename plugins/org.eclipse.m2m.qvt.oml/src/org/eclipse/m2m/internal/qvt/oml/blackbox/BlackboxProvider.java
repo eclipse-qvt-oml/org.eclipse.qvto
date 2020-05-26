@@ -101,7 +101,7 @@ public abstract class BlackboxProvider {
 	
 	public abstract void cleanup();
 	
-	private void handleBlackboxException(BlackboxException e, BlackboxUnitDescriptor descriptor) {
+	protected void handleBlackboxException(BlackboxException e, BlackboxUnitDescriptor descriptor) {
 		
 		Diagnostic diagnostic = e.getDiagnostic();
 		if(diagnostic != null) {

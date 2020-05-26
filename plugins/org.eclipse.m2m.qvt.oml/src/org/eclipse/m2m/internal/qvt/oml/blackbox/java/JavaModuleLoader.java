@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2008, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,7 +8,7 @@
  *   
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bugs 289982, 326871
+ *     Christopher Gerking - bugs 289982, 326871, 472482
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.blackbox.java;
 
@@ -142,6 +142,9 @@ abstract class JavaModuleLoader {
 		} catch (SecurityException e) {
 			return false;
 		} catch (NoSuchMethodException e) {
+			return false;
+		}
+		catch (NoClassDefFoundError e) {
 			return false;
 		}
 		
