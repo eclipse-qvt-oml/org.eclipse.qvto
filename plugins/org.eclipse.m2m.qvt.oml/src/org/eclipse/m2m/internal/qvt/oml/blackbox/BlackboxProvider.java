@@ -99,7 +99,7 @@ public abstract class BlackboxProvider {
 			String qualifiedName, ResolutionContext resolutionContext);
 	
 	public abstract void cleanup();
-		
+	
 	private ResolutionContext getResolutionContext(QvtOperationalModuleEnv env) {
 		URI sourceURI = QvtOperationalUtil.getSourceURI(env);
 		return sourceURI != null ? new ResolutionContextImpl(sourceURI) : GLOBAL_RESOLUTION_CONTEXT;
