@@ -34,7 +34,7 @@ import org.eclipse.m2m.internal.qvt.oml.stdlib.CallHandler;
 import org.eclipse.m2m.internal.qvt.oml.stdlib.CallHandlerAdapter;
 
 public abstract class BlackboxProvider {
-		
+
 	private static final ResolutionContext GLOBAL_RESOLUTION_CONTEXT = new ResolutionContextImpl(BlackboxUnitResolver.GLOBAL_CONTEXT);
 
 	public interface InstanceAdapterFactory {
@@ -99,7 +99,7 @@ public abstract class BlackboxProvider {
 			String qualifiedName, ResolutionContext resolutionContext);
 	
 	public abstract void cleanup();
-	
+
 	private ResolutionContext getResolutionContext(QvtOperationalModuleEnv env) {
 		URI sourceURI = QvtOperationalUtil.getSourceURI(env);
 		return sourceURI != null ? new ResolutionContextImpl(sourceURI) : GLOBAL_RESOLUTION_CONTEXT;

@@ -91,7 +91,7 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 			projectDescriptors = new HashMap<String, JdtBlackboxProvider.JdtDescriptor>();
 			descriptors.put(project, projectDescriptors);
 		}
-				
+		
 		try {
 			if (!project.hasNature(JavaCore.NATURE_ID)) {
 				return null;
