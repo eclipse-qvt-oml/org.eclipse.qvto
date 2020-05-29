@@ -29,7 +29,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
-import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxException;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxUnitDescriptor;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.ResolutionContext;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.java.JavaBlackboxProvider;
@@ -186,14 +185,7 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 	public static void clearDescriptors(IProject project) {
 		descriptors.remove(project);
 	}
-	
-	@Override
-	protected void handleBlackboxException(BlackboxException e,
-			BlackboxUnitDescriptor descriptor) {
 		
-		// do not report load errors for workspace blackboxes loaded through JDT	
-	}
-	
 	private class JdtDescriptor extends JavaBlackboxProvider.JavaUnitDescriptor {
 		
 		private final Class<?> fModuleJavaClass;

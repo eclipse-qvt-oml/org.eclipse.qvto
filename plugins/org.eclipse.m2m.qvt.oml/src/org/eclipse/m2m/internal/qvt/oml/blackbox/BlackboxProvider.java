@@ -103,7 +103,7 @@ public abstract class BlackboxProvider {
 	
 	public abstract void cleanup();
 	
-	protected void handleBlackboxException(BlackboxException e, BlackboxUnitDescriptor descriptor) {
+	private void handleBlackboxException(BlackboxException e, BlackboxUnitDescriptor descriptor) {
 		
 		Diagnostic diagnostic = e.getDiagnostic();
 		if(diagnostic != null) {
@@ -123,21 +123,23 @@ public abstract class BlackboxProvider {
 	public Collection<CallHandler> getBlackboxCallHandler(ImperativeOperation operation, QvtOperationalModuleEnv env) {
 		Collection<CallHandler> result = Collections.emptyList();
 		for (BlackboxUnitDescriptor d : getUnitDescriptors(getResolutionContext(env))) {
-			if (env.getImportedNativeLibs().isEmpty()) {
-				try {
-					d.load(new LoadContext(env.getEPackageRegistry()));
-				} catch (BlackboxException e) {
-					handleBlackboxException(e, d);
-					
-					continue;
-				}
-			}
-			else {
+			
+			if (!env.getImportedNativeLibs().isEmpty()) {
 				if (!env.getImportedNativeLibs().containsKey(d.getURI())) {
 					continue;
 				}
 			}
 			
+			try {
+				d.load(new LoadContext(env.getEPackageRegistry()));
+			} catch (BlackboxException e) {
+				if (env.getImportedNativeLibs().containsKey(d.getURI())) {
+					handleBlackboxException(e, d);
+				}
+				
+				continue;
+			}
+						
 			Collection<CallHandler> handlers = d.getBlackboxCallHandler(operation, env);
 			if (!handlers.isEmpty()) {
 				if (result.isEmpty()) {
@@ -152,19 +154,21 @@ public abstract class BlackboxProvider {
 	public Collection<CallHandler> getBlackboxCallHandler(OperationalTransformation transformation, QvtOperationalModuleEnv env) {
 		Collection<CallHandler> result = Collections.emptyList();
 		for (BlackboxUnitDescriptor d : getUnitDescriptors(getResolutionContext(env))) {
-			if (env.getImportedNativeLibs().isEmpty()) {
-				try {
-					d.load(new LoadContext(env.getEPackageRegistry()));
-				} catch (BlackboxException e) {
-					handleBlackboxException(e, d);
-					
-					continue;
-				}
-			}
-			else {
+			
+			if (!env.getImportedNativeLibs().isEmpty()) {
 				if (!env.getImportedNativeLibs().containsKey(d.getURI())) {
 					continue;
 				}
+			}
+			
+			try {
+				d.load(new LoadContext(env.getEPackageRegistry()));
+			} catch (BlackboxException e) {
+				if (env.getImportedNativeLibs().containsKey(d.getURI())) {
+					handleBlackboxException(e, d);
+				}
+				
+				continue;
 			}
 			
 			Collection<CallHandler> handlers = d.getBlackboxCallHandler(transformation, env);
