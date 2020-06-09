@@ -6,14 +6,13 @@
     xmlns:git="http://www.eclipse.org/oomph/setup/git/1.0"
     xmlns:jdt="http://www.eclipse.org/oomph/setup/jdt/1.0"
     xmlns:mylyn="http://www.eclipse.org/oomph/setup/mylyn/1.0"
-    xmlns:pde="http://www.eclipse.org/oomph/setup/pde/1.0"
     xmlns:predicates="http://www.eclipse.org/oomph/predicates/1.0"
     xmlns:projects="http://www.eclipse.org/oomph/setup/projects/1.0"
     xmlns:setup="http://www.eclipse.org/oomph/setup/1.0"
     xmlns:setup.p2="http://www.eclipse.org/oomph/setup/p2/1.0"
     xmlns:setup.targlets="http://www.eclipse.org/oomph/setup/targlets/1.0"
     xmlns:setup.workingsets="http://www.eclipse.org/oomph/setup/workingsets/1.0"
-    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/JDT.ecore http://www.eclipse.org/oomph/setup/mylyn/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Mylyn.ecore http://www.eclipse.org/oomph/setup/pde/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/PDE.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
+    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/JDT.ecore http://www.eclipse.org/oomph/setup/mylyn/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Mylyn.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
     name="qvto"
     label="QVTo">
   <setupTask
@@ -24,16 +23,16 @@
   <setupTask
       xsi:type="git:GitCloneTask"
       id="qvto.git.clone"
-      remoteURI="mmt/org.eclipse.qvto">
+      remoteURI="mmt/org.eclipse.qvto.git">
     <annotation
         source="http://www.eclipse.org/oomph/setup/InducedChoices">
       <detail
           key="inherit">
-        <value>eclipse.git.remoteURIs</value>
+        <value>eclipse.git.gerrit.remoteURIs</value>
       </detail>
       <detail
           key="label">
-        <value>QVTo Git Repository</value>
+        <value>QVTo Git or Gerrit Repository</value>
       </detail>
       <detail
           key="target">
@@ -48,7 +47,12 @@
     <setupTask
         xsi:type="jdt:JRETask"
         version="J2SE-1.6"
-        location="${jre.location-1.6}"/>
+        location="${jre.location-1.6}"
+        executionEnvironmentDefault="false"/>
+    <setupTask
+        xsi:type="jdt:JRETask"
+        version="JavaSE-1.8"
+        location="${jre.location-1.8}"/>
     <setupTask
         xsi:type="setup:EclipseIniTask"
         option="-Xmx"
@@ -70,37 +74,112 @@
         <requirement
             name="org.eclipse.emf.sdk.feature.group"/>
         <requirement
-            name="org.eclipse.uml2.sdk.feature.group"/>
-        <requirement
-            name="org.eclipse.ocl.examples.feature.group"/>
-        <requirement
             name="org.eclipse.emf.validation.feature.group"/>
         <requirement
-            name="org.eclipse.xtext.sdk.feature.group"/>
+            name="org.eclipse.uml2.sdk.feature.group"/>
+        <requirement
+            name="org.eclipse.ocl.all.sdk.feature.group"/>
+        <requirement
+            name="com.google.guava"/>
+        <repositoryList
+            name="Latest">
+          <repository
+              url="http://download.eclipse.org/releases/latest"/>
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/latest-R"/>
+        </repositoryList>
+        <repositoryList
+            name="2020-06">
+          <repository
+              url="http://download.eclipse.org/releases/2020-06"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20200529191137/repository/"/>
+        </repositoryList>
+        <repositoryList
+            name="2020-03">
+          <repository
+              url="http://download.eclipse.org/releases/2020-03"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20200224183213/repository/"/>
+        </repositoryList>
+        <repositoryList
+            name="2019-12">
+          <repository
+              url="http://download.eclipse.org/releases/2019-12"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository/"/>
+        </repositoryList>
+        <repositoryList
+            name="2019-09">
+          <repository
+              url="http://download.eclipse.org/releases/2019-09"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20190827152740/repository/"/>
+        </repositoryList>
+        <repositoryList
+            name="2019-06">
+          <repository
+              url="http://download.eclipse.org/releases/2019-06"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20190602212107/repository/"/>
+        </repositoryList>
+        <repositoryList
+            name="2019-03">
+          <repository
+              url="http://download.eclipse.org/releases/2019-03"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20190226160451/repository/"/>
+        </repositoryList>
+        <repositoryList
+            name="2018-12">
+          <repository
+              url="http://download.eclipse.org/releases/2018-12"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20181128170323/repository/"/>
+        </repositoryList>
+        <repositoryList
+            name="2018-09">
+          <repository
+              url="http://download.eclipse.org/releases/2018-09"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20181128170323/repository/"/>
+        </repositoryList>
         <repositoryList
             name="Photon">
           <repository
               url="http://download.eclipse.org/releases/photon"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180606145124/repository/"/>
         </repositoryList>
         <repositoryList
             name="Oxygen">
           <repository
               url="http://download.eclipse.org/releases/oxygen"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180330011457/repository/"/>
         </repositoryList>
         <repositoryList
             name="Neon">
           <repository
               url="http://download.eclipse.org/releases/neon"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/R-builds/R20170307180635/repository/"/>
         </repositoryList>
         <repositoryList
             name="Mars">
           <repository
               url="http://download.eclipse.org/releases/mars"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20160221192158/repository/"/>
         </repositoryList>
         <repositoryList
             name="Luna">
           <repository
               url="http://download.eclipse.org/releases/luna"/>
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20150124073747/repository/"/>
+          <repository
+              url="http://download.eclipse.org/modeling/mdt/papyrus/updates/releases/luna"/>
         </repositoryList>
       </targlet>
     </setupTask>
@@ -156,16 +235,31 @@
           url="https://bugs.eclipse.org/bugs/buglist.cgi?bug_status=RESOLVED&amp;classification=Modeling&amp;list_id=8654045&amp;product=QVTo&amp;query_format=advanced"/>
     </setupTask>
     <setupTask
+        xsi:type="mylyn:MylynQueriesTask"
+        connectorKind="org.eclipse.mylyn.gerrit"
+        repositoryURL="https://git.eclipse.org/r"
+        userID="${bugzilla.id}"
+        password="${eclipse.user.password}">
+      <query
+          summary="QVTo Gerrit Reviews">
+        <attribute
+            key="gerrit query type"
+            value="custom"/>
+        <attribute
+            key="gerrit query project"
+            value="mmt/org.eclipse.qvto"/>
+        <attribute
+            key="gerrit query string"
+            value="project:mmt/org.eclipse.qvto status:open branch:master"/>
+      </query>
+    </setupTask>
+    <setupTask
         xsi:type="mylyn:MylynBuildsTask"
-        serverURL="https://hudson.eclipse.org/hudson/"
+        serverURL="https://ci.eclipse.org/qvto/"
         userID="${bugzilla.id}"
         password="${eclipse.user.password}">
       <buildPlan
-          name="qvto-photon-master"/>
-      <buildPlan
-          name="qvto-neon-master"/>
-      <buildPlan
-          name="qvto-mars-master"/>
+          name="qvto-master"/>
       <buildPlan
           name="qvto-branch-tests"/>
     </setupTask>
@@ -183,11 +277,7 @@
     <setupTask
         xsi:type="projects:ProjectsImportTask">
       <sourceLocator
-          rootFolder="${qvto.git.clone.location/doc}"/>
-      <sourceLocator
           rootFolder="${qvto.git.clone.location/plugins}"/>
-      <sourceLocator
-          rootFolder="${qvto.git.clone.location/features}"/>
       <sourceLocator
           rootFolder="${qvto.git.clone.location/tests}"/>
       <sourceLocator
@@ -217,10 +307,13 @@
                 pattern="org.eclipse.m2m.qvt.oml.*-feature"/>
             <operand
                 xsi:type="predicates:NamePredicate"
+                pattern="org.eclipse.m2m.qvt.oml.*\.doc"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
                 pattern="org.eclipse.m2m.qvt.oml.*\.feature"/>
             <operand
                 xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.m2m.qvt.oml.*\.doc"/>
+                pattern="org.eclipse.m2m.qvt.oml.*\.releng"/>
             <operand
                 xsi:type="predicates:NamePredicate"
                 pattern="org.eclipse.m2m.qvt.oml.examples.blackbox"/>
@@ -233,29 +326,20 @@
             <operand
                 xsi:type="predicates:NamePredicate"
                 pattern="org.eclipse.m2m.qvt.oml.samples.simpleuml2rdb"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org.eclipse.m2m.tests.*"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org.eclipse.qvto.*"/>
           </operand>
         </predicate>
-      </workingSet>
-      <workingSet
-          name="QVTo Features">
-        <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.qvt.oml.*-feature"/>
-        <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.qvt.oml.*\.feature"/>
       </workingSet>
       <workingSet
           name="QVTo Tests">
         <predicate
             xsi:type="predicates:NamePredicate"
             pattern="org.eclipse.m2m.tests.*"/>
-      </workingSet>
-      <workingSet
-          name="QVTo Doc">
-        <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.qvt.oml.*\.doc"/>
       </workingSet>
       <workingSet
           name="QVTo Examples">
@@ -269,53 +353,71 @@
     </setupTask>
     <stream
         name="master"
-        label="Master">
-      <setupTask
-          xsi:type="pde:APIBaselineTask"
-          name="QVTo"
-          version="3.7.0"
-          location="${installation.location}/api/v3.7/"
-          remoteURI="http://download.eclipse.org/mmt/qvto/downloads/drops/3.7.0/R201706041316/mmt-qvto-Update-3.7.0.zip">
-        <description>Oxygen QVTo Baseline</description>
-      </setupTask>
-    </stream>
+        label="Master (Latest)"/>
+    <stream
+        name="3.10.2"
+        label="3.10.2 (2020-06)"/>
+    <stream
+        name="3.10.1"
+        label="3.10.1 (2019-12)"/>
+    <stream
+        name="3.10.0"
+        label="3.10.0 (2019-09)"/>
+    <stream
+        name="3.9.3"
+        label="3.9.3 (2019-06)"/>
+    <stream
+        name="3.9.2"
+        label="3.9.1 (2019-03)"/>
+    <stream
+        name="3.9.1"
+        label="3.9.1 (2018-12)"/>
+    <stream
+        name="3.9.0"
+        label="3.9.0 (2018-09)"/>
+    <stream
+        name="3.8.0"
+        label="3.8.0 (Photon)"/>
+    <stream
+        name="3.7.0"
+        label="3.7.0 (Oxygen)"/>
     <description>The development environment for the QVTo project</description>
   </project>
   <project name="Releng">
     <setupTask
-        xsi:type="git:GitCloneTask"
-        id="simrel.git.clone"
-        remoteURI="simrel/org.eclipse.simrel.build"
-        checkoutBranch="${simrel.branch}">
-      <annotation
-          source="http://www.eclipse.org/oomph/setup/InducedChoices">
-        <detail
-            key="inherit">
-          <value>eclipse.git.remoteURIs</value>
-        </detail>
-        <detail
-            key="label">
-          <value>SimRel Git Repository</value>
-        </detail>
-        <detail
-            key="target">
-          <value>remoteURI</value>
-        </detail>
-      </annotation>
-      <description>Simultaneous Release Git repository</description>
+        xsi:type="setup.p2:P2Task"
+        label="Releng Tools">
+      <requirement
+          name="org.eclipse.m2e.feature.feature.group"/>
     </setupTask>
     <setupTask
         xsi:type="projects:ProjectsImportTask">
       <sourceLocator
-          rootFolder="${qvto.git.clone.location/releng}"
-          locateNestedProjects="true"/>
+          rootFolder="${qvto.git.clone.location/doc}"/>
       <sourceLocator
-          rootFolder="${simrel.git.clone.location}"
+          rootFolder="${qvto.git.clone.location/features}"/>
+      <sourceLocator
+          rootFolder="${qvto.git.clone.location/releng}"
           locateNestedProjects="true"/>
       <description>Releng projects</description>
     </setupTask>
     <setupTask
         xsi:type="setup.workingsets:WorkingSetTask">
+      <workingSet
+          name="QVTo Doc">
+        <predicate
+            xsi:type="predicates:NamePredicate"
+            pattern="org.eclipse.m2m.qvt.oml.*\.doc"/>
+      </workingSet>
+      <workingSet
+          name="QVTo Features">
+        <predicate
+            xsi:type="predicates:NamePredicate"
+            pattern="org.eclipse.m2m.qvt.oml.*-feature"/>
+        <predicate
+            xsi:type="predicates:NamePredicate"
+            pattern="org.eclipse.m2m.qvt.oml.*\.feature"/>
+      </workingSet>
       <workingSet
           name="QVTo Releng">
         <predicate
@@ -326,61 +428,40 @@
             pattern="org.eclipse.qvto.releng.*"/>
         <predicate
             xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.simrel.build"/>
-        <predicate
-            xsi:type="predicates:NamePredicate"
             pattern="org.eclipse.m2m.qvt.oml.tools.coverage.releng"/>
       </workingSet>
     </setupTask>
     <stream
         name="master"
-        label="Master">
-      <setupTask
-          xsi:type="setup:VariableTask"
-          name="simrel.branch"
-          value="master"/>
-    </stream>
-    <description>The release engineering for the QVTo project</description>
-  </project>
-  <project name="Pivot">
-    <setupTask
-        xsi:type="projects:ProjectsImportTask">
-      <sourceLocator
-          rootFolder="${qvto.git.clone.location/examples}"
-          locateNestedProjects="true"/>
-      <description>Development Projects</description>
-    </setupTask>
-    <setupTask
-        xsi:type="setup.workingsets:WorkingSetTask">
-      <workingSet
-          name="QVTo Pivot WIP">
-        <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.qvto.examples.*"/>
-      </workingSet>
-    </setupTask>
+        label="Master (Latest)"/>
     <stream
-        name="master"
-        label="Master">
-      <setupTask
-          xsi:type="setup.p2:P2Task"
-          label="QVTo Pivot IDE">
-        <requirement
-            name="org.eclipse.xtext.sdk.feature.group"/>
-        <requirement
-            name="org.eclipse.ocl.examples.feature.group"/>
-        <requirement
-            name="org.eclipse.m2m.qvt.oml.sdk.feature.group"/>
-        <requirement
-            name="org.eclipse.emf.ecoretools.sdk.feature.group"/>
-        <requirement
-            name="org.eclipse.egit.feature.group"/>
-        <requirement
-            name="org.eclipse.emf.mwe2.language.sdk.feature.group"/>
-        <description>Aditional IDE for QVTo Pivot Developers</description>
-      </setupTask>
-    </stream>
-    <description>The experimental Pivot-based development environment for the QVTo project.</description>
+        name="3.10.2"
+        label="3.10.2 (2020-06)"/>
+    <stream
+        name="3.10.1"
+        label="3.10.1 (2019-12)"/>
+    <stream
+        name="3.10.0"
+        label="3.10.0 (2019-09)"/>
+    <stream
+        name="3.9.3"
+        label="3.9.3 (2019-06)"/>
+    <stream
+        name="3.9.2"
+        label="3.9.1 (2019-03)"/>
+    <stream
+        name="3.9.1"
+        label="3.9.1 (2018-12)"/>
+    <stream
+        name="3.9.0"
+        label="3.9.0 (2018-09)"/>
+    <stream
+        name="3.8.0"
+        label="3.8.0 (Photon)"/>
+    <stream
+        name="3.7.0"
+        label="3.7.0 (Oxygen)"/>
+    <description>The release engineering for the QVTo project</description>
   </project>
   <logicalProjectContainer
       xsi:type="setup:ProjectCatalog"
