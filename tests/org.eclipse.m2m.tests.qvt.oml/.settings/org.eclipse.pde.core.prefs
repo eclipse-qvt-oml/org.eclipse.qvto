@@ -1,0 +1,2 @@
+eclipse.preferences.version=1
+selfhosting.binExcludes=/org.eclipse.m2m.tests.qvt.oml/parserTestData/sources/bug472482/bin
