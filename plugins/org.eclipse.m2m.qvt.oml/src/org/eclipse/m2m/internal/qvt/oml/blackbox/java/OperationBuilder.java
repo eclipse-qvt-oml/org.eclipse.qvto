@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2008, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,11 +8,13 @@
  *   
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bugs 289982, 427237
+ *     Christopher Gerking - bugs 289982, 427237, 472482
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.blackbox.java;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.GenericSignatureFormatError;
+import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
@@ -56,8 +58,24 @@ class OperationBuilder {
     private EOperation createOperation(Method method) {    	
     	EClassifier contextType = null;
     	String name = method.getName();
-    	Type resultType = method.getGenericReturnType();
-    	Type[] paramTypes = method.getGenericParameterTypes();
+    	
+    	Type resultType = null;
+    	Type[] paramTypes = {};
+    	
+    	try {
+    		resultType = method.getGenericReturnType();
+    		paramTypes = method.getGenericParameterTypes();
+    	}
+    	catch (GenericSignatureFormatError e) {
+    		reportError(e.getLocalizedMessage(), method);
+    	}
+    	catch (TypeNotPresentException e) {
+    		reportError(e, method);
+    	}
+    	catch (MalformedParameterizedTypeException e) {
+    		reportError(e, method);
+    	}
+    	
     	Annotation[][] annotations = method.getParameterAnnotations();
 
     	int paramTypesCount = paramTypes.length;
@@ -193,11 +211,19 @@ class OperationBuilder {
     	fProblems = null;
     }
     
+    private void reportError(Exception exception, Method problemMethod) {
+    	reportError(exception.getLocalizedMessage(), exception, problemMethod);
+    }
+    
     private void reportError(String message, Method problemMethod) {
+    	reportError(message, null, problemMethod);
+    }
+    
+    private void reportError(String message, Exception exception, Method problemMethod) {
     	if(fProblems == null) {
     		fProblems = DiagnosticUtil.createRootDiagnostic(NLS.bind(JavaBlackboxMessages.LoadOperationDiagnostics, problemMethod));
     	}
     	
-    	fProblems.add(DiagnosticUtil.createErrorDiagnostic(message));
+    	fProblems.add(DiagnosticUtil.createErrorDiagnostic(message, exception));
     }
 }
