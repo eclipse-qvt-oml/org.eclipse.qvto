@@ -21,12 +21,9 @@ import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EOperation;
-import org.eclipse.m2m.internal.qvt.oml.NLS;
-import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.parser.QvtOperationalVisitorCS;
-import org.eclipse.m2m.internal.qvt.oml.ast.parser.ValidationMessages;
 import org.eclipse.m2m.internal.qvt.oml.compiler.BlackboxUnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModuleInstance;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModuleInstanceFactory;
@@ -102,19 +99,7 @@ public abstract class BlackboxProvider {
 			String qualifiedName, ResolutionContext resolutionContext);
 	
 	public abstract void cleanup();
-	
-	private void handleBlackboxException(BlackboxException e, BlackboxUnitDescriptor descriptor) {
 		
-		Diagnostic diagnostic = e.getDiagnostic();
-		if(diagnostic != null) {
-			QvtPlugin.logDiagnostic(diagnostic);					
-		} else {
-			QvtPlugin.error(NLS.bind(ValidationMessages.FailedToLoadUnit, 
-					new Object[] { descriptor.getQualifiedName() }), e);
-		}
-		
-	}
-	
 	private ResolutionContext getResolutionContext(QvtOperationalModuleEnv env) {
 		URI sourceURI = QvtOperationalVisitorCS.getSourceURI(env);
 		return sourceURI != null ? new ResolutionContextImpl(sourceURI) : GLOBAL_RESOLUTION_CONTEXT;
@@ -132,11 +117,7 @@ public abstract class BlackboxProvider {
 			
 			try {
 				d.load(new LoadContext(env.getEPackageRegistry()));
-			} catch (BlackboxException e) {
-				if (env.getImportedNativeLibs().containsKey(d.getURI())) {
-					handleBlackboxException(e, d);
-				}
-				
+			} catch (BlackboxException e) {				
 				continue;
 			}
 						
@@ -163,11 +144,7 @@ public abstract class BlackboxProvider {
 			
 			try {
 				d.load(new LoadContext(env.getEPackageRegistry()));
-			} catch (BlackboxException e) {
-				if (env.getImportedNativeLibs().containsKey(d.getURI())) {
-					handleBlackboxException(e, d);
-				}
-				
+			} catch (BlackboxException e) {				
 				continue;
 			}
 			
