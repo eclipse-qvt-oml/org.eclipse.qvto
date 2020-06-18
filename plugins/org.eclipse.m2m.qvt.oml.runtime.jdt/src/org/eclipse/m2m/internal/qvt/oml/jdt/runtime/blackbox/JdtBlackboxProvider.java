@@ -83,12 +83,14 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 		
 		Map<String, JdtDescriptor> projectDescriptors = descriptors.get(project);
 		
-		if (projectDescriptors != null && projectDescriptors.containsKey(qualifiedName)) {
-			return projectDescriptors.get(qualifiedName);
+		if (projectDescriptors != null) {
+			if (projectDescriptors.containsKey(qualifiedName)) {
+				return projectDescriptors.get(qualifiedName);
+			}
+		} else {
+			projectDescriptors = new HashMap<String, JdtBlackboxProvider.JdtDescriptor>();
+			descriptors.put(project, projectDescriptors);
 		}
-
-		projectDescriptors = new HashMap<String, JdtBlackboxProvider.JdtDescriptor>();
-		descriptors.put(project, projectDescriptors);
 				
 		try {
 			if (!project.hasNature(JavaCore.NATURE_ID)) {
@@ -179,11 +181,18 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 	
 	@Override
 	public void cleanup() {
+		ProjectClassLoader.resetAllProjectClassLoaders();
 		descriptors.clear();		
 	}
 	
-	public static void clearDescriptors(IProject project) {
-		descriptors.remove(project);
+	static boolean requiresReset(IJavaProject javaProject) {
+		return descriptors.containsKey(javaProject.getProject()) 
+				|| ProjectClassLoader.isProjectClassLoaderExisting(javaProject);
+	}
+	
+	static void reset(IJavaProject javaProject) {
+		ProjectClassLoader.resetProjectClassLoader(javaProject);
+		descriptors.remove(javaProject.getProject());
 	}
 		
 	private class JdtDescriptor extends JavaBlackboxProvider.JavaUnitDescriptor {
