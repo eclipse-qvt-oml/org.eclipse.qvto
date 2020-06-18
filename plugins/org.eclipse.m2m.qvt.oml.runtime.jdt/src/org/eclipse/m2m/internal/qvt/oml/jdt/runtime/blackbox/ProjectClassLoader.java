@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Christopher Gerking and others.
+ * Copyright (c) 2016, 2020 Christopher Gerking and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -80,6 +80,13 @@ public class ProjectClassLoader extends URLClassLoader {
 			}
 			catch (Exception e) {}
 			loadersMap.remove(javaProject);
+		}
+	}
+	
+	static synchronized void resetAllProjectClassLoaders() {
+
+		for(IJavaProject javaProject : loadersMap.keySet()) {
+			resetProjectClassLoader(javaProject);
 		}
 	}
 
