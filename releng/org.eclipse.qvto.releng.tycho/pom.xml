@@ -12,7 +12,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.eclipse.qvto</groupId>
   <artifactId>org.eclipse.qvto.releng.tycho</artifactId>
-  <version>3.10.2-SNAPSHOT</version>
+  <version>3.10.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <licenses>
     <license>
@@ -124,7 +124,7 @@
             <artifact>
               <groupId>org.eclipse.qvto</groupId>
               <artifactId>org.eclipse.qvto.releng.tycho</artifactId>
-              <version>3.10.2-SNAPSHOT</version>
+              <version>3.10.3-SNAPSHOT</version>
               <classifier>${targetPlatform}</classifier>
             </artifact>
           </target>

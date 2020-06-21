@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.eclipse.qvto-plugins</groupId>
     <artifactId>org.eclipse.qvto.plugins-folder</artifactId>
-    <version>3.10.2-SNAPSHOT</version>
+    <version>3.10.3-SNAPSHOT</version>
   </parent>
   <build>
     <plugins>
