@@ -8,7 +8,7 @@
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *     Christopher Gerking - bugs 302594, 310991, 289982, 391289, 425634, 427237,
- *     						   433585, 433919, 438038, 536601
+ *     						   433585, 433919, 438038, 472482, 536601
  *     Alex Paperno - bugs 272869, 268636, 404647, 414363, 414363, 401521,
  *                         419299, 414619, 403440, 415024, 420970, 413391,
  *                         424584, 424869
@@ -2943,7 +2943,7 @@ CallOperationAction, SendSignalAction, Constraint, EClass, EObject> { 	// FIXME 
 			}
 
 			for (QvtOperationalModuleEnv nextImportedEnv : moduleEnvironments) {
-				URI sourceURI = getSourceURI(nextImportedEnv);
+				URI sourceURI = QvtOperationalUtil.getSourceURI(nextImportedEnv);
 				nextImportedCS.setAst(sourceURI);
 				nextImportedCS.getPathNameCS().setAst(sourceURI);
 			}
@@ -5983,21 +5983,6 @@ CallOperationAction, SendSignalAction, Constraint, EClass, EObject> { 	// FIXME 
 		annotation.getDetails().put(tagId, value);
 		annotation.getReferences().add(element);
 		return annotation;
-	}
-
-	private static URI getSourceURI(QvtOperationalModuleEnv env) {
-		if(env instanceof QvtOperationalFileEnv) {
-			QvtOperationalFileEnv fileEnv = (QvtOperationalFileEnv) env;
-			return fileEnv.getFile();
-		}
-		else if (env.getFileParent() instanceof QvtOperationalFileEnv) {
-			QvtOperationalFileEnv fileEnv = env.getFileParent();
-			return fileEnv.getFile();
-		}
-		else if (env.getModuleContextType() != null) {
-			return env.getModuleContextType().eResource().getURI();
-		}
-		return null;
 	}
 
 }

@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
-import org.eclipse.m2m.internal.qvt.oml.ast.parser.QvtOperationalVisitorCS;
+import org.eclipse.m2m.internal.qvt.oml.ast.parser.QvtOperationalUtil;
 import org.eclipse.m2m.internal.qvt.oml.compiler.BlackboxUnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModuleInstance;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModuleInstanceFactory;
@@ -101,7 +101,7 @@ public abstract class BlackboxProvider {
 	public abstract void cleanup();
 		
 	private ResolutionContext getResolutionContext(QvtOperationalModuleEnv env) {
-		URI sourceURI = QvtOperationalVisitorCS.getSourceURI(env);
+		URI sourceURI = QvtOperationalUtil.getSourceURI(env);
 		return sourceURI != null ? new ResolutionContextImpl(sourceURI) : GLOBAL_RESOLUTION_CONTEXT;
 	}
 	
