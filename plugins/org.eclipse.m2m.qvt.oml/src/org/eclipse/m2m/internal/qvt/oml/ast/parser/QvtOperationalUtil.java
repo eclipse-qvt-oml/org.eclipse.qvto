@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
@@ -26,6 +27,8 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EParameter;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.InternalEvaluationEnv;
+import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalFileEnv;
+import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
 import org.eclipse.m2m.internal.qvt.oml.expressions.Constructor;
 import org.eclipse.m2m.internal.qvt.oml.expressions.DirectionKind;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ImperativeOperation;
@@ -230,5 +233,29 @@ public class QvtOperationalUtil {
         }
         
         return filtered;
+	}
+
+	/**
+	 * Returns a URI representing the source of the given module environment.
+	 * 
+	 * @param env
+	 *            the module environment
+	 * @return a URI referring to the environment's source file (if available)
+	 *         or to the resource of the module's context type (if existing),
+	 *         <code>null</code> otherwise
+	 */
+	public static URI getSourceURI(QvtOperationalModuleEnv env) {
+		if(env instanceof QvtOperationalFileEnv) {
+			QvtOperationalFileEnv fileEnv = (QvtOperationalFileEnv) env;
+			return fileEnv.getFile();
+		}
+		else if (env.getFileParent() instanceof QvtOperationalFileEnv) {
+			QvtOperationalFileEnv fileEnv = env.getFileParent();
+			return fileEnv.getFile();
+		}
+		else if (env.getModuleContextType() != null) {
+			return env.getModuleContextType().eResource().getURI();
+		}
+		return null;
 	}
 }
