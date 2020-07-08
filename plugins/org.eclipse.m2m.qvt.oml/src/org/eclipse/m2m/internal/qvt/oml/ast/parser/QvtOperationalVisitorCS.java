@@ -2943,7 +2943,7 @@ CallOperationAction, SendSignalAction, Constraint, EClass, EObject> { 	// FIXME 
 			}
 
 			for (QvtOperationalModuleEnv nextImportedEnv : moduleEnvironments) {
-				URI sourceURI = getSourceURI(nextImportedEnv);
+				URI sourceURI = QvtOperationalUtil.getSourceURI(nextImportedEnv);
 				nextImportedCS.setAst(sourceURI);
 				nextImportedCS.getPathNameCS().setAst(sourceURI);
 			}
@@ -5983,21 +5983,6 @@ CallOperationAction, SendSignalAction, Constraint, EClass, EObject> { 	// FIXME 
 		annotation.getDetails().put(tagId, value);
 		annotation.getReferences().add(element);
 		return annotation;
-	}
-
-	public static URI getSourceURI(QvtOperationalModuleEnv env) {
-		if(env instanceof QvtOperationalFileEnv) {
-			QvtOperationalFileEnv fileEnv = (QvtOperationalFileEnv) env;
-			return fileEnv.getFile();
-		}
-		else if (env.getFileParent() instanceof QvtOperationalFileEnv) {
-			QvtOperationalFileEnv fileEnv = env.getFileParent();
-			return fileEnv.getFile();
-		}
-		else if (env.getModuleContextType() != null) {
-			return env.getModuleContextType().eResource().getURI();
-		}
-		return null;
 	}
 
 }
