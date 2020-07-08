@@ -53,7 +53,7 @@ import org.osgi.framework.Version;
 @SuppressWarnings("restriction")
 public abstract class PdeProjectIntegrationImpl implements ProjectIntegration {
 	
-	private org.eclipse.pde.internal.ui.wizards.plugin.PluginClassCodeGenerator fGenerator;
+	private PluginClassCodeGenerator fGenerator;
 	
 	private PluginFieldData toFieldData(NewProjectData projectData) {
 		PluginFieldData fieldData = new PluginFieldData();

@@ -31,6 +31,10 @@ import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitProxy;
 import org.eclipse.m2m.internal.qvt.oml.ui.QVTUIPlugin;
 
+/**
+ * @deprecated as per bug 562175. 
+ * Use {@link org.eclipse.pde.internal.ui.wizards.plugin.PluginClassCodeGenerator} instead.
+ */
 @Deprecated
 class PluginClassCodeGenerator {
 	
