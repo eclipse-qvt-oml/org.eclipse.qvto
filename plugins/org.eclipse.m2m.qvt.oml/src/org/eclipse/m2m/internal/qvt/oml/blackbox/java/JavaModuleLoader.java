@@ -15,20 +15,15 @@ package org.eclipse.m2m.internal.qvt.oml.blackbox.java;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.emf.common.util.BasicDiagnostic;
 import org.eclipse.emf.common.util.Diagnostic;
-import org.eclipse.emf.common.util.DiagnosticChain;
 import org.eclipse.emf.ecore.EOperation;
-import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.m2m.internal.qvt.oml.NLS;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnvFactory;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
@@ -36,7 +31,6 @@ import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.LoadContext;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.EmfUtilPlugin;
 import org.eclipse.m2m.internal.qvt.oml.expressions.Library;
-import org.eclipse.m2m.qvt.oml.blackbox.java.Module;
 
 abstract class JavaModuleLoader {
 	
@@ -79,14 +73,9 @@ abstract class JavaModuleLoader {
 		fEnv = new QvtOperationalEnvFactory(loadContext.getMetamodelRegistry()).createModuleEnvironment(module);
 		loadModule(fEnv, javaClass);
 		
-		Set<String> usedPackages = new LinkedHashSet<String>(moduleHandle.getUsedPackages());
-		Module annotation = javaClass.getAnnotation(Module.class);
-		if (annotation != null) {
-			usedPackages.addAll(Arrays.asList(annotation.packageURIs()));
-		}
+		Collection<String> usedPackages = new LinkedHashSet<String>(moduleHandle.getUsedPackages());
 		
-		Java2QVTTypeResolver typeResolver = new Java2QVTTypeResolver(fEnv, 
-				resolvePackages(usedPackages, fDiagnostics));
+		Java2QVTTypeResolver typeResolver = new Java2QVTTypeResolver(fEnv, usedPackages, fDiagnostics);
 		
 		fOperBuilder = new OperationBuilder(typeResolver);
 		
@@ -97,7 +86,7 @@ abstract class JavaModuleLoader {
 				if(!isLibraryOperation(method)) {
 					continue;
 				}
-				
+								
 				EOperation operation = fOperBuilder.buildOperation(method);
 				Diagnostic operationStatus = fOperBuilder.getDiagnostics();
 				if(EmfUtilPlugin.isSuccess(operationStatus)) {
@@ -146,28 +135,5 @@ abstract class JavaModuleLoader {
 		}
 		
 		return Modifier.isPublic(javaClass.getModifiers());
-	}
-	
-	private List<EPackage> resolvePackages(Collection<String> nsURIs, DiagnosticChain diagnosticChain) {
-		EPackage.Registry registry = fEnv.getEPackageRegistry();
-		List<EPackage> ePackages = new ArrayList<EPackage>(nsURIs.size());
-		for (String nextURI : nsURIs) {
-			EPackage resolvedPackage;
-			try {
-				resolvedPackage = registry.getEPackage(nextURI);
-			}
-			catch (Throwable t) {
-				resolvedPackage = null;
-			}
-			
-			if(resolvedPackage != null) {
-				ePackages.add(resolvedPackage);				
-			} else {
-				diagnosticChain.add(DiagnosticUtil.createErrorDiagnostic(
-						NLS.bind(JavaBlackboxMessages.UnresolvedMetamodelURI, nextURI)));
-			}
-		}
-		
-		return ePackages;
 	}
 }
