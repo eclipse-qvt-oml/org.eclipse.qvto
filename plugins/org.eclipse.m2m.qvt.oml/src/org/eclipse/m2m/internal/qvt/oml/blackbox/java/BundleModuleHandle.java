@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.blackbox.java;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
@@ -32,8 +33,11 @@ class BundleModuleHandle extends ModuleHandle {
 		this.usedPackages = usedPackages;
 	}
 	
+	@Override
 	public List<String> getUsedPackages() {
-		return usedPackages;
+		List<String> packages = new ArrayList<String>(usedPackages);
+		packages.addAll(super.getUsedPackages());
+		return packages;
 	}
 	
 	@Override
