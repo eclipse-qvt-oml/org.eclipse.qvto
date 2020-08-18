@@ -235,7 +235,14 @@ class Java2QVTTypeResolver {
 		for (String nsURI : packageURIs) {
 			EPackage ePackage = resolvePackage(nsURI, fDiagnostics);
 			
-			if (ePackage != null) {				
+			if (ePackage != null) {
+				// early return for same-named classifier
+				EClassifier sameNamedClassifier = ePackage.getEClassifier(type.getSimpleName());
+								
+				if (sameNamedClassifier != null && type == sameNamedClassifier.getInstanceClass()) {
+					return sameNamedClassifier;
+				}
+				
 				for (EClassifier eClassifier : ePackage.getEClassifiers()) {
 					Class<?> instanceClass = eClassifier.getInstanceClass();
 					if(type == instanceClass) {
