@@ -22,11 +22,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.emf.common.util.BasicDiagnostic;
+import org.eclipse.emf.common.util.DiagnosticChain;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.m2m.internal.qvt.oml.NLS;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
 import org.eclipse.m2m.qvt.oml.blackbox.java.JavaModelInstance;
@@ -56,13 +59,15 @@ class Java2QVTTypeResolver {
 
 	
 	private QvtOperationalModuleEnv fEnv;
-	private List<EPackage> fPackages;
+	private Collection<String> fPackageURIs;
 	// used to delegate the OCL type determination to MDT OCL UMLReflection 
 	private EClassifier fHelperEClassiferAdapter;
+	private BasicDiagnostic fDiagnostics;
 	
-	Java2QVTTypeResolver(QvtOperationalModuleEnv env, List<EPackage> packages) {	
+	Java2QVTTypeResolver(QvtOperationalModuleEnv env, Collection<String> packageURIs, BasicDiagnostic diagnostics) {	
 		fEnv = env;
-		fPackages = packages;
+		fPackageURIs = packageURIs;
+		fDiagnostics = diagnostics;
 	}
 	
 	QvtOperationalModuleEnv getEnvironment() {
@@ -85,7 +90,7 @@ class Java2QVTTypeResolver {
 		
 		return result;
 	}
-	
+		
 	private EClassifier type2EClassifier(Type type, int relationship) {
 		if(type instanceof ParameterizedType) {
 			ParameterizedType parameterizedType = (ParameterizedType) type;
@@ -218,29 +223,35 @@ class Java2QVTTypeResolver {
 		
 		return lookupByInstanceClass(type, relationship);
 	}
-	
+		
 	private EClassifier lookupByInstanceClass(Class<?> type, int relationship) {
 		assert type != null;
 		
 		Set<EClassifier> subtypes = new TreeSet<EClassifier>(HIERARCHY_COMPARATOR_DESC);
 		Set<EClassifier> supertypes = new TreeSet<EClassifier>(HIERARCHY_COMPARATOR_ASC);
-		
-		for (EPackage ePackage : fPackages) {
-			for (EClassifier eClassifier : ePackage.getEClassifiers()) {
-				Class<?> instanceClass = eClassifier.getInstanceClass();
-				if(type == instanceClass) {
-					return eClassifier;
-				}
-
-				// fall-back strategy for resolving sub/super types 
-				if ((relationship & ALLOW_SUBTYPE) == ALLOW_SUBTYPE) {
-					if(isAssignableFromTo(type, instanceClass)) {
-						subtypes.add(eClassifier);
+				
+		Iterable<String> packageURIs = fPackageURIs.isEmpty() ? fEnv.getEPackageRegistry().keySet() : fPackageURIs;
+				
+		for (String nsURI : packageURIs) {
+			EPackage ePackage = resolvePackage(nsURI, fDiagnostics);
+			
+			if (ePackage != null) {				
+				for (EClassifier eClassifier : ePackage.getEClassifiers()) {
+					Class<?> instanceClass = eClassifier.getInstanceClass();
+					if(type == instanceClass) {
+						return eClassifier;
 					}
-				}
-				if ((relationship & ALLOW_SUPERTYPE) == ALLOW_SUPERTYPE) {
-					if(isAssignableFromTo(instanceClass, type)) {
-						supertypes.add(eClassifier);
+	
+					// fall-back strategy for resolving sub/super types 
+					if ((relationship & ALLOW_SUBTYPE) == ALLOW_SUBTYPE) {
+						if(isAssignableFromTo(type, instanceClass)) {
+							subtypes.add(eClassifier);
+						}
+					}
+					if ((relationship & ALLOW_SUPERTYPE) == ALLOW_SUPERTYPE) {
+						if(isAssignableFromTo(instanceClass, type)) {
+							supertypes.add(eClassifier);
+						}
 					}
 				}
 			}
@@ -264,15 +275,9 @@ class Java2QVTTypeResolver {
 	private EClassifier lookupByInstanceClass(ParameterizedType type) {
 		assert type != null;
 		
-		for (EPackage ePackage : fPackages) {
-			for (EClassifier eClassifier : ePackage.getEClassifiers()) {
-				if(type.getRawType() == eClassifier.getInstanceClass()) {
-					return eClassifier;
-				}
-			}
-		}
+		Type rawType = type.getRawType();
 		
-		return null;
+		return toEClassifier(rawType, Java2QVTTypeResolver.STRICT_TYPE);
 	}
 	
 	private EClassifier asEClassifier(Class<?> javaClass) { 		
@@ -323,6 +328,26 @@ class Java2QVTTypeResolver {
             }
 		}
 	};
-
+	
+	private EPackage resolvePackage(String nsURI, DiagnosticChain diagnosticChain) {
+		EPackage.Registry registry = fEnv.getEPackageRegistry();
+		
+		EPackage resolvedPackage;
+		try {
+			resolvedPackage = registry.getEPackage(nsURI);
+		}
+		catch (Throwable t) {
+			resolvedPackage = null;
+		}
+		
+		if(resolvedPackage != null) {
+			return resolvedPackage;				
+		} else {
+			diagnosticChain.add(DiagnosticUtil.createErrorDiagnostic(
+					NLS.bind(JavaBlackboxMessages.UnresolvedMetamodelURI, nsURI)));
+		}
+		
+		return null;
+	}
 
 }

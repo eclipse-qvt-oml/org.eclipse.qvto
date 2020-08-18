@@ -12,7 +12,11 @@
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.blackbox.java;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import org.eclipse.m2m.qvt.oml.blackbox.java.Module;
 
 
 public abstract class ModuleHandle {
@@ -38,7 +42,15 @@ public abstract class ModuleHandle {
 		return className;
 	}
 	
-	public abstract List<String> getUsedPackages();
+	public List<String> getUsedPackages() {
+		try {
+			Module annotation = getModuleJavaClass().getAnnotation(Module.class);
+			return annotation == null ? Collections.<String>emptyList() : Arrays.asList(annotation.packageURIs());
+		}
+		catch(ClassNotFoundException e) {
+			return Collections.emptyList();
+		}
+	}
 		
 	public Class<?> getModuleJavaClass() throws ClassNotFoundException {
 		return Class.forName(className);
