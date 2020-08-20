@@ -1,0 +1,7 @@
+import /*<error>*/org.eclipse.m2m.tests.qvt.oml.bbox.Bug566230_Lib/*</error>*/;
+
+transformation bug566230();
+
+main() {	
+	/*<error>*/getIterable()/*</error>*/;
+}

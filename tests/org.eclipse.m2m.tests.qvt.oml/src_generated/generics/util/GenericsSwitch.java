@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2018, 2019 Eclipse Modeling Project and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v2.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v20.html
- *
- * Contributors:
- *     S.Boyko - initial API and implementation
- *******************************************************************************/
 /**
  */
 package generics.util;
@@ -71,7 +61,7 @@ public class GenericsSwitch<T> extends Switch<T> {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the first non-null result returned by a <code>caseXXX</code> call.
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
 	protected T doSwitch(int classifierID, EObject theEObject) {
@@ -82,10 +72,16 @@ public class GenericsSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case GenericsPackage.MY_ITERABLE: {
+				Iterable<?> myIterable = (Iterable<?>)theEObject;
+				T result = caseMyIterable(myIterable);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
-
+	
 	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Generic Cls</em>'.
 	 * <!-- begin-user-doc -->
@@ -98,6 +94,21 @@ public class GenericsSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public <E extends Number> T caseGenericCls(GenericCls<E> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>My Iterable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>My Iterable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated NOT
+	 */
+	public T caseMyIterable(Iterable<?> object) {
 		return null;
 	}
 

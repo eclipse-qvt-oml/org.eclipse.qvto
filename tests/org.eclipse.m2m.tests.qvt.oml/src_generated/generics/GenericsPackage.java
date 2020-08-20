@@ -104,6 +104,34 @@ public interface GenericsPackage extends EPackage {
 	int GENERIC_CLS_OPERATION_COUNT = 0;
 
 	/**
+	 * The meta object id for the '{@link generics.impl.MyIterableImpl <em>My Iterable</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see generics.impl.MyIterableImpl
+	 * @see generics.impl.GenericsPackageImpl#getMyIterable()
+	 * @generated
+	 */
+	int MY_ITERABLE = 1;
+
+	/**
+	 * The number of structural features of the '<em>My Iterable</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int MY_ITERABLE_FEATURE_COUNT = 0;
+
+	/**
+	 * The number of operations of the '<em>My Iterable</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int MY_ITERABLE_OPERATION_COUNT = 0;
+
+	/**
 	 * The meta object id for the '<em>My Number</em>' data type.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -111,7 +139,7 @@ public interface GenericsPackage extends EPackage {
 	 * @see generics.impl.GenericsPackageImpl#getMyNumber()
 	 * @generated
 	 */
-	int MY_NUMBER = 1;
+	int MY_NUMBER = 2;
 
 
 	/**
@@ -134,6 +162,17 @@ public interface GenericsPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getGenericCls_Values();
+
+	/**
+	 * Returns the meta object for class '{@link java.lang.Iterable <em>My Iterable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>My Iterable</em>'.
+	 * @see java.lang.Iterable
+	 * @model instanceClass="java.lang.Iterable" typeParameters="C"
+	 * @generated
+	 */
+	EClass getMyIterable();
 
 	/**
 	 * Returns the meta object for data type '{@link java.lang.Number <em>My Number</em>}'.
@@ -186,6 +225,16 @@ public interface GenericsPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute GENERIC_CLS__VALUES = eINSTANCE.getGenericCls_Values();
+
+		/**
+		 * The meta object literal for the '{@link generics.impl.MyIterableImpl <em>My Iterable</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see generics.impl.MyIterableImpl
+		 * @see generics.impl.GenericsPackageImpl#getMyIterable()
+		 * @generated
+		 */
+		EClass MY_ITERABLE = eINSTANCE.getMyIterable();
 
 		/**
 		 * The meta object literal for the '<em>My Number</em>' data type.

@@ -11,5 +11,8 @@
       <genTypeParameters ecoreTypeParameter="generics.ecore#//GenericCls/E"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute generics.ecore#//GenericCls/values"/>
     </genClasses>
+    <genClasses ecoreClass="generics.ecore#//MyIterable">
+      <genTypeParameters ecoreTypeParameter="generics.ecore#//MyIterable/C"/>
+    </genClasses>
   </genPackages>
 </genmodel:GenModel>

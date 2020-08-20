@@ -13,6 +13,7 @@
 package generics.impl;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -68,6 +69,7 @@ public class GenericsFactoryImpl extends EFactoryImpl implements GenericsFactory
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case GenericsPackage.GENERIC_CLS: return createGenericCls();
+			case GenericsPackage.MY_ITERABLE: return (EObject)createMyIterable();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -111,6 +113,16 @@ public class GenericsFactoryImpl extends EFactoryImpl implements GenericsFactory
 	public <E extends Number> GenericCls<E> createGenericCls() {
 		GenericClsImpl<E> genericCls = new GenericClsImpl<E>();
 		return genericCls;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public <C extends EClassifier> Iterable<C> createMyIterable() {
+		MyIterableImpl<C> myIterable = new MyIterableImpl<C>();
+		return myIterable;
 	}
 
 	/**

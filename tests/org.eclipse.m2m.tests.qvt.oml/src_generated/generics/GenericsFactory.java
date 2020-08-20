@@ -12,6 +12,7 @@
  */
 package generics;
 
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EFactory;
 
 /**
@@ -39,6 +40,15 @@ public interface GenericsFactory extends EFactory {
 	 * @generated
 	 */
 	<E extends Number> GenericCls<E> createGenericCls();
+
+	/**
+	 * Returns a new object of class '<em>My Iterable</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>My Iterable</em>'.
+	 * @generated
+	 */
+	<C extends EClassifier> Iterable<C> createMyIterable();
 
 	/**
 	 * Returns the package supported by this factory.

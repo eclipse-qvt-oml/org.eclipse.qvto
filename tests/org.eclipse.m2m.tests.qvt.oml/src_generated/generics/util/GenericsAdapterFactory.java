@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2018 Eclipse Modeling Project and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v2.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v20.html
- *
- * Contributors:
- *     S.Boyko - initial API and implementation
- *******************************************************************************/
 /**
  */
 package generics.util;
@@ -81,6 +71,10 @@ public class GenericsAdapterFactory extends AdapterFactoryImpl {
 				return createGenericClsAdapter();
 			}
 			@Override
+			public Adapter caseMyIterable(Iterable<?> object) {
+				return createMyIterableAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -111,6 +105,20 @@ public class GenericsAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createGenericClsAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.lang.Iterable <em>My Iterable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.lang.Iterable
+	 * @generated
+	 */
+	public Adapter createMyIterableAdapter() {
 		return null;
 	}
 

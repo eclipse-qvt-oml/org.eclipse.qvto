@@ -23,6 +23,7 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
 import generics.GenericCls;
 import generics.GenericsFactory;
 import generics.GenericsPackage;
+import java.lang.Iterable;
 
 /**
  * <!-- begin-user-doc -->
@@ -37,6 +38,13 @@ public class GenericsPackageImpl extends EPackageImpl implements GenericsPackage
 	 * @generated
 	 */
 	private EClass genericClsEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass myIterableEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -129,6 +137,15 @@ public class GenericsPackageImpl extends EPackageImpl implements GenericsPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getMyIterable() {
+		return myIterableEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EDataType getMyNumber() {
 		return myNumberEDataType;
 	}
@@ -164,6 +181,8 @@ public class GenericsPackageImpl extends EPackageImpl implements GenericsPackage
 		genericClsEClass = createEClass(GENERIC_CLS);
 		createEAttribute(genericClsEClass, GENERIC_CLS__VALUES);
 
+		myIterableEClass = createEClass(MY_ITERABLE);
+
 		// Create data types
 		myNumberEDataType = createEDataType(MY_NUMBER);
 	}
@@ -193,10 +212,13 @@ public class GenericsPackageImpl extends EPackageImpl implements GenericsPackage
 
 		// Create type parameters
 		ETypeParameter genericClsEClass_E = addETypeParameter(genericClsEClass, "E");
+		ETypeParameter myIterableEClass_C = addETypeParameter(myIterableEClass, "C");
 
 		// Set bounds for type parameters
 		EGenericType g1 = createEGenericType(this.getMyNumber());
 		genericClsEClass_E.getEBounds().add(g1);
+		g1 = createEGenericType(ecorePackage.getEClassifier());
+		myIterableEClass_C.getEBounds().add(g1);
 
 		// Add supertypes to classes
 
@@ -204,6 +226,8 @@ public class GenericsPackageImpl extends EPackageImpl implements GenericsPackage
 		initEClass(genericClsEClass, GenericCls.class, "GenericCls", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		g1 = createEGenericType(genericClsEClass_E);
 		initEAttribute(getGenericCls_Values(), g1, "values", null, 0, -1, GenericCls.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(myIterableEClass, Iterable.class, "MyIterable", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 
 		// Initialize data types
 		initEDataType(myNumberEDataType, Number.class, "MyNumber", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);

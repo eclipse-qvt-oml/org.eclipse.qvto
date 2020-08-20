@@ -11,4 +11,9 @@
     </eStructuralFeatures>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EDataType" name="MyNumber" instanceClassName="java.lang.Number"/>
+  <eClassifiers xsi:type="ecore:EClass" name="MyIterable" instanceClassName="java.lang.Iterable">
+    <eTypeParameters name="C">
+      <eBounds eClassifier="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EClassifier"/>
+    </eTypeParameters>
+  </eClassifiers>
 </ecore:EPackage>
