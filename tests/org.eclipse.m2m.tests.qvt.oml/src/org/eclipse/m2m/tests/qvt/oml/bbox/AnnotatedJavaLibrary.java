@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2008, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,12 +8,14 @@
  * 
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bug 431082
+ *     Christopher Gerking - bugs 431082, 566216
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml.bbox;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.ENamedElement;
@@ -443,5 +446,14 @@ public class AnnotatedJavaLibrary {
 	public <E extends Number> GenericCls<E> getGenericClsType() {
 		return GenericsFactory.eINSTANCE.createGenericCls();
 	}
-
+			
+	@Operation (kind=Kind.QUERY)
+	public Time getTime() {
+		return Time.valueOf(LocalTime.now());
+	}
+	
+	@Operation (kind=Kind.QUERY)
+	public String notifierToString(Notifier notifier) {
+		return notifier.toString();
+	}
 }

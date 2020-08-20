@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2008, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
+ *     Christopher Gerking - bug 566216
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml.transform.javaless;
 
@@ -142,6 +143,7 @@ public class JavalessQvtTest extends TestQvtInterpreter {
             "blackboxlib_annotation_java", //$NON-NLS-1$
             "bug486579", //$NON-NLS-1$
             "bug425066", //$NON-NLS-1$
+            "bug566216", //$NON-NLS-1$
 
     		// EObjects are created inside blackbox transformation and later merged with javaless objects 
             "bug427237a", //$NON-NLS-1$
