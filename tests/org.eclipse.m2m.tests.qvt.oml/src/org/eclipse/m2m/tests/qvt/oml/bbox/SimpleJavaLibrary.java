@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2008, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
+ *     Christopher Gerking - bug 566216
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml.bbox;
 
@@ -52,11 +53,15 @@ public class SimpleJavaLibrary {
 	}
 		
 	@Operation(contextual=true)
-	public static Date toDate(XMLCalendar self) {
-		return self.getDate();
+	public static Date toDate(XMLGregorianCalendar self) {
+		if (self instanceof XMLCalendar) {
+			return ((XMLCalendar) self).getDate();
+		}
+		
+		return null;
 	}
 		
-	public Number simpleCreateBigInt(String value) {
+	public BigInteger simpleCreateBigInt(String value) {
 		return new BigInteger(value);
 	}
 

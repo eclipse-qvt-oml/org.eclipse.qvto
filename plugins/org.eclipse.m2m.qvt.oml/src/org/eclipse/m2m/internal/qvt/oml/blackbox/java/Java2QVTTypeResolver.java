@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2008, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,7 +8,7 @@
  *   
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bugs 326871, 400233, 427237
+ *     Christopher Gerking - bugs 326871, 400233, 427237, 566216
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.blackbox.java;
 
@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.emf.common.util.BasicDiagnostic;
@@ -223,12 +224,12 @@ class Java2QVTTypeResolver {
 		
 		return lookupByInstanceClass(type, relationship);
 	}
-		
+			
 	private EClassifier lookupByInstanceClass(Class<?> type, int relationship) {
 		assert type != null;
 		
-		Set<EClassifier> subtypes = new TreeSet<EClassifier>(HIERARCHY_COMPARATOR_DESC);
-		Set<EClassifier> supertypes = new TreeSet<EClassifier>(HIERARCHY_COMPARATOR_ASC);
+		SortedSet<EClassifier> subtypes = new TreeSet<EClassifier>(HIERARCHY_COMPARATOR_DESC);
+		SortedSet<EClassifier> supertypes = new TreeSet<EClassifier>(HIERARCHY_COMPARATOR_ASC);
 				
 		Iterable<String> packageURIs = fPackageURIs.isEmpty() ? fEnv.getEPackageRegistry().keySet() : fPackageURIs;
 				
@@ -265,18 +266,18 @@ class Java2QVTTypeResolver {
 		}
 		
 		if ((relationship & ALLOW_SUBTYPE) == ALLOW_SUBTYPE && !subtypes.isEmpty()) {
-			return subtypes.iterator().next();
+			return subtypes.first();
 		}
 		
 		if ((relationship & ALLOW_SUPERTYPE) == ALLOW_SUPERTYPE && !supertypes.isEmpty()) {
-			return supertypes.iterator().next();
+			return supertypes.first();
 		}
 		
 		return null;
 	}
 	
 	private boolean isAssignableFromTo(Class<?> from, Class<?> to) {
-		return from != null && to != null && from.isAssignableFrom(to);
+		return from != null && to != null && to.isAssignableFrom(from);
 	}
 	
 	private EClassifier lookupByInstanceClass(ParameterizedType type) {
@@ -310,9 +311,9 @@ class Java2QVTTypeResolver {
             if (o2Class.equals(o1Class)) {
                 return 0;
             } else if (o1Class.isAssignableFrom(o2Class)) {
-                return 1;
-            } else if (o2Class.isAssignableFrom(o1Class)) {
                 return -1;
+            } else if (o2Class.isAssignableFrom(o1Class)) {
+                return 1;
             } else {
                 return 0;
             }
@@ -327,9 +328,9 @@ class Java2QVTTypeResolver {
             if (o2Class.equals(o1Class)) {
                 return 0;
             } else if (o1Class.isAssignableFrom(o2Class)) {
-                return -1;
-            } else if (o2Class.isAssignableFrom(o1Class)) {
                 return 1;
+            } else if (o2Class.isAssignableFrom(o1Class)) {
+                return -1;
             } else {
                 return 0;
             }
