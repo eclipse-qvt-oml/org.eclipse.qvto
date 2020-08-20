@@ -8,7 +8,7 @@
  *   
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bugs 326871, 400233, 427237, 566216
+ *     Christopher Gerking - bugs 326871, 400233, 427237, 566216, 566230
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.blackbox.java;
 
@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,9 +27,11 @@ import java.util.TreeSet;
 import org.eclipse.emf.common.util.BasicDiagnostic;
 import org.eclipse.emf.common.util.DiagnosticChain;
 import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.m2m.internal.qvt.oml.NLS;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
@@ -162,7 +165,7 @@ class Java2QVTTypeResolver {
 			return resolveCollectionType(CollectionKind.COLLECTION_LITERAL, actualElementType, relationship);
 		}
 		
-		return lookupByInstanceClass(parameterizedType);
+		return lookupByInstanceClass(parameterizedType, relationship);
 	}
 	
 	
@@ -280,12 +283,42 @@ class Java2QVTTypeResolver {
 		return from != null && to != null && to.isAssignableFrom(from);
 	}
 	
-	private EClassifier lookupByInstanceClass(ParameterizedType type) {
+	private EClassifier lookupByInstanceClass(ParameterizedType type, int relationship) {
 		assert type != null;
 		
 		Type rawType = type.getRawType();
+		EClassifier rawClassifier = toEClassifier(rawType, relationship);
 		
-		return toEClassifier(rawType, Java2QVTTypeResolver.STRICT_TYPE);
+		if (rawClassifier != null) {
+			Iterator<ETypeParameter> typeParameters = rawClassifier.getETypeParameters().iterator();
+					
+			for (Type argumentType : type.getActualTypeArguments()) {
+				if (argumentType instanceof Class<?>) {
+					EClassifier argumentClassifier = lookupByInstanceClass((Class<?>) argumentType, relationship);
+								
+					if (argumentClassifier != null && typeParameters.hasNext()) {					
+						ETypeParameter typeParameter = typeParameters.next();
+						for (EGenericType genericType : typeParameter.getEBounds()) {
+							EClassifier genericClassifier = genericType.getEClassifier();
+							Class<?> genericInstanceClass = genericClassifier.getInstanceClass();
+							
+							if ((relationship & ALLOW_SUBTYPE) == ALLOW_SUBTYPE) {
+								if(!isAssignableFromTo((Class<?>) argumentType, genericInstanceClass)) {
+									return null;
+								}
+							}
+							if ((relationship & ALLOW_SUPERTYPE) == ALLOW_SUPERTYPE) {
+								if(!isAssignableFromTo(genericInstanceClass, (Class<?>) argumentType)) {
+									return null;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+				
+		return rawClassifier;
 	}
 	
 	private EClassifier asEClassifier(Class<?> javaClass) { 		
