@@ -293,15 +293,16 @@ class Java2QVTTypeResolver {
 			Iterator<ETypeParameter> typeParameters = rawClassifier.getETypeParameters().iterator();
 					
 			for (Type argumentType : type.getActualTypeArguments()) {
-				if (argumentType instanceof Class<?>) {
-					EClassifier argumentClassifier = lookupByInstanceClass((Class<?>) argumentType, relationship);
+				EClassifier argumentClassifier = toEClassifier(argumentType, relationship);
 								
-					if (argumentClassifier != null && typeParameters.hasNext()) {					
-						ETypeParameter typeParameter = typeParameters.next();
-						for (EGenericType genericType : typeParameter.getEBounds()) {
-							EClassifier genericClassifier = genericType.getEClassifier();
-							Class<?> genericInstanceClass = genericClassifier.getInstanceClass();
-							
+				if (argumentClassifier != null && typeParameters.hasNext()) {					
+					ETypeParameter typeParameter = typeParameters.next();
+					
+					for (EGenericType genericType : typeParameter.getEBounds()) {
+						EClassifier genericClassifier = genericType.getEClassifier();
+						Class<?> genericInstanceClass = genericClassifier.getInstanceClass();
+						
+						if (argumentType instanceof Class<?>) {
 							if ((relationship & ALLOW_SUBTYPE) == ALLOW_SUBTYPE) {
 								if(!isAssignableFromTo((Class<?>) argumentType, genericInstanceClass)) {
 									return null;
