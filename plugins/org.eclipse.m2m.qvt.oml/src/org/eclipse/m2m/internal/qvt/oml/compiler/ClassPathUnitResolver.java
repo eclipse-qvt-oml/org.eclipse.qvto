@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2009, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -11,12 +11,9 @@
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.compiler;
 
-import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 
 public class ClassPathUnitResolver implements UnitResolver {
 	
@@ -31,15 +28,11 @@ public class ClassPathUnitResolver implements UnitResolver {
 		URL resourceUrl = ClassLoader.getSystemResource(resourcePath);
 		
 		if (resourceUrl != null) {
-			try {
-				int numberOfNameSegments = ResolverUtils.getNameSegments(qualifiedName).length;
-				String resourceUri = URIUtil.toURI(resourceUrl).toString();
-				URI baseUri = URI.createURI(resourceUri).trimSegments(numberOfNameSegments);
-				
-				return new URIUnitResolver(baseUri).resolveUnit(qualifiedName);		
-			} catch(URISyntaxException e) {			
-				QvtPlugin.INSTANCE.log(e);
-			}
+			int numberOfNameSegments = ResolverUtils.getNameSegments(qualifiedName).length;				
+			String resourceUri = URI.decode(resourceUrl.toString());
+			URI baseUri = URI.createURI(resourceUri).trimSegments(numberOfNameSegments);
+			
+			return new URIUnitResolver(baseUri).resolveUnit(qualifiedName);
 		}
 		
 		return null;
