@@ -78,6 +78,10 @@
     	
     	<library class="org.eclipse.m2m.tests.qvt.oml.bbox.InvalidLibrary"/> 
     	
+    	<library class="org.eclipse.m2m.tests.qvt.oml.bbox.Bug566216_Library">
+    	 	<metamodel nsURI="http://www.eclipse.org/emf/2002/Ecore"/>
+    	</library>
+    	
 	</extension>
 
   	<extension point="org.eclipse.emf.ecore.dynamic_package">

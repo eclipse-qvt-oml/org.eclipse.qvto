@@ -8,7 +8,7 @@
  *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bugs 537041, 562177
+ *     Christopher Gerking - bugs 537041, 562177, 566216
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml;
 
@@ -222,6 +222,7 @@ public class TestQvtParser extends TestCase {
 						new TestData("bug488742", 0), //$NON-NLS-1$
 						TestData.createSourceChecked("bug490424", 4, 0).includeMetamodel("test1.ecore"), //$NON-NLS-1$ //$NON-NLS-2$
 						TestData.createSourceChecked("bug496181", 0, 3), //$NON-NLS-1$
+						TestData.createSourceChecked("bug566216", 1, 2), //$NON-NLS-1$
 				}
 				);
 	}

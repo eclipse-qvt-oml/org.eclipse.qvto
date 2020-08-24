@@ -1,0 +1,16 @@
+import /*<error>*/org.eclipse.m2m.tests.qvt.oml.bbox.Bug566216/*</error>*/;
+
+modeltype ecore uses "http://www.eclipse.org/emf/2002/Ecore";
+modeltype xmltype uses "http://www.eclipse.org/emf/2003/XMLType";
+
+transformation bug566216();
+
+main() {}
+
+-- test violated covariance 
+-- (Java method 'simpleCreateBigInt' returns Number, which does not substitute EBigDecimal)
+blackbox /*<warn>*/query simpleCreateBigInt(s : String) : ecore::EBigDecimal/*</warn>*/;
+
+-- test violated contravariance 
+-- (Java method 'toDate' accepts XMLCalender, which is not substituted by OclAny)
+blackbox /*<warn>*/query toDate(any : OclAny) : ecore::EDate/*</warn>*/;
