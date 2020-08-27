@@ -76,7 +76,11 @@
     	 	<!-- Also testing no referenced metamodel, if using only OCL Stdlib types -->			
     	</library>
     	
-    	<library class="org.eclipse.m2m.tests.qvt.oml.bbox.InvalidLibrary"/> 
+    	<library class="org.eclipse.m2m.tests.qvt.oml.bbox.InvalidLibrary"/>
+    	
+    	<library class="org.eclipse.m2m.tests.qvt.oml.bbox.Bug565747_Library">
+    		<!-- No referenced metamodel, inferred from context -->
+    	</library>	 
     	
 	</extension>
 

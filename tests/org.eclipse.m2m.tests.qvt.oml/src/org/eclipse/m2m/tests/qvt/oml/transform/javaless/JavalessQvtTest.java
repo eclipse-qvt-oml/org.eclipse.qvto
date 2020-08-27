@@ -142,7 +142,8 @@ public class JavalessQvtTest extends TestQvtInterpreter {
             "blackboxlib_annotation_java", //$NON-NLS-1$
             "bug486579", //$NON-NLS-1$
             "bug425066", //$NON-NLS-1$
-
+            "bug565747", //$NON-NLS-1$
+            
     		// EObjects are created inside blackbox transformation and later merged with javaless objects 
             "bug427237a", //$NON-NLS-1$
             

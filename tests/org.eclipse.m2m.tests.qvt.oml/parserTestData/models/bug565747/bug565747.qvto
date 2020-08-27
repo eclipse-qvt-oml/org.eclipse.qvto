@@ -1,0 +1,10 @@
+modeltype ecore uses 'http://www.eclipse.org/emf/2002/Ecore';
+
+transformation bug565747();
+
+main() {
+	var eObject = object EObject {};
+	assert fatal (eObject.print() <> null);
+}
+
+blackbox query EObject :: print() : String;

@@ -9,7 +9,8 @@
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *     Christopher Gerking - bugs 302594, 309762, 377882, 388325, 392080, 392153
- *                         397215, 397959, 358709, 388801, 254962, 414555, 561707
+ *                         397215, 397959, 358709, 388801, 254962, 414555, 561707,
+ *                         565747
  *     Alex Paperno - bugs 410470, 392429, 294127, 400720, 314443, 404647, 413131,
  *                         274105, 274505, 415029, 419299, 403440, 267917, 420970,
  *                         424584, 424869
@@ -582,6 +583,7 @@ public class TransformTests extends TestCase {
         		new FilesToFilesData("bug490998"), //$NON-NLS-1$ 
         		new FilesToFilesData("bug492966"), //$NON-NLS-1$
         		new FilesToFilesData("bug561707", Collections.<String>emptyList(), Collections.singletonList("out.ecore")), //$NON-NLS-1$
+        		new FilesToFilesData("bug565747"), //$NON-NLS-1$
         	};
     }
 
