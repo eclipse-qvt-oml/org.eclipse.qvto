@@ -23,8 +23,11 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EPackageRegistryImpl;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.m2m.internal.qvt.oml.emf.util.EmfUtil;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.mmregistry.EmfStandaloneMetamodelProvider;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.mmregistry.IMetamodelProvider;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.mmregistry.IMetamodelRegistryProvider;
@@ -51,7 +54,7 @@ public class ProjectMetamodelRegistryProvider implements IMetamodelRegistryProvi
 		this(resourceSet.getPackageRegistry(), resourceSet);
 	}
 	
-	private ProjectMetamodelRegistryProvider(EPackage.Registry registry, ResourceSet resourceSet) {
+	private ProjectMetamodelRegistryProvider(final EPackage.Registry registry, ResourceSet resourceSet) {
 		
 		if(registry == null) {
 			throw new IllegalArgumentException();
@@ -60,6 +63,39 @@ public class ProjectMetamodelRegistryProvider implements IMetamodelRegistryProvi
 		if (resourceSet == null) {
 			resourceSet = new ResourceSetImpl();
 			resourceSet.setPackageRegistry(new EPackageRegistryImpl(registry));
+		}
+		
+		if (resourceSet instanceof ResourceSetImpl) {
+		
+			((ResourceSetImpl) resourceSet).setURIResourceMap(new HashMap<URI, Resource>() {
+				
+				public Resource get(Object key) {
+					
+					if (key instanceof URI) {
+						URI uri = (URI) key;
+					
+						if (uri.isPlatformResource()) {
+							if (!URIConverter.INSTANCE.exists(uri, null)) {
+								
+								URI platformPluginUri = URI.createPlatformPluginURI(uri.toPlatformString(false), false);
+								Resource resource = EmfUtil.loadResource(platformPluginUri);
+								EPackage rootPackage = EmfUtil.getFirstEPackageContent(resource);
+									
+								if (rootPackage != null) {
+									URI nsUri = URI.createURI(((EPackage) rootPackage).getNsURI());
+									EPackage ePackage = registry.getEPackage(nsUri.toString());
+									
+									if (ePackage != null) {
+										return ePackage.eResource();
+									}
+								}
+							}
+						}
+					}
+					
+					return super.get(key);
+				}
+			});
 		}
 		
 		resolutionRSet = resourceSet;
