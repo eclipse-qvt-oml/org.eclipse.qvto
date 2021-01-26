@@ -77,18 +77,21 @@ public class ProjectMetamodelRegistryProvider implements IMetamodelRegistryProvi
 						if (uri.isPlatformResource()) {
 							if (!URIConverter.INSTANCE.exists(uri, null)) {
 								
-								URI platformPluginUri = URI.createPlatformPluginURI(uri.toPlatformString(false), false);
-								Resource resource = EmfUtil.loadResource(platformPluginUri);
-								EPackage rootPackage = EmfUtil.getFirstEPackageContent(resource);
-									
-								if (rootPackage != null) {
-									URI nsUri = URI.createURI(((EPackage) rootPackage).getNsURI());
-									EPackage ePackage = registry.getEPackage(nsUri.toString());
-									
-									if (ePackage != null) {
-										return ePackage.eResource();
+								URI platformPluginUri = URI.createPlatformPluginURI(uri.toPlatformString(false), false);	
+								
+								try {
+									Resource resource = EmfUtil.loadResource(platformPluginUri);
+									EPackage rootPackage = EmfUtil.getFirstEPackageContent(resource);
+										
+									if (rootPackage != null) {
+										EPackage ePackage = registry.getEPackage(rootPackage.getNsURI());
+										
+										if (ePackage != null) {
+											return ePackage.eResource();
+										}
 									}
 								}
+								catch(Exception e) {}
 							}
 						}
 					}
