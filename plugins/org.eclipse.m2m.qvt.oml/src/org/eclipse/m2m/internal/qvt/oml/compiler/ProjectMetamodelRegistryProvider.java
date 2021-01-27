@@ -70,33 +70,36 @@ public class ProjectMetamodelRegistryProvider implements IMetamodelRegistryProvi
 			((ResourceSetImpl) resourceSet).setURIResourceMap(new HashMap<URI, Resource>() {
 				
 				public Resource get(Object key) {
+					Resource resource = super.get(key);
 					
 					if (key instanceof URI) {
 						URI uri = (URI) key;
 					
 						if (uri.isPlatformResource()) {
 							if (!URIConverter.INSTANCE.exists(uri, null)) {
-								
-								URI platformPluginUri = URI.createPlatformPluginURI(uri.toPlatformString(false), false);	
-								
-								try {
-									Resource resource = EmfUtil.loadResource(platformPluginUri);
-									EPackage rootPackage = EmfUtil.getFirstEPackageContent(resource);
-										
-									if (rootPackage != null) {
-										EPackage ePackage = registry.getEPackage(rootPackage.getNsURI());
-										
-										if (ePackage != null) {
-											return ePackage.eResource();
+								if (!(resource instanceof Resource)) {
+									URI platformPluginUri = URI.createPlatformPluginURI(uri.toPlatformString(false), false);	
+									
+									try {
+										Resource pluginResource = EmfUtil.loadResource(platformPluginUri);
+										EPackage rootPackage = EmfUtil.getFirstEPackageContent(pluginResource);
+											
+										if (rootPackage != null) {
+											EPackage ePackage = registry.getEPackage(rootPackage.getNsURI());
+											
+											if (ePackage != null) {
+												resource = ePackage.eResource();
+												put(uri, resource);
+											}
 										}
 									}
+									catch(Exception e) {}
 								}
-								catch(Exception e) {}
 							}
 						}
-					}
+					}				
 					
-					return super.get(key);
+					return resource;
 				}
 			});
 		}
