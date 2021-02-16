@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009,2018 Borland Software Corporation and others.
+ * Copyright (c) 2009, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,7 +8,7 @@
  * 
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bug 414662
+ *     Christopher Gerking - bugs 414662, 562175
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.ui.wizards.project;
 
@@ -31,6 +31,11 @@ import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitProxy;
 import org.eclipse.m2m.internal.qvt.oml.ui.QVTUIPlugin;
 
+/**
+ * @deprecated as per bug 562175. 
+ * Use {@link org.eclipse.pde.internal.ui.wizards.plugin.PluginClassCodeGenerator} instead.
+ */
+@Deprecated
 class PluginClassCodeGenerator {
 	
 	private final IProject fProject;
