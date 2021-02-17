@@ -24,6 +24,8 @@ group="modeling.mmt.qvt-oml"
 zipPrefix="mmt-qvto-Update-"
 localZip="newJavadoc.zip"
 
+java -version
+
 while getopts v:t:q:a: option
 do
 case "${option}"

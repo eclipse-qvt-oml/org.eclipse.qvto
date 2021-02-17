@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2009, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,6 +8,7 @@
  *   
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
+ *     Christopher Gerking - bug 562175
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.runtime.project;
 
@@ -45,9 +46,9 @@ import org.osgi.framework.Bundle;
  */
 public class PlatformPluginUnitResolver extends DelegatingUnitResolver {
 	
-    private static final String SOURCE_CONTAINER_POINT = QvtRuntimePlugin.ID + ".qvtTransformationContainer"; //$NON-NLS-1$
-    private static final String SOURCE_CONTAINER = "sourceContainer"; //$NON-NLS-1$
-    private static final String CONTAINER_PATH = "path"; //$NON-NLS-1$
+    public static final String SOURCE_CONTAINER_POINT = QvtRuntimePlugin.ID + ".qvtTransformationContainer"; //$NON-NLS-1$
+    public static final String SOURCE_CONTAINER = "sourceContainer"; //$NON-NLS-1$
+    public static final String CONTAINER_PATH = "path"; //$NON-NLS-1$
 	
 	private final Bundle fBundle;
 	private final List<IPath> fSrcContainers;

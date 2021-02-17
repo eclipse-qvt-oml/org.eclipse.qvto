@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2009, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
+ *     Christopher Gerking - bug 562175
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.ui.wizards.project;
 
@@ -17,10 +18,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.widgets.Combo;
 
-public interface JdtProjectIntegration {
+public interface ProjectIntegration {
 
-	void setupJava(IProject project, boolean isPDE, String sourceFolder, String outFolder, String executionEnv, IProgressMonitor monitor) throws CoreException;		
-
+	void setupProject(IProject project, NewProjectData data, IProgressMonitor monitor) throws CoreException;		
+	
 	String getRequiredExecutionEnv(String executionEnv);
 	
 	String getClassField(String id, String suffix);

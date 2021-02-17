@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2019 Borland Software Corporation and others.
+ * Copyright (c) 2007, 2020 Borland Software Corporation and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,28 +8,23 @@
  *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bugs 319078, 536601
+ *     Christopher Gerking - bugs 319078, 536601, 562175
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.ui.wizards.project;
 
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardSelectionPage;
-import org.eclipse.m2m.internal.qvt.oml.project.builder.QVTOBuilderConfig;
 import org.eclipse.m2m.internal.qvt.oml.ui.QVTUIPlugin;
 import org.eclipse.m2m.internal.qvt.oml.ui.QvtPluginImages;
 import org.eclipse.ui.INewWizard;
@@ -113,12 +108,7 @@ public class NewQVTProjectWizard extends Wizard implements INewWizard, IExecutab
 	}
 
 	private WorkspaceModifyOperation createNewProjectOperation() {
-		return new NewProjectCreationOperation(fMainPage.getProjectHandle(), fProjectData) {
-			@Override
-			protected void createContents(IProgressMonitor monitor, IProject project) throws CoreException, InterruptedException {
-				doPostCreateProjectAction(project, monitor);
-			}
-		};
+		return new NewProjectCreationOperation(fMainPage.getProjectHandle(), fProjectData);
 	}
 
 	@Override
@@ -159,22 +149,6 @@ public class NewQVTProjectWizard extends Wizard implements INewWizard, IExecutab
         fIsFinishPerformed = true;
         return true;
 	}
-
-
-    private void doPostCreateProjectAction(IProject createdProject, IProgressMonitor monitor) throws CoreException {
-    	SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.NewQVTProjectWizard_Create, 2);
-
-    	IContainer srcContainer = fMainPage.getQVTSourceContainerHandle();
-    	if(srcContainer instanceof IFolder) {
-        	SourceContainerUpdater.ensureDestinationExists((IFolder)srcContainer, subMonitor.split(1));
-    	}
-
-    	QVTOBuilderConfig qvtConfig = QVTOBuilderConfig.getConfig(createdProject);
-    	qvtConfig.setSourceContainer(srcContainer);
-    	qvtConfig.addTransformationNature();
-
-    	subMonitor.worked(1);
-    }
 
     private INewQVTElementDestinationWizardDelegate getDestinationProvider() {
     	assert fMainPage != null;

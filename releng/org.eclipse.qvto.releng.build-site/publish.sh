@@ -11,6 +11,7 @@
 #*******************************************************************************
 # Local QVTo publish script for use by the promoter job. It prepares and invokes remote scripts.
 #
+java -version
 rm -f downloads.sh javadoc.zip publish.zip updates.sh
 curl -s -k ${PUBLISH__DOWNLOADS_SH} > downloads.sh
 curl -s -k ${PUBLISH__JAVADOC} > javadoc.zip

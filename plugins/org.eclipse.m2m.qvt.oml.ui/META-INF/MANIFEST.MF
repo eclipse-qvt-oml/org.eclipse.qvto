@@ -21,6 +21,6 @@ Require-Bundle: org.eclipse.equinox.common;bundle-version="[3.8.0,4.0.0)",
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.m2m.internal.qvt.oml.ui;x-internal:=true,
  org.eclipse.m2m.internal.qvt.oml.ui.wizards;x-internal:=true,
- org.eclipse.m2m.internal.qvt.oml.ui.wizards.project;x-internal:=true
+ org.eclipse.m2m.internal.qvt.oml.ui.wizards.project;x-friends:="org.eclipse.m2m.tests.qvt.oml.ui"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.ui
