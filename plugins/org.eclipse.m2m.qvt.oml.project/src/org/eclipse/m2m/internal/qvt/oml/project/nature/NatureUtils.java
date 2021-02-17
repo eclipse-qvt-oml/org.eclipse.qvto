@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 public class NatureUtils {
@@ -46,6 +47,8 @@ public class NatureUtils {
 		newNatures[prevNatures.length] = id;
 		description.setNatureIds(newNatures);
 		project.setDescription(description, null);
+		
+		project.refreshLocal(IResource.DEPTH_INFINITE, null);
     }
     
     public static boolean addNature(IProjectDescription description, String id) throws CoreException{
