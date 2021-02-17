@@ -82,6 +82,8 @@ public abstract class PdeProjectIntegrationImpl implements ProjectIntegration {
 				
 				// add plugin nature to project
 				CoreUtility.addNatureToProject(project, IBundleProjectDescription.PLUGIN_NATURE, subMonitor.split(1));
+				
+				assert project.hasNature(IBundleProjectDescription.PLUGIN_NATURE);
 					    			    	
 				// generate the manifest.mf file
 				createManifest(project, data, subMonitor.split(1));

@@ -47,10 +47,6 @@ public class NatureUtils {
 		newNatures[prevNatures.length] = id;
 		description.setNatureIds(newNatures);
 		project.setDescription(description, null);
-		
-		project.refreshLocal(IResource.DEPTH_INFINITE, null);
-		
-		assert (project.hasNature(id));
     }
     
     public static boolean addNature(IProjectDescription description, String id) throws CoreException{

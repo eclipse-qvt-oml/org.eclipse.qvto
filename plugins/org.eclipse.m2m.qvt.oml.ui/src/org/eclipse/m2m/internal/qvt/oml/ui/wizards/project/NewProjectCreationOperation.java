@@ -76,6 +76,9 @@ public class NewProjectCreationOperation extends WorkspaceModifyOperation {
 				
 		try {
 			createProject(subMonitor.split(1));
+			
+			fProjectHandle.refreshLocal(IResource.DEPTH_INFINITE, null);
+						
 			createContents(subMonitor.split(1));
 		}
 		finally {
