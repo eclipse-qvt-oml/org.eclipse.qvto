@@ -126,7 +126,7 @@ public class NewProjectCreationOperationTest {
 		
 		if (data.isPlugin()) {
 			
-			assertTrue("Project should have the " + IBundleProjectDescription.PLUGIN_NATURE + " nature but only has the following natures:" + project.getDescription().getNatureIds(), project.hasNature(IBundleProjectDescription.PLUGIN_NATURE));
+			assertTrue("Project should have the " + IBundleProjectDescription.PLUGIN_NATURE + " nature but only has the following natures:" + Arrays.toString(project.getDescription().getNatureIds()), project.hasNature(IBundleProjectDescription.PLUGIN_NATURE));
 			
 	    	BundleContext context = FrameworkUtil.getBundle(NewProjectCreationOperation.class).getBundleContext();
 	    	ServiceReference<IBundleProjectService> serviceReference = context.getServiceReference(IBundleProjectService.class);

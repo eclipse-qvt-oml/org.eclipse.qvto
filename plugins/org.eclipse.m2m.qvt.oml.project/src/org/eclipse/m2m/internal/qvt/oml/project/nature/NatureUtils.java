@@ -49,6 +49,8 @@ public class NatureUtils {
 		project.setDescription(description, null);
 		
 		project.refreshLocal(IResource.DEPTH_INFINITE, null);
+		
+		assert (project.hasNature(id));
     }
     
     public static boolean addNature(IProjectDescription description, String id) throws CoreException{
