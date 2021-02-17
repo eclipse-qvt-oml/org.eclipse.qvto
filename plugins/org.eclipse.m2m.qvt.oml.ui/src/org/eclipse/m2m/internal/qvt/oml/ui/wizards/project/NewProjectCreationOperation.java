@@ -46,16 +46,16 @@ public class NewProjectCreationOperation extends WorkspaceModifyOperation {
 		fProjectHandle = projectHandle;
 	}
 	
-	protected void createContents(IProgressMonitor monitor, IProject project) throws CoreException, InterruptedException {		
+	protected void createContents(IProgressMonitor monitor) throws CoreException, InterruptedException {		
 		try {
 			SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.NewQVTProjectWizard_Create, 2);
 		
-	    	IContainer srcContainer = project.getFolder(fData.getQVTSourceFolderName());
+	    	IContainer srcContainer = fProjectHandle.getFolder(fData.getQVTSourceFolderName());
 	    	if(srcContainer instanceof IFolder) {
 	        	SourceContainerUpdater.ensureDestinationExists((IFolder) srcContainer, subMonitor.split(1));
 	    	}
 	
-	    	QVTOBuilderConfig qvtConfig = QVTOBuilderConfig.getConfig(project);
+	    	QVTOBuilderConfig qvtConfig = QVTOBuilderConfig.getConfig(fProjectHandle);
 	    	qvtConfig.setSourceContainer(srcContainer);
 	    	qvtConfig.addTransformationNature();
 	    	
@@ -76,7 +76,7 @@ public class NewProjectCreationOperation extends WorkspaceModifyOperation {
 				
 		try {
 			createProject(subMonitor.split(1));
-			createContents(subMonitor.split(1), fProjectHandle);
+			createContents(subMonitor.split(1));
 		}
 		finally {
 			SubMonitor.done(monitor);
@@ -92,7 +92,7 @@ public class NewProjectCreationOperation extends WorkspaceModifyOperation {
 	
 			IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			final IProjectDescription description = workspace.newProjectDescription(fProjectHandle.getName());
-			if (location != null && ResourcesPlugin.getWorkspace().getRoot().getLocationURI().equals(location)) {
+			if (location != null && workspace.getRoot().getLocationURI().equals(location)) {
 				location = null;
 			}
 			description.setLocationURI(location); 

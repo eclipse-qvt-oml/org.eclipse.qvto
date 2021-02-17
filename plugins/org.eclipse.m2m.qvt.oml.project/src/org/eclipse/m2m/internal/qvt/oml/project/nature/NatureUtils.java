@@ -34,10 +34,18 @@ public class NatureUtils {
     }
     
     public static void addNature(IProject project, String id) throws CoreException{
-        IProjectDescription description = project.getDescription();
-        if(addNature(description, id)) {
-            project.setDescription(description, null);
-        }
+//        IProjectDescription description = project.getDescription();
+//        if(addNature(description, id)) {
+//            project.setDescription(description, null);
+//        }
+    	
+    	IProjectDescription description = project.getDescription();
+		String[] prevNatures = description.getNatureIds();
+		String[] newNatures = new String[prevNatures.length + 1];
+		System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
+		newNatures[prevNatures.length] = id;
+		description.setNatureIds(newNatures);
+		project.setDescription(description, null);
     }
     
     public static boolean addNature(IProjectDescription description, String id) throws CoreException{
