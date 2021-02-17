@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2007, 2020 Borland Software Corporation and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,34 +8,35 @@
  * 
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
+ *     Christopher Gerking - bug 562175
  *******************************************************************************/
 package org.eclipse.m2m.internal.tests.qvt.oml.ui;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import org.eclipse.m2m.internal.tests.qvt.oml.debugger.DebuggerTests;
 import org.eclipse.m2m.internal.tests.qvt.oml.ui.completion.CompletionTests;
 import org.eclipse.m2m.internal.tests.qvt.oml.ui.editor.AllEditorTests;
+import org.eclipse.m2m.internal.tests.qvt.oml.ui.wizards.project.NewProjectCreationOperationTest;
 import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
+import junit.framework.TestSuite;
 
 /**
  * @author sboyko
  */
+@RunWith(Suite.class)
+@SuiteClasses({CompletionTests.class, AllEditorTests.class, DebuggerTests.class, NewProjectCreationOperationTest.class})
 public class AllTests {
 
 	public static void main(String[] args) {
-		junit.textui.TestRunner.run(AllTests.suite());
+		junit.textui.TestRunner.run(new TestSuite(AllTests.class));
 	}
 
-	public static Test suite() {
+	@BeforeClass
+	public static void setUpBeforeClass() {
 		TestUtil.suppressGitPrefixPopUp();
-		TestSuite suite = new TestSuite("Tests for org.eclipse.m2m.tests.qvt.oml.ui"); //$NON-NLS-1$
-		//$JUnit-BEGIN$
-        suite.addTest(CompletionTests.suite());
-		suite.addTest(AllEditorTests.suite());
-        suite.addTest(DebuggerTests.suite());
-		//$JUnit-END$
-		return suite;
 	}
 }
