@@ -38,6 +38,13 @@ public class TestQvtExecutor extends TransformationExecutorTest {
 	public TestQvtExecutor(ModelTestData data) {
 		super(data.getName(), getInModels(data), getOutModels(data), QvtLaunchUtil.getConfigProperties(data.getContext()));
 		ecoreMetamodels = data.getEcoreMetamodels();
+		
+		uriCreator = new UriCreator(name) {
+			@Override
+			public String getTestDataFolder() {
+				return data.getTestDataFolder();
+			};
+		};
 	}
 		
 	@Parameters(name="{0}")

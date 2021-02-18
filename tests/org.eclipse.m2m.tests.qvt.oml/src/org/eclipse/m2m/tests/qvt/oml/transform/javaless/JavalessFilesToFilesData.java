@@ -155,6 +155,11 @@ public class JavalessFilesToFilesData extends ModelTestData {
 		return patchedData;
     }
     
+    @Override
+    public String getTestDataFolder() {
+    	return myFileData.getTestDataFolder();
+    }
+    
     private final FilesToFilesData myFileData;
     private FilesToFilesData myPatchedData;
 }
