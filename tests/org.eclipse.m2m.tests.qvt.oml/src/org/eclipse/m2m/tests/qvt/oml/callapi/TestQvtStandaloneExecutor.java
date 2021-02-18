@@ -36,7 +36,12 @@ public class TestQvtStandaloneExecutor extends TestQvtExecutor {
 	public TestQvtStandaloneExecutor(ModelTestData data) {
 		super(data);
 		this.data = data;
-		uriCreator = new FileUriCreator(data.getName());
+		uriCreator = new FileUriCreator(data.getName()) {
+			@Override
+			public String getTestDataFolder() {
+				return data.getTestDataFolder();
+			}
+		};
 	}
 	
 	@Parameters(name="{0}")

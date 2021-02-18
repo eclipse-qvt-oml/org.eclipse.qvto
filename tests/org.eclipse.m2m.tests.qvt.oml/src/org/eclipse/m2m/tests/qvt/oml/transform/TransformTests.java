@@ -581,7 +581,12 @@ public class TransformTests extends TestCase {
         		new FilesToFilesData("bug484020"), //$NON-NLS-1$ 
         		new FilesToFilesData("bug490998"), //$NON-NLS-1$ 
         		new FilesToFilesData("bug492966"), //$NON-NLS-1$
-        		new FilesToFilesData("bug561707", Collections.<String>emptyList(), Collections.singletonList("out.ecore")), //$NON-NLS-1$
+        		new FilesToFilesData("bug561707", Collections.<String>emptyList(), Collections.singletonList("out.ecore")), //$NON-NLS-1$,
+        		new FilesToFilesData("bug566236") { //$NON-NLS-1$
+        			public String getTestDataFolder() {
+        				return "parserTestData with whitespace"; //$NON-NLS-1$
+        			};
+        		}
         	};
     }
 

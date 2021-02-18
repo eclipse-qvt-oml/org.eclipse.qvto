@@ -1,0 +1,5 @@
+import models.bug566236.Lib;
+
+transformation bug566236();
+
+main() {}
