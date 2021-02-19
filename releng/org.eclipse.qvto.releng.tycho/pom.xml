@@ -82,6 +82,9 @@
   <build>
    <!-- This is for checkstyle and PMD -->
    <sourceDirectory>src</sourceDirectory>
+    
+    <!-- See Bug 526404 This enables maven-surefire-plugin to do standalone tests AND tycho-surefire-plugin to do plugin tests -->
+    <testOutputDirectory>${project.build.directory}/classes</testOutputDirectory>
 
     <plugins>
       <plugin>
