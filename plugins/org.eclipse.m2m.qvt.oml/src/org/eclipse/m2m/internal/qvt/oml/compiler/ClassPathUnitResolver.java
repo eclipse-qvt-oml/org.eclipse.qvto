@@ -30,7 +30,7 @@ public class ClassPathUnitResolver implements UnitResolver {
 		
 		if (resourceUrl != null) {
 			int numberOfNameSegments = ResolverUtils.getNameSegments(qualifiedName).length;
-			URI baseUri = URI.createURI(resourceUrl.toString()).trimSegments(numberOfNameSegments);
+			URI baseUri = URI.createURI(resourceUrl.toExternalForm(), true).trimSegments(numberOfNameSegments);
 			
 			DelegatingUnitResolver delegateResolver = new URIUnitResolver(Collections.singletonList(baseUri), false);
 			return delegateResolver.resolveUnit(qualifiedName);
