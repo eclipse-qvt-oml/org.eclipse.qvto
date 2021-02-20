@@ -104,12 +104,27 @@ public class TestQvtStandaloneExecutor extends TestQvtExecutor {
 			super(name);
 		}
 		
+		@Override
 		URI getTransformationUri() {
-			return URI.createFileURI(new File("").getAbsolutePath()).trimSegments(1).appendSegment(data.getBundle()).appendSegment(data.getTestDataFolder()).appendSegment(ModelTestData.MODEL_FOLDER).appendSegment(getName()).appendSegment(getName()).appendFileExtension(MDAConstants.QVTO_FILE_EXTENSION);
+			return URI.createFileURI(new File("").getAbsolutePath()).
+					trimSegments(1).
+					appendSegment(data.getBundle()).
+					appendSegment(URI.encodeSegment(data.getTestDataFolder(), false)).
+					appendSegment(ModelTestData.MODEL_FOLDER).
+					appendSegment(getName()).
+					appendSegment(getName()).
+					appendFileExtension(MDAConstants.QVTO_FILE_EXTENSION);
 		}
 		
+		@Override
 		public URI getModelUri(String name) {
-			return URI.createFileURI(new File("").getAbsolutePath()).trimSegments(1).appendSegment(data.getBundle()).appendSegment(data.getTestDataFolder()).appendSegment(ModelTestData.MODEL_FOLDER).appendSegment(getName()).appendSegment(name);
+			return URI.createFileURI(new File("").getAbsolutePath()).
+					trimSegments(1).
+					appendSegment(data.getBundle()).
+					appendSegment(URI.encodeSegment(data.getTestDataFolder(), false)).
+					appendSegment(ModelTestData.MODEL_FOLDER).
+					appendSegment(getName()).
+					appendSegment(name);
 		}
 		
 	}
