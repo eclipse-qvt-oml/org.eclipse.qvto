@@ -121,7 +121,7 @@
    </extension>
    <extension
 	     point="org.eclipse.m2m.qvt.oml.runtime.qvtTransformationContainer">
-      <sourceContainer path="parserTestData with whitespace"/>
+      <sourceContainer path="parserTestData with%20whitespace"/>
    </extension>
 
 </plugin>

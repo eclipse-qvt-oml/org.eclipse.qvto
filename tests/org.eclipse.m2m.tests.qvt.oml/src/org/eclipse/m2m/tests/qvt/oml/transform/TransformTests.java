@@ -616,8 +616,9 @@ public class TransformTests extends TestCase {
         			}
         		},
         		new FilesToFilesData("bug566236") { //$NON-NLS-1$
-        			public String getTestDataFolder() {
-        				return "parserTestData with whitespace"; //$NON-NLS-1$
+        			@Override
+					public String getTestDataFolder() {
+        				return "parserTestData with%20whitespace"; //$NON-NLS-1$
         			};
         		}
         	};

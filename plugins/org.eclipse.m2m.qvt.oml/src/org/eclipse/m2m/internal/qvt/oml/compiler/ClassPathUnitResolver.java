@@ -29,8 +29,9 @@ public class ClassPathUnitResolver implements UnitResolver {
 		URL resourceUrl = ClassLoader.getSystemResource(resourcePath);
 		
 		if (resourceUrl != null) {
+			String resourceUri = URI.decode(resourceUrl.toString());		// Revert the ClassLoader encoding
 			int numberOfNameSegments = ResolverUtils.getNameSegments(qualifiedName).length;
-			URI baseUri = URI.createURI(resourceUrl.toExternalForm(), true).trimSegments(numberOfNameSegments);
+			URI baseUri = URI.createURI(resourceUri, true).trimSegments(numberOfNameSegments);
 			
 			DelegatingUnitResolver delegateResolver = new URIUnitResolver(Collections.singletonList(baseUri), false);
 			return delegateResolver.resolveUnit(qualifiedName);
