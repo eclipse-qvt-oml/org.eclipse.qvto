@@ -12,6 +12,7 @@
     <version>3.10.4-SNAPSHOT</version>
   </parent>
   <build>
+  <!--  test comment -->
   <plugins>
     <plugin>
      <groupId>org.eclipse.tycho</groupId>
