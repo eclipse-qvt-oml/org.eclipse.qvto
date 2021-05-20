@@ -595,7 +595,8 @@ public class TransformTests extends TestCase {
         			public void prepare(BlackboxRegistry blackboxRegistry) {
         				blackboxRegistry.registerModule(AnnotatedJavaLibrary.class, "org.bar.Foo", "Bug566216_Lib");
         			}
-        		}
+        		},
+        		new PluginDependencyProjectData("bug573659", "bug573659_referenced") //$NON-NLS-1$ //$NON-NLS-2$
         	};
     }
 

@@ -1,0 +1,5 @@
+import models.bug573659_referenced.bug573659_referenced;
+
+transformation bug573659();
+
+main() {}
