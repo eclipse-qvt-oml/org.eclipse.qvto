@@ -152,8 +152,8 @@ public class JavalessQvtTest extends TestQvtInterpreter {
             // EObjects for incremental update are loaded from original 'in.ecore' so they don't match with those from 'in.ecore.javaless' 
             "bug463572", //$NON-NLS-1$ 
                   	
-            // use of Eclipse project references requires patching across multiple projects
-          	"bug433937", //$NON-NLS-1$
+            // use of Eclipse project references or plug-in dependencies requires patching across multiple projects
+          	"bug433937", "bug573659" //$NON-NLS-1$ //$NON-NLS-2$
           	
     }));
 
