@@ -12,7 +12,6 @@
 package org.eclipse.m2m.internal.qvt.oml.project.builder;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -21,8 +20,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.Logger;
 import org.eclipse.m2m.internal.qvt.oml.project.QVTOProjectPlugin;
+import org.eclipse.m2m.internal.qvt.oml.runtime.project.ProjectDependencyTracker;
 
-
+/**
+ * @deprecated Use {@link org.eclipse.m2m.internal.qvt.oml.runtime.project.ProjectDependencyTracker} instead.
+ */
+@Deprecated
 class ProjectDependencyHelper {
 	
 	private ProjectDependencyHelper() {
@@ -44,13 +47,7 @@ class ProjectDependencyHelper {
 	 * @return arrya of dependency projects
 	 */
 	public static IProject[] getQvtProjectDependencies(IProject project, boolean recursive) {
-		Set<IProject> projects = new LinkedHashSet<IProject>();		
-		if(isPluginProject(project)) {		
-			collectQvtPluginWorkspaceDependencies(project, projects, recursive);
-		} else {
-			collectQvtProjectWorkspaceDependencies(project, projects, recursive);			
-		}
-		return projects.toArray(new IProject[projects.size()]);
+		return ProjectDependencyTracker.getAllReferencedProjects(project, recursive).toArray(new IProject[] {});
 	}	
 	
 	public static boolean isPluginProject(IProject project) {
