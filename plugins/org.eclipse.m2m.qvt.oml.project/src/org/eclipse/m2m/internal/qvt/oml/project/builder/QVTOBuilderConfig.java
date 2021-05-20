@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
@@ -28,7 +29,9 @@ import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.Logger;
 import org.eclipse.m2m.internal.qvt.oml.project.Messages;
 import org.eclipse.m2m.internal.qvt.oml.project.QVTOProjectPlugin;
+import org.eclipse.m2m.internal.qvt.oml.project.QvtProjectUtil;
 import org.eclipse.m2m.internal.qvt.oml.project.nature.NatureUtils;
+import org.eclipse.m2m.internal.qvt.oml.runtime.project.ProjectDependencyTracker;
 import org.eclipse.osgi.util.NLS;
 
 
@@ -147,10 +150,9 @@ public class QVTOBuilderConfig {
 		containers.add(getSourceContainer());
         
         try {
-        	IProject[] referencedProjects = ProjectDependencyHelper.getQvtProjectDependencies(myProject, true); 
-			for (int i = 0; i < referencedProjects.length; i++) {
-				IProject nextProject = referencedProjects[i];
-				if(nextProject.isOpen() && nextProject.hasNature(QVTOProjectPlugin.NATURE_ID)) {
+        	Set<IProject> referencedProjects = ProjectDependencyTracker.getAllReferencedProjects(myProject, true); 
+			for (IProject nextProject : referencedProjects) {
+				if(QvtProjectUtil.isQvtProject(nextProject)) {
 					containers.add(getConfig(nextProject).getSourceContainer());
 				}
 			}
@@ -162,7 +164,7 @@ public class QVTOBuilderConfig {
     }
     
     public IProject[] getProjectDependencies(boolean recursive) {
-    	return ProjectDependencyHelper.getQvtProjectDependencies(myProject, recursive);
+    	return ProjectDependencyTracker.getAllReferencedProjects(myProject, recursive).toArray(new IProject[] {});
     }
     
     private String getPathString(IContainer container) {
