@@ -31,7 +31,9 @@ public class ClassPathUnitResolver implements UnitResolver {
 			int numberOfNameSegments = ResolverUtils.getNameSegments(qualifiedName).length;
 			URI baseUri = URI.createURI(resourceUrl.toString()).trimSegments(numberOfNameSegments);
 			
-			return new URIUnitResolver(baseUri).resolveUnit(qualifiedName);
+			DelegatingUnitResolver delegateResolver = new URIUnitResolver(baseUri);
+			delegateResolver.setParent(BlackboxUnitResolver.DEFAULT);
+			return delegateResolver.resolveUnit(qualifiedName);
 		}
 		
 		return null;
