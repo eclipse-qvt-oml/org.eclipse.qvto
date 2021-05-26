@@ -32,6 +32,8 @@ import org.eclipse.m2m.internal.qvt.oml.common.emf.ExtendedEmfUtil;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.Logger;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.URIUtils;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.TraceUtil;
+import org.eclipse.m2m.internal.qvt.oml.expressions.DirectionKind;
+import org.eclipse.m2m.internal.qvt.oml.trace.EDirectionKind;
 import org.eclipse.m2m.internal.qvt.oml.trace.EValue;
 import org.eclipse.m2m.internal.qvt.oml.trace.Trace;
 import org.eclipse.m2m.internal.qvt.oml.trace.TraceRecord;
@@ -102,7 +104,7 @@ public class TraceSerializer {
 
     private void updateResult(VarParameterValue varParamValue) {
 		if (varParamValue.getValue() != null) {
-			varParamValue.setValue(TraceUtil.createEValue(varParamValue.getValue().getOclObject()));
+			varParamValue.setValue(TraceUtil.createEValue(varParamValue.getValue().getOclObject(), DirectionKind.getByName(varParamValue.getKind().getName())));
 		}
 	}
 

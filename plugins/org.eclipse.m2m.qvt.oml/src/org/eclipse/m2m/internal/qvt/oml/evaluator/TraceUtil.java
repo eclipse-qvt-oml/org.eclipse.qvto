@@ -341,14 +341,14 @@ public class TraceUtil {
         varParameterValue.setName(name);
         varParameterValue.setType(type.getName());
         Object oclObject = evalEnv.getValueOf(name);
-        varParameterValue.setValue(createEValue(oclObject));
+        varParameterValue.setValue(createEValue(oclObject, kind));
         return varParameterValue;
     }
 
     @SuppressWarnings("unchecked")
-    public static EValue createEValue(Object oclObject) {
+    public static EValue createEValue(Object oclObject, DirectionKind kind) {
         EValue value = TraceFactory.eINSTANCE.createEValue();
-        value.setOclObject(cloneOclObject(oclObject));
+        value.setOclObject(cloneOclObject(oclObject, kind));
         if (oclObject != null) {
             if (oclObject instanceof Dictionary) {
             	Dictionary<Object, Object> dict = (Dictionary<Object, Object>) oclObject;
@@ -356,13 +356,13 @@ public class TraceUtil {
                 for (Object dictKey : dict.keys()) {
                     ETuplePartValue tuplePartValue = TraceFactory.eINSTANCE.createETuplePartValue();
                     tuplePartValue.setName("key"); //$NON-NLS-1$
-                    tuplePartValue.setValue(createEValue(dictKey));
+                    tuplePartValue.setValue(createEValue(dictKey, kind));
                     value.getCollection().add(tuplePartValue);
 
                     Object dictValue = dict.get(dictKey);
                     tuplePartValue = TraceFactory.eINSTANCE.createETuplePartValue();
                     tuplePartValue.setName("value"); //$NON-NLS-1$
-                    tuplePartValue.setValue(createEValue(dictValue));
+                    tuplePartValue.setValue(createEValue(dictValue, kind));
                     value.getCollection().add(tuplePartValue);
                 }
             } else if (oclObject instanceof Tuple) {
@@ -373,7 +373,7 @@ public class TraceUtil {
                     Object partValue = tuple.getValue(part);
                     ETuplePartValue tuplePartValue = TraceFactory.eINSTANCE.createETuplePartValue();
                     tuplePartValue.setName(part.getName());
-                    EValue partEValue = createEValue(partValue);
+                    EValue partEValue = createEValue(partValue, kind);
                     tuplePartValue.setValue(partEValue);
                     value.getCollection().add(tuplePartValue);
                 }
@@ -382,12 +382,12 @@ public class TraceUtil {
                     // TODO: Write a test for checking collections
                     value.setCollectionType(getCollectionTypeName(oclCollection));
                     for (Object collectionElement : oclCollection) {
-                        value.getCollection().add(createEValue(collectionElement));
+                        value.getCollection().add(createEValue(collectionElement, kind));
                     }
             } else if (oclObject instanceof ModelInstance) {
                 value.setCollectionType(ModelType.SINGLETON_NAME);
                 for (Object collectionElement : ((ModelInstance) oclObject).getExtent().getInitialObjects()) {
-                    value.getCollection().add(createEValue(collectionElement));
+                    value.getCollection().add(createEValue(collectionElement, kind));
                 }
             } else if (oclObject instanceof EObject) {
                 value.setModelElement((EObject) oclObject);
@@ -435,13 +435,13 @@ public class TraceUtil {
     	return null;
     }
     
-	private static Object cloneOclObject(Object obj) {
-		return cloneOclObjectRec(obj, new IdentityHashMap<Object, Object>());
+	private static Object cloneOclObject(Object obj, DirectionKind kind) {
+		return cloneOclObjectRec(obj, new IdentityHashMap<Object, Object>(), kind);
 	}
 	
     @SuppressWarnings("unchecked")
-	private static Object cloneOclObjectRec(Object obj, Map<Object, Object> processed) {
-    	if (obj instanceof MutableList<?>) {
+	private static Object cloneOclObjectRec(Object obj, Map<Object, Object> processed, DirectionKind kind) {
+    	if (kind == DirectionKind.IN && obj instanceof MutableList<?>) {
         	if (processed.containsKey(obj)) {
         		return processed.get(obj);
         	}
@@ -452,12 +452,12 @@ public class TraceUtil {
     		processed.put(obj, result);
 
     		for (Object o : original) {
-    			result.add(cloneOclObjectRec(o, processed));
+    			result.add(cloneOclObjectRec(o, processed, kind));
     		}    		
     		return result;
     	}
 
-    	if (obj instanceof Dictionary<?, ?>) {
+    	if (kind == DirectionKind.IN && obj instanceof Dictionary<?, ?>) {
         	if (processed.containsKey(obj)) {
         		return processed.get(obj);
         	}
@@ -468,7 +468,7 @@ public class TraceUtil {
     		processed.put(obj, result);
 
     		for (Object k : original.keys()) {
-    			result.put(cloneOclObjectRec(k, processed), cloneOclObjectRec(original.get(k), processed));
+    			result.put(cloneOclObjectRec(k, processed, kind), cloneOclObjectRec(original.get(k), processed, kind));
     		}    		
     		return result;
     	}
