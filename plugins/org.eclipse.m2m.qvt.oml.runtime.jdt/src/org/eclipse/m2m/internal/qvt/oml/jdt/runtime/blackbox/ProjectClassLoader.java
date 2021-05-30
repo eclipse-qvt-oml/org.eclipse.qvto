@@ -17,7 +17,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,17 +25,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.emf.common.CommonPlugin;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
-import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.wiring.BundleWiring;
 
 public class ProjectClassLoader extends URLClassLoader {
 
@@ -117,42 +113,38 @@ public class ProjectClassLoader extends URLClassLoader {
 		if (pluginModel == null) {
 			return ProjectClassLoader.class.getClassLoader();
 		}
-				
+		
 		IPluginImport[] imports = pluginModel.getPluginBase().getImports();
-		final Collection<ClassLoader> delegateClassLoaders = new ArrayList<>(imports.length);
+		final List<IPluginModelBase> importedPlugins = new ArrayList<IPluginModelBase>(imports.length);
 		
 		for(IPluginImport i : imports) {
-			IPluginModelBase base = PluginRegistry.findModel(i.getId());
+			IPluginModelBase importedPlugin = PluginRegistry.findModel(i.getId());
 			
-			if (base != null && base.getUnderlyingResource() == null) {
-				BundleDescription bundleDescription = base.getBundleDescription();
-				
-				if (bundleDescription != null) {
-					Bundle bundle = Platform.getBundle(bundleDescription.getSymbolicName());
-					
-					if (bundle != null) {
-						ClassLoader classLoader = bundle.adapt(BundleWiring.class).getClassLoader();
-						delegateClassLoaders.add(classLoader);
-					}
-				}
+			if (importedPlugin != null) {
+				importedPlugins.add(importedPlugin);
 			}
 		}
 		
 		return new ClassLoader(ProjectClassLoader.class.getClassLoader()) {
-			
+						
 			@Override
-			protected Class<?> findClass(String name) throws ClassNotFoundException {				
-				for (ClassLoader delegate : delegateClassLoaders) {
-					try {
-						return delegate.loadClass(name);
-					}
-					catch (ClassNotFoundException e) {
-						continue;
+			protected Class<?> findClass(String name) throws ClassNotFoundException {
+				
+				for(IPluginModelBase importedPlugin : importedPlugins) {
+					
+					if (importedPlugin.getUnderlyingResource() == null) {
+						String pluginId = importedPlugin.getPluginBase().getId();
+						
+						try {
+							return CommonPlugin.loadClass(pluginId, name);
+						}
+						catch (ClassNotFoundException e) {
+							continue;
+						}
 					}
 				}
 				
 				throw new ClassNotFoundException();
-				
 			}
 		};
 	}
