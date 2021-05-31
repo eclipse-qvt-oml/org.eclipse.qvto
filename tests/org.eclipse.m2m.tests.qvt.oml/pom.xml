@@ -24,25 +24,26 @@
               <goal>test</goal>
             </goals>
             <configuration>
-              <includes>
-                <include>**/TestQvtStandaloneExecutor.java</include>
-              </includes>
-              <argLine>-DtestNameSuffix="maven" -ea</argLine>
+              <providerHint>junit4</providerHint>
+              <testClass>org.eclipse.m2m.tests.qvt.oml.callapi.TestQvtStandaloneExecutor</testClass>
+              <argLine>-ea</argLine>
               <reportsDirectory>${project.build.directory}/surefire-reports/standalone</reportsDirectory>
+              <workingDirectory>${project.build.directory}/test-reports</workingDirectory>
             </configuration>
           </execution>
         </executions>
       </plugin>
     <plugin>
-     <groupId>org.eclipse.tycho</groupId>
-     <artifactId>tycho-surefire-plugin</artifactId>
-     <configuration>
-       <providerHint>junit4</providerHint>
-       <testClass>org.eclipse.m2m.tests.qvt.oml.AllTests</testClass>
-       <useUIHarness>true</useUIHarness>
-       <useUIThread>true</useUIThread>
-       <argLine>-Xms128m -Xmx1G -ea</argLine>
-     </configuration>
+      <groupId>org.eclipse.tycho</groupId>
+      <artifactId>tycho-surefire-plugin</artifactId>
+      <configuration>
+        <providerHint>junit4</providerHint>
+        <testClass>org.eclipse.m2m.tests.qvt.oml.AllTests</testClass>
+        <useUIHarness>true</useUIHarness>
+        <useUIThread>true</useUIThread>
+        <argLine>-Xms128m -Xmx1G -ea</argLine>
+        <reportsDirectory>${project.build.directory}/surefire-reports/plugin</reportsDirectory>
+      </configuration>
     </plugin>
   </plugins>
   </build>
