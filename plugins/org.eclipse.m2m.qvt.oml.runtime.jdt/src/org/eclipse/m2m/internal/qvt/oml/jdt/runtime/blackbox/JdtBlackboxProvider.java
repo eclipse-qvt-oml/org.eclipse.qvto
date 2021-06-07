@@ -259,7 +259,7 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 		}
 				
 		@Override
-		public BlackboxUnit load(LoadContext context) throws BlackboxException {
+		public synchronized BlackboxUnit load(LoadContext context) throws BlackboxException {
 			if (fPackageRegistry != context.getMetamodelRegistry()) {
 				unload();
 				fPackageRegistry = context.getMetamodelRegistry();
