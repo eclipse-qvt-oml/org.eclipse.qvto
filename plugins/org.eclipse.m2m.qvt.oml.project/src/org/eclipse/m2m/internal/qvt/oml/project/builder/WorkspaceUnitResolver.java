@@ -44,6 +44,7 @@ import org.eclipse.m2m.internal.qvt.oml.compiler.UnitProxy;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.URIUtils;
 import org.eclipse.m2m.internal.qvt.oml.project.QVTOProjectPlugin;
+import org.eclipse.m2m.internal.qvt.oml.project.QvtProjectUtil;
 import org.eclipse.m2m.internal.qvt.oml.runtime.project.DeployedImportResolver;
 import org.eclipse.m2m.internal.qvt.oml.runtime.project.ProjectDependencyTracker;
 
@@ -101,6 +102,10 @@ public class WorkspaceUnitResolver extends DelegatingUnitResolver implements Uni
 			resolvers = new ArrayList<UnitResolver>(referencedProjects.size());
 
 			for (IProject referenced : referencedProjects) {
+				if (!QvtProjectUtil.isQvtProject(referenced)) {
+					continue;
+				}
+				
 				if (analyzedProjects.containsKey(referenced)) {
 					resolvers.add(analyzedProjects.get(referenced));
 					continue;
