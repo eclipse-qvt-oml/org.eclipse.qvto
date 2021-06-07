@@ -249,22 +249,20 @@ public class ProjectClassLoader extends URLClassLoader {
 				}
 								
 				for(IPluginModelBase importedPlugin : importedPlugins) {	
-					if (importedPlugin.getUnderlyingResource() == null) {
-						String pluginId = importedPlugin.getPluginBase().getId();
+					String pluginId = importedPlugin.getPluginBase().getId();
+					
+					try {
+						Class<?> result = CommonPlugin.loadClass(pluginId, name);
 						
-						try {
-							Class<?> result = CommonPlugin.loadClass(pluginId, name);
-							
-					        if (resolve) {
-					            resolveClass(result);
-					        }
-							
-							loadedClasses.put(name, result);							
-							return result;
-						}
-						catch (ClassNotFoundException e) {
-							continue;
-						}
+				        if (resolve) {
+				            resolveClass(result);
+				        }
+						
+						loadedClasses.put(name, result);							
+						return result;
+					}
+					catch (ClassNotFoundException e) {
+						continue;
 					}
 				}
 				
