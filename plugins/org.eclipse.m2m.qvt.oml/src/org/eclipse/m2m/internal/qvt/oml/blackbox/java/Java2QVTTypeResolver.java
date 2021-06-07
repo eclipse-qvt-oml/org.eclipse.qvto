@@ -428,18 +428,22 @@ class Java2QVTTypeResolver {
 					while (iterator.hasNext()) {
 						EObject eObject = iterator.next();
 						
-						if (eObject instanceof GenClassifier) {
-							GenClassifier genClassifier = (GenClassifier) eObject;
-							
-							EClassifier ecoreClassifier = genClassifier.getEcoreClassifier();
-																
-							if (ecoreClassifier == eClassifier) {
-								String classifierInstanceName = genClassifier.getRawInstanceClassName();
+						try {
+							if (eObject instanceof GenClassifier) {
+								GenClassifier genClassifier = (GenClassifier) eObject;
 								
-								if (type.getName().equals(classifierInstanceName)) {
-									return true;
+								EClassifier ecoreClassifier = genClassifier.getEcoreClassifier();
+																	
+								if (ecoreClassifier == eClassifier) {
+									String classifierInstanceName = genClassifier.getRawInstanceClassName();
+									
+									if (type.getName().equals(classifierInstanceName)) {
+										return true;
+									}
 								}
 							}
+						} catch(NoClassDefFoundError e) {
+							break;
 						}
 					}
 				}
