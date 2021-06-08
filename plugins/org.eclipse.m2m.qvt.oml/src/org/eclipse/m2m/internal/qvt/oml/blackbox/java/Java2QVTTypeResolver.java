@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -76,7 +77,8 @@ class Java2QVTTypeResolver {
 	// used to delegate the OCL type determination to MDT OCL UMLReflection 
 	private EClassifier fHelperEClassiferAdapter;
 	private BasicDiagnostic fDiagnostics;
-	private Map<String, URI> genModelMap;
+	private Map<String, URI> genModelLocationsMap;
+	private Map<EPackage, ModelContent> genModelContentsMap = new HashMap<EPackage, ModelContent>();
 	
 	Java2QVTTypeResolver(QvtOperationalModuleEnv env, Collection<String> packageURIs, BasicDiagnostic diagnostics) {	
 		fEnv = env;
@@ -404,7 +406,7 @@ class Java2QVTTypeResolver {
 		
 		return null;
 	}
-	
+		
 	private boolean isMatchingInstanceClass(EClassifier eClassifier, Class<?> type) {
 		
 		Class<?> instanceClass = eClassifier.getInstanceClass();
@@ -414,33 +416,25 @@ class Java2QVTTypeResolver {
 		}
 		else if (instanceClass == null && EmfUtil.isDynamic(eClassifier)) {
 			EPackage ePackage = eClassifier.getEPackage();
-			String nsURI = ePackage.getNsURI();
+			ModelContent genModelContent = getGenModelContent(ePackage);
 			
-			Map<String, URI> genModelMap = getGenModelMap();
-			URI genModelUri = genModelMap.get(nsURI);
-			
-			if (genModelUri != null) {														
-				ResourceSet resourceSet = ePackage.eResource().getResourceSet();
-				ModelContent genModelContent = EmfUtil.safeLoadModel(genModelUri, resourceSet);
-				
-				if (genModelContent != null) {
-					for (EObject eObject : genModelContent.getContent()) {
-						try {
-							if (eObject instanceof GenModel) {
-								GenModel genModel = (GenModel) eObject;
-								GenClassifier genClassifier = genModel.findGenClassifier(eClassifier);
-																									
-								if (genClassifier != null) {
-									String classifierInstanceName = genClassifier.getRawInstanceClassName();
-									
-									if (type.getName().equals(classifierInstanceName)) {
-										return true;
-									}
+			if (genModelContent != null) {
+				for (EObject eObject : genModelContent.getContent()) {
+					try {
+						if (eObject instanceof GenModel) {
+							GenModel genModel = (GenModel) eObject;
+							GenClassifier genClassifier = genModel.findGenClassifier(eClassifier);
+																								
+							if (genClassifier != null) {
+								String classifierInstanceName = genClassifier.getRawInstanceClassName();
+								
+								if (type.getName().equals(classifierInstanceName)) {
+									return true;
 								}
 							}
-						} catch(NoClassDefFoundError e) {
-							break;
 						}
+					} catch(NoClassDefFoundError e) {
+						break;
 					}
 				}
 			}
@@ -449,11 +443,32 @@ class Java2QVTTypeResolver {
 		return false;
 	}
 	
-	private Map<String, URI> getGenModelMap() {
-		if (genModelMap == null) {
-			genModelMap = EcorePlugin.getEPackageNsURIToGenModelLocationMap(true);
+	private Map<String, URI> getGenModelLocationsMap() {
+		if (genModelLocationsMap == null) {
+			genModelLocationsMap = EcorePlugin.getEPackageNsURIToGenModelLocationMap(true);
 		}
 		
-		return genModelMap;
+		return genModelLocationsMap;
+	}
+	
+	private ModelContent getGenModelContent(EPackage ePackage) {
+		
+		ModelContent result = genModelContentsMap.get(ePackage);
+		
+		if (result == null) {
+			String nsURI = ePackage.getNsURI();
+			
+			Map<String, URI> genModelLocationMap = getGenModelLocationsMap();
+			URI genModelUri = genModelLocationMap.get(nsURI);
+			
+			if (genModelUri != null) {														
+				ResourceSet resourceSet = ePackage.eResource().getResourceSet();
+				result = EmfUtil.safeLoadModel(genModelUri, resourceSet);
+				
+				genModelContentsMap.put(ePackage, result);
+			}
+		}
+		
+		return result;
 	}
 }
