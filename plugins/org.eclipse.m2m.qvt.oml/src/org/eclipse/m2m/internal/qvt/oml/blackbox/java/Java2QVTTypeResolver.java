@@ -76,6 +76,7 @@ class Java2QVTTypeResolver {
 	// used to delegate the OCL type determination to MDT OCL UMLReflection 
 	private EClassifier fHelperEClassiferAdapter;
 	private BasicDiagnostic fDiagnostics;
+	private Map<String, URI> genModelMap;
 	
 	Java2QVTTypeResolver(QvtOperationalModuleEnv env, Collection<String> packageURIs, BasicDiagnostic diagnostics) {	
 		fEnv = env;
@@ -404,7 +405,7 @@ class Java2QVTTypeResolver {
 		return null;
 	}
 	
-	private static boolean isMatchingInstanceClass(EClassifier eClassifier, Class<?> type) {
+	private boolean isMatchingInstanceClass(EClassifier eClassifier, Class<?> type) {
 		
 		Class<?> instanceClass = eClassifier.getInstanceClass();
 		
@@ -415,7 +416,7 @@ class Java2QVTTypeResolver {
 			EPackage ePackage = eClassifier.getEPackage();
 			String nsURI = ePackage.getNsURI();
 			
-			Map<String, URI> genModelMap = EcorePlugin.getEPackageNsURIToGenModelLocationMap(true);
+			Map<String, URI> genModelMap = getGenModelMap();
 			URI genModelUri = genModelMap.get(nsURI);
 			
 			if (genModelUri != null) {														
@@ -446,5 +447,13 @@ class Java2QVTTypeResolver {
 		}
 		
 		return false;
+	}
+	
+	private Map<String, URI> getGenModelMap() {
+		if (genModelMap == null) {
+			genModelMap = EcorePlugin.getEPackageNsURIToGenModelLocationMap(true);
+		}
+		
+		return genModelMap;
 	}
 }
