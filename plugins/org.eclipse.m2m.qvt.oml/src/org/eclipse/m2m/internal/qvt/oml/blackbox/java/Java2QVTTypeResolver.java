@@ -26,6 +26,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.emf.codegen.ecore.genmodel.GenClassifier;
+import org.eclipse.emf.codegen.ecore.genmodel.GenModel;
 import org.eclipse.emf.common.util.BasicDiagnostic;
 import org.eclipse.emf.common.util.DiagnosticChain;
 import org.eclipse.emf.common.util.URI;
@@ -39,7 +40,6 @@ import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.m2m.internal.qvt.oml.NLS;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
@@ -423,18 +423,13 @@ class Java2QVTTypeResolver {
 				ModelContent genModelContent = EmfUtil.safeLoadModel(genModelUri, resourceSet);
 				
 				if (genModelContent != null) {
-					Iterator<EObject> iterator = EcoreUtil.getAllContents(genModelContent.getContent());
-									
-					while (iterator.hasNext()) {
-						EObject eObject = iterator.next();
-						
+					for (EObject eObject : genModelContent.getContent()) {
 						try {
-							if (eObject instanceof GenClassifier) {
-								GenClassifier genClassifier = (GenClassifier) eObject;
-								
-								EClassifier ecoreClassifier = genClassifier.getEcoreClassifier();
-																	
-								if (ecoreClassifier == eClassifier) {
+							if (eObject instanceof GenModel) {
+								GenModel genModel = (GenModel) eObject;
+								GenClassifier genClassifier = genModel.findGenClassifier(eClassifier);
+																									
+								if (genClassifier != null) {
 									String classifierInstanceName = genClassifier.getRawInstanceClassName();
 									
 									if (type.getName().equals(classifierInstanceName)) {
@@ -452,5 +447,4 @@ class Java2QVTTypeResolver {
 		
 		return false;
 	}
-
 }
