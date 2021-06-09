@@ -419,24 +419,13 @@ class Java2QVTTypeResolver {
 			ModelContent genModelContent = getGenModelContent(ePackage);
 			
 			if (genModelContent != null) {
-				for (EObject eObject : genModelContent.getContent()) {
-					try {
-						if (eObject instanceof GenModel) {
-							GenModel genModel = (GenModel) eObject;
-							GenClassifier genClassifier = genModel.findGenClassifier(eClassifier);
-																								
-							if (genClassifier != null) {
-								String classifierInstanceName = genClassifier.getRawInstanceClassName();
-								
-								if (type.getName().equals(classifierInstanceName)) {
-									return true;
-								}
-							}
-						}
-					} catch(NoClassDefFoundError e) {
-						break;
+				try {
+					String classifierInstanceName = readClassifierInstanceName(eClassifier, genModelContent);
+					
+					if (type.getName().equals(classifierInstanceName)) {
+						return true;
 					}
-				}
+				} catch(NoClassDefFoundError e) {}
 			}
 		}
 		
@@ -470,5 +459,20 @@ class Java2QVTTypeResolver {
 		}
 		
 		return result;
+	}
+	
+	private String readClassifierInstanceName(EClassifier eClassifier, ModelContent genModelContent) {
+		for (EObject eObject : genModelContent.getContent()) {
+			if (eObject instanceof GenModel) {
+				GenModel genModel = (GenModel) eObject;
+				GenClassifier genClassifier = genModel.findGenClassifier(eClassifier);
+																					
+				if (genClassifier != null) {
+					return genClassifier.getRawInstanceClassName();
+				}
+			}
+		}
+		
+		return null;
 	}
 }
