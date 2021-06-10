@@ -27,6 +27,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.emf.codegen.ecore.genmodel.GenClassifier;
+import org.eclipse.emf.codegen.ecore.genmodel.GenModel;
 import org.eclipse.emf.common.util.BasicDiagnostic;
 import org.eclipse.emf.common.util.DiagnosticChain;
 import org.eclipse.emf.common.util.URI;
@@ -435,13 +436,11 @@ class Java2QVTTypeResolver {
 	}
 
 	private static boolean isMatchingInstanceGenClassifier(EClassifier eClassifier, Class<?> type, ModelContent genModelContent) {
-		Iterator<EObject> iterator = EcoreUtil.getAllContents(genModelContent.getContent());
-		while (iterator.hasNext()) {
-			EObject eObject = iterator.next();
-			if (eObject instanceof GenClassifier) {
-				GenClassifier genClassifier = (GenClassifier) eObject;
-				EClassifier ecoreClassifier = genClassifier.getEcoreClassifier();
-				if (ecoreClassifier == eClassifier) {
+		for(EObject eObject : genModelContent.getContent()) {
+			if (eObject instanceof GenModel) {
+				GenModel genModel = (GenModel) eObject;
+				GenClassifier genClassifier = genModel.findGenClassifier(eClassifier);
+				if (genClassifier != null) {
 					String classifierInstanceName = genClassifier.getRawInstanceClassName();
 					if (type.getName().equals(classifierInstanceName)) {
 						return true;
