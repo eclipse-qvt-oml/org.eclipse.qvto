@@ -51,7 +51,11 @@ public class ProjectClassLoader extends URLClassLoader {
 	}
 
 	ProjectClassLoader(IJavaProject javaProject) throws CoreException, MalformedURLException {
-		super(getProjectClassPath(javaProject), getParentClassLoader(javaProject));
+		this(javaProject, new WorkspaceDependencyAnalyzer());
+	}
+	
+	private ProjectClassLoader(IJavaProject javaProject, WorkspaceDependencyAnalyzer analyzer) throws CoreException, MalformedURLException {
+		super(analyzer.getProjectClassPath(javaProject), analyzer.getParentClassLoader(javaProject));
 				
 		loadersMap.put(javaProject, this);
 	}
@@ -146,29 +150,7 @@ public class ProjectClassLoader extends URLClassLoader {
 		return requiredPluginLocations;
 	}
 	
-	private static URL[] getProjectClassPath(IJavaProject javaProject) throws CoreException, MalformedURLException {
-		List<String> classPathEntries = new ArrayList<String>(Arrays.asList(JavaRuntime.computeDefaultRuntimeClassPath(javaProject)));
-		
-		List<String> requiredPluginLocations = getRequiredPluginLocations(javaProject);
-								
-		for (String pluginLocation : requiredPluginLocations) {
-			URI uri = URIUtil.toURI(pluginLocation);
-			if (!isWorkspaceLocation(uri)) {
-				classPathEntries.remove(pluginLocation);
-			}
-		}
-		
-		List<URL> urlList = new ArrayList<URL>(classPathEntries.size());
-		
-		for (String entry : classPathEntries) {
-			 URL url = new File(entry).toURI().toURL();
-			 urlList.add(url);
-		}
-		
-		return urlList.toArray(new URL[] {});
-	}
-	
-	private static boolean isWorkspaceLocation(URI uri) throws CoreException {		
+	private static IProject getProject(URI uri) throws CoreException {		
 		IContainer[] containers = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(uri);
 							
 		for (IContainer container : containers) {
@@ -176,12 +158,22 @@ public class ProjectClassLoader extends URLClassLoader {
 			
 			if (project != null && project.isOpen()) {
 				if (project.hasNature(JavaCore.NATURE_ID)) {
-					return true;
+					return project;
 				};
 			}
 		}
 		
-		return false;
+		return null;
+	}
+	
+	private static IPluginModelBase getPluginModel(String pluginLocation) {
+		for (IPluginModelBase base : PluginRegistry.getAllModels()) {
+			if (pluginLocation.equals(base.getInstallLocation())) {
+				return base;
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override
@@ -204,71 +196,144 @@ public class ProjectClassLoader extends URLClassLoader {
         
         return result;
 	}
-			
-	private static ClassLoader getParentClassLoader(IJavaProject javaProject) {
-		
-		ClassLoader root = ProjectClassLoader.class.getClassLoader();
-		
-		IPluginModelBase pluginModel = PluginRegistry.findModel(javaProject.getProject());
-		
-		if (pluginModel == null) {
-			return root;
-		}
-		
-		IPluginImport[] imports = pluginModel.getPluginBase().getImports();
-		final List<IPluginModelBase> importedPlugins = new ArrayList<IPluginModelBase>(imports.length);
-		
-		for(IPluginImport i : imports) {
-			IPluginModelBase importedPlugin = PluginRegistry.findModel(i.getId());
-			
-			if (importedPlugin != null) {
-				importedPlugins.add(importedPlugin);
-			}
-		}
-		
-		if (importedPlugins.isEmpty()) {
-			return root;
-		}
-		
-		return new ClassLoader() {
-			
-			private Map<String, Class<?>> loadedClasses = new HashMap<String, Class<?>>();
-			
-			@Override
-			protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-												
-				if (loadedClasses.containsKey(name)) {
-					Class<?> result = loadedClasses.get(name);
-					
-					if (result == null) {
-						throw new ClassNotFoundException();
-					}
-					else {
-						return result;
-					}
-				}
-								
-				for(IPluginModelBase importedPlugin : importedPlugins) {	
-					String pluginId = importedPlugin.getPluginBase().getId();
-					
-					try {
-						Class<?> result = CommonPlugin.loadClass(pluginId, name);
-						
-				        if (resolve) {
-				            resolveClass(result);
-				        }
-						
-						loadedClasses.put(name, result);							
-						return result;
-					}
-					catch (ClassNotFoundException e) {
-						continue;
-					}
-				}
 				
-				loadedClasses.put(name, null);
-				throw new ClassNotFoundException();
+	private static class WorkspaceDependencyAnalyzer {
+		
+		private final Map<String, Boolean> dependencyCache = new HashMap<String, Boolean>();
+		
+		private boolean hasWorkspaceDependency(IPluginModelBase pluginModel) throws CoreException {
+			return hasWorkspaceDependency(pluginModel.getInstallLocation());
+		}
+		
+		private boolean hasWorkspaceDependency(String pluginLocation) throws CoreException {
+			
+			if (dependencyCache.containsKey(pluginLocation)) {
+				return dependencyCache.get(pluginLocation);
 			}
-		};
+			
+			boolean result = false;
+			
+			URI uri = URIUtil.toURI(pluginLocation);
+			IProject pluginProject = getProject(uri);
+			
+			if (pluginProject != null) {
+				result = true;
+			}
+			else {	
+				IPluginModelBase pluginModel = getPluginModel(pluginLocation);
+				
+				if (pluginModel != null) {
+					IPluginImport[] imports = pluginModel.getPluginBase().getImports();
+					
+					for(IPluginImport i : imports) {
+						IPluginModelBase importedPlugin = PluginRegistry.findModel(i.getId());
+						
+						if (importedPlugin != null) {							
+							if (hasWorkspaceDependency(importedPlugin)) {
+								result = true;
+								break;
+							}
+						}
+					}
+				}				
+			}
+			
+			dependencyCache.put(pluginLocation, result);
+			return result;
+		}
+		
+		URL[] getProjectClassPath(IJavaProject javaProject) throws CoreException, MalformedURLException {
+			List<String> classPathEntries = new ArrayList<String>(Arrays.asList(JavaRuntime.computeDefaultRuntimeClassPath(javaProject)));
+			
+			List<String> requiredPluginLocations = getRequiredPluginLocations(javaProject);
+			
+			for(String pluginLocation : requiredPluginLocations) {
+				if (!hasWorkspaceDependency(pluginLocation)) {
+					classPathEntries.remove(pluginLocation);
+				}
+			}
+						
+			List<URL> urlList = new ArrayList<URL>(classPathEntries.size());
+			
+			for (String entry : classPathEntries) {
+				 URL url = new File(entry).toURI().toURL();
+				 urlList.add(url);
+			}
+			
+			return urlList.toArray(new URL[] {});
+		}
+		
+		ClassLoader getParentClassLoader(IJavaProject javaProject) {
+			
+			ClassLoader root = ProjectClassLoader.class.getClassLoader();
+			
+			IPluginModelBase pluginModel = PluginRegistry.findModel(javaProject.getProject());
+			
+			if (pluginModel == null) {
+				return root;
+			}
+			
+			IPluginImport[] imports = pluginModel.getPluginBase().getImports();
+			final List<IPluginModelBase> importedPlugins = new ArrayList<IPluginModelBase>(imports.length);
+			
+			for(IPluginImport i : imports) {
+				IPluginModelBase importedPlugin = PluginRegistry.findModel(i.getId());
+				
+				if (importedPlugin != null) {
+					importedPlugins.add(importedPlugin);
+				}
+			}
+			
+			if (importedPlugins.isEmpty()) {
+				return root;
+			}
+			
+			return new ClassLoader() {
+				
+				private Map<String, Class<?>> loadedClasses = new HashMap<String, Class<?>>();
+				
+				@Override
+				protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+													
+					if (loadedClasses.containsKey(name)) {
+						Class<?> result = loadedClasses.get(name);
+						
+						if (result == null) {
+							throw new ClassNotFoundException();
+						}
+						else {
+							return result;
+						}
+					}
+									
+					for(IPluginModelBase importedPlugin : importedPlugins) {
+																	
+						try {
+							if (!hasWorkspaceDependency(importedPlugin)) {
+								String pluginId = importedPlugin.getPluginBase().getId();
+								Class<?> result = CommonPlugin.loadClass(pluginId, name);
+								
+						        if (resolve) {
+						            resolveClass(result);
+						        }
+								
+								loadedClasses.put(name, result);							
+								return result;
+							}
+						}
+						catch (ClassNotFoundException e) {
+							continue;
+						}
+						catch(CoreException e) {
+							continue;
+						}
+						
+					}
+					
+					loadedClasses.put(name, null);
+					throw new ClassNotFoundException();
+				}
+			};
+		}
 	}
 }
