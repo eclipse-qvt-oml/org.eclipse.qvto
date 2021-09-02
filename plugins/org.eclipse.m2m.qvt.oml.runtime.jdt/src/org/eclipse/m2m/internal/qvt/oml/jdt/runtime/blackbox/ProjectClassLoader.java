@@ -263,7 +263,7 @@ public class ProjectClassLoader extends URLClassLoader {
 			return urlList.toArray(new URL[] {});
 		}
 		
-		ClassLoader getParentClassLoader(IJavaProject javaProject) {
+		ClassLoader getParentClassLoader(IJavaProject javaProject) throws CoreException {
 			
 			ClassLoader root = ProjectClassLoader.class.getClassLoader();
 			
@@ -279,7 +279,7 @@ public class ProjectClassLoader extends URLClassLoader {
 			for(IPluginImport i : imports) {
 				IPluginModelBase importedPlugin = PluginRegistry.findModel(i.getId());
 				
-				if (importedPlugin != null) {
+				if (importedPlugin != null && !hasWorkspaceDependency(importedPlugin)) {
 					importedPlugins.add(importedPlugin);
 				}
 			}
@@ -309,22 +309,17 @@ public class ProjectClassLoader extends URLClassLoader {
 					for(IPluginModelBase importedPlugin : importedPlugins) {
 																	
 						try {
-							if (!hasWorkspaceDependency(importedPlugin)) {
-								String pluginId = importedPlugin.getPluginBase().getId();
-								Class<?> result = CommonPlugin.loadClass(pluginId, name);
-								
-						        if (resolve) {
-						            resolveClass(result);
-						        }
-								
-								loadedClasses.put(name, result);							
-								return result;
-							}
+							String pluginId = importedPlugin.getPluginBase().getId();
+							Class<?> result = CommonPlugin.loadClass(pluginId, name);
+							
+					        if (resolve) {
+					            resolveClass(result);
+					        }
+							
+							loadedClasses.put(name, result);							
+							return result;
 						}
 						catch (ClassNotFoundException e) {
-							continue;
-						}
-						catch(CoreException e) {
 							continue;
 						}
 						
