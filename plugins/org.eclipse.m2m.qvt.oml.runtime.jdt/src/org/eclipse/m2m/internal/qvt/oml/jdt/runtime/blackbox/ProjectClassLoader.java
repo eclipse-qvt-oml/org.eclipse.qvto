@@ -263,6 +263,17 @@ public class ProjectClassLoader extends URLClassLoader {
 			return urlList.toArray(new URL[] {});
 		}
 		
+		private static String getPrefix(String fullyQualifiedName) {
+			int lastIndex = fullyQualifiedName.lastIndexOf('.');
+			
+			if (lastIndex == -1) {
+				return null;
+			}
+			else {
+				return fullyQualifiedName.substring(0, lastIndex);
+			}
+		}
+
 		ClassLoader getParentClassLoader(IJavaProject javaProject) throws CoreException {
 			
 			ClassLoader root = ProjectClassLoader.class.getClassLoader();
@@ -292,6 +303,55 @@ public class ProjectClassLoader extends URLClassLoader {
 				
 				private Map<String, Class<?>> loadedClasses = new HashMap<String, Class<?>>();
 				
+				private Map<String, List<String>> package2plugins = new HashMap<String, List<String>>();
+				
+				private List<String> getCandidateHostPlugins(String className) {
+					
+					String packageName = getPrefix(className);
+					
+					if (package2plugins.containsKey(packageName)) {
+						return package2plugins.get(packageName);
+					};
+					
+					while (packageName != null) {
+						IPluginModelBase pluginModel = PluginRegistry.findModel(packageName);
+						
+						if (pluginModel != null) {
+							return Collections.singletonList(pluginModel.getPluginBase().getId());
+						}
+						
+						packageName = getPrefix(packageName);
+					};
+					
+					return Collections.emptyList();
+				}
+								
+				private Class<?> loadClassFromPlugin(String name, boolean resolve, String pluginId) throws ClassNotFoundException {
+					Class<?> result = CommonPlugin.loadClass(pluginId, name);
+					
+			        if (resolve) {
+			            resolveClass(result);
+			        }
+					
+			        register(result, pluginId);
+					
+					return result;
+				}
+				
+				private void register(Class<?> c, String pluginId) {
+					loadedClasses.put(c.getName(), c);
+			        
+					String packageName = c.getPackageName();
+			        List<String> plugins = package2plugins.get(packageName);
+			        
+			        if (plugins == null) {
+			        	plugins = new ArrayList<String>(1);
+			        	package2plugins.put(packageName, plugins);
+			        }
+			        
+			        plugins.add(pluginId);
+				}
+								
 				@Override
 				protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 													
@@ -305,19 +365,27 @@ public class ProjectClassLoader extends URLClassLoader {
 							return result;
 						}
 					}
+					
+					List<String> candidateHosts = getCandidateHostPlugins(name);
+										
+					for(String host : candidateHosts) {
+						try {							
+							return loadClassFromPlugin(name, resolve, host);
+						}
+						catch(ClassNotFoundException e) {
+							continue;
+						}
+					}
+
 									
 					for(IPluginModelBase importedPlugin : importedPlugins) {
 																	
 						try {
 							String pluginId = importedPlugin.getPluginBase().getId();
-							Class<?> result = CommonPlugin.loadClass(pluginId, name);
 							
-					        if (resolve) {
-					            resolveClass(result);
-					        }
-							
-							loadedClasses.put(name, result);							
-							return result;
+							if(!candidateHosts.contains(pluginId)) {
+								return loadClassFromPlugin(name, resolve, pluginId);
+							}
 						}
 						catch (ClassNotFoundException e) {
 							continue;
