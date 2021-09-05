@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IContainer;
@@ -303,9 +305,9 @@ public class ProjectClassLoader extends URLClassLoader {
 				
 				private Map<String, Class<?>> loadedClasses = new HashMap<String, Class<?>>();
 				
-				private Map<String, List<String>> package2plugins = new HashMap<String, List<String>>();
+				private Map<String, Set<String>> package2plugins = new HashMap<String, Set<String>>();
 				
-				private List<String> getCandidateHostPlugins(String className) {
+				private Set<String> getCandidateHostPlugins(String className) {
 					
 					String packageName = getPrefix(className);
 					
@@ -317,13 +319,13 @@ public class ProjectClassLoader extends URLClassLoader {
 						IPluginModelBase pluginModel = PluginRegistry.findModel(packageName);
 						
 						if (pluginModel != null) {
-							return Collections.singletonList(pluginModel.getPluginBase().getId());
+							return Collections.singleton(pluginModel.getPluginBase().getId());
 						}
 						
 						packageName = getPrefix(packageName);
 					};
 					
-					return Collections.emptyList();
+					return Collections.emptySet();
 				}
 								
 				private Class<?> loadClassFromPlugin(String name, boolean resolve, String pluginId) throws ClassNotFoundException {
@@ -341,15 +343,21 @@ public class ProjectClassLoader extends URLClassLoader {
 				private void register(Class<?> c, String pluginId) {
 					loadedClasses.put(c.getName(), c);
 			        
-					String packageName = c.getPackageName();
-			        List<String> plugins = package2plugins.get(packageName);
-			        
-			        if (plugins == null) {
-			        	plugins = new ArrayList<String>(1);
-			        	package2plugins.put(packageName, plugins);
-			        }
-			        
-			        plugins.add(pluginId);
+					Package p = c.getPackage();
+					
+					if (p != null) {
+						String packageName = p.getName();
+				        Set<String> plugins = package2plugins.get(packageName);
+				        
+				        if (plugins == null) {
+				        	plugins = new LinkedHashSet<String>(1);
+				        	package2plugins.put(packageName, plugins);
+				        }
+				        
+				        if(!plugins.contains(pluginId)) {
+				        	plugins.add(pluginId);
+				        }
+					}
 				}
 								
 				@Override
@@ -366,7 +374,7 @@ public class ProjectClassLoader extends URLClassLoader {
 						}
 					}
 					
-					List<String> candidateHosts = getCandidateHostPlugins(name);
+					Set<String> candidateHosts = getCandidateHostPlugins(name);
 										
 					for(String host : candidateHosts) {
 						try {							
@@ -376,8 +384,7 @@ public class ProjectClassLoader extends URLClassLoader {
 							continue;
 						}
 					}
-
-									
+				
 					for(IPluginModelBase importedPlugin : importedPlugins) {
 																	
 						try {
