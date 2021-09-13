@@ -128,16 +128,11 @@ abstract class JavaModuleLoader {
 			if(!Modifier.isPublic(constructor.getModifiers())) {
 				return false;
 			}
-		} catch (SecurityException e) {
-			return false;
-		} catch (NoSuchMethodException e) {
-			return false;
-		} catch (NoClassDefFoundError e) {
-			return false;
-		} catch(LinkageError e) {
+			else {		
+				return Modifier.isPublic(javaClass.getModifiers());
+			}
+		} catch (Throwable t) { // bad class
 			return false;
 		}
-		
-		return Modifier.isPublic(javaClass.getModifiers());
 	}
 }
