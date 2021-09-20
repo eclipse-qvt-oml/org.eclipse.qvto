@@ -184,25 +184,27 @@ public class ProjectClassLoader extends URLClassLoader {
 	@Override
 	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 		
-		Class<?> result = findLoadedClass(name);
-		
-		if (result == null) {		
-			try {
-				result = findClass(name);
+		synchronized (getClassLoadingLock(name)) {
+			Class<?> result = findLoadedClass(name);
+			
+			if (result == null) {		
+				try {
+					result = findClass(name);
+				}
+				catch(ClassNotFoundException e) {
+					result = getParent().loadClass(name);
+				}
+				catch(Throwable t) {
+					throw new ClassNotFoundException(name, t);
+				}
 			}
-			catch(ClassNotFoundException e) {
-				result = getParent().loadClass(name);
-			}
-			catch(Throwable t) {
-				throw new ClassNotFoundException();
-			}
+			
+	        if (resolve) {
+	            resolveClass(result);
+	        }
+	        
+	        return result;
 		}
-		
-        if (resolve) {
-            resolveClass(result);
-        }
-        
-        return result;
 	}
 				
 	private static class WorkspaceDependencyAnalyzer {
@@ -319,7 +321,7 @@ public class ProjectClassLoader extends URLClassLoader {
 						Class<?> result = loadedClasses.get(name);
 						
 						if (result == null) {
-							throw new ClassNotFoundException();
+							throw new ClassNotFoundException(name);
 						}
 						else {
 							return result;
@@ -340,7 +342,7 @@ public class ProjectClassLoader extends URLClassLoader {
 					}
 					
 					loadedClasses.put(name, null);
-					throw new ClassNotFoundException();
+					throw new ClassNotFoundException(name);
 				}
 			};
 		}
