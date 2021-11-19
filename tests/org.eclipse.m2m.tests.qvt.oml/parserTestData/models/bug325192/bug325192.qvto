@@ -34,7 +34,7 @@ main() {
 	assert fatal (v8->size() = 3);
 	
 	var resolved8 : List(EClass) = resolveoneIn(EClass::mapToListInc, List(EClass));
-	assert fatal (resolved8->size() = 1);
+	assert fatal (resolved8->size() = 3);
 
 	var v9 : Dict(EClass, EClass) = object EClass{}.map mapToDict();
 	assert fatal (v9->size() = 1);
