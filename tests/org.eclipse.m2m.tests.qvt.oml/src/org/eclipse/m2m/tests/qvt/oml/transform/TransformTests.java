@@ -598,6 +598,7 @@ public class TransformTests extends TestCase {
         		},
         		new PluginDependencyProjectData("bug573659", "bug573659_referenced"), //$NON-NLS-1$ //$NON-NLS-2$
         		new FilesToFilesData("bug570407").includeMetamodelFile("bug570407.ecore"),
+        		new FilesToFilesData("bug573718"), //$NON-NLS-1$ 
         	};
     }
 

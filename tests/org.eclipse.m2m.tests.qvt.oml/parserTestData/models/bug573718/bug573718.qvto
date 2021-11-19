@@ -1,0 +1,17 @@
+modeltype Ecore uses ecore('http://www.eclipse.org/emf/2002/Ecore');
+
+transformation bug573718();
+
+main() {
+	var c = object EClass{};
+	
+	var x = map m(c); -- add c to list x
+	assert fatal (x->includes(c)); -- succeeds, c was added
+	
+	var y = map m(c); -- invoke the same mapping again
+	assert fatal (y->includes(c)); -- must not fail, list should include c 
+}
+
+mapping m(c : EClass) : List(EClass) {
+	result += c;
+}
