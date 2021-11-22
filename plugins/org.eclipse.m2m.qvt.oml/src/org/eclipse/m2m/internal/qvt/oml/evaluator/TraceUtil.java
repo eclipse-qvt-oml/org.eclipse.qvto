@@ -344,6 +344,14 @@ public class TraceUtil {
         varParameterValue.setValue(createEValue(oclObject, kind));
         return varParameterValue;
     }
+    
+    /**
+	 * @deprecated Use {@link #createEValue(Object, DirectionKind)}.
+	 */
+    @Deprecated
+    public static EValue createEValue(Object oclObject) {
+    	return createEValue(oclObject, DirectionKind.IN);
+    }
 
     @SuppressWarnings("unchecked")
     public static EValue createEValue(Object oclObject, DirectionKind kind) {
