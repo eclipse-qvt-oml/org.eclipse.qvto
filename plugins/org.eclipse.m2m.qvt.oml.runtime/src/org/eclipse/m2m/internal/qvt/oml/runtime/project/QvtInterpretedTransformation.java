@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2007, 2018 Borland Software Corporation and others.
- * 
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v20.html
- * 
+ *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *     Christopher Gerking - bug 427237
@@ -69,27 +69,27 @@ public class QvtInterpretedTransformation implements QvtTransformation {
 	public QvtInterpretedTransformation(IFile transformationFile) {
     	this(new WorkspaceQvtModule(transformationFile));
     }
-	
+
 	public QvtInterpretedTransformation(QvtModule qvtModule) {
 		if(qvtModule == null) {
 			throw new IllegalArgumentException("Null QvtModule"); //$NON-NLS-1$
 		}
     	myModule = qvtModule;
     }
-	
+
 	public QvtModule getModule() {
 		return myModule;
 	}
-	
+
 	@Deprecated
     public ModelContent loadInput(URI inputObjectURI) throws MdaException {
     	return EmfUtil.loadModel(inputObjectURI, myModule.getResourceSet());
     }
-    
+
     public void setQvtCompilerOptions(QvtCompilerOptions options) {
     	myModule.setQvtCompilerOptions(options);
     }
-    
+
     @Deprecated
 	public org.eclipse.m2m.internal.qvt.oml.runtime.generator.TransformationRunner.Out run(org.eclipse.m2m.internal.qvt.oml.runtime.generator.TransformationRunner.In in) throws MdaException {
         Module module = myModule.getModule();
@@ -121,14 +121,14 @@ public class QvtInterpretedTransformation implements QvtTransformation {
             	throw new MdaException(e.getCause());
             }
         }
-        
+
         return evaluate(myModule.getResourceSet(), module, inputs, new Context(in.getContext()));
     }
-	
+
 	public String getModuleName() throws MdaException {
 		return myModule.getModule().getName();
 	}
-	
+
 	public URI getURI() {
 		CompiledUnit unit = getUnit();
 		return unit != null ? unit.getURI() : URI.createURI(""); //$NON-NLS-1$
@@ -141,7 +141,7 @@ public class QvtInterpretedTransformation implements QvtTransformation {
 	public boolean hasEntryOperation() throws MdaException {
 		return QvtOperationalParserUtil.getMainOperation(myModule.getModule()) != null;
 	}
-	
+
 	public boolean isBlackbox() throws MdaException {
 		return myModule.getModule().isIsBlackbox();
 	}
@@ -149,20 +149,20 @@ public class QvtInterpretedTransformation implements QvtTransformation {
     public Set<QvtConfigurationProperty> getConfigurationProperties() throws MdaException {
         return myModule.getConfigurationProperties();
     }
-    
+
 	public ResourceSet getResourceSet() {
 		return myModule.getResourceSet();
 	}
-	
+
 	public CompiledUnit getUnit() {
 		try {
 			return myModule.getUnit();
 		} catch(MdaException e) {
 			IStatus status = e.getStatus();
-    		
+
     		myDiagnostic = new ExecutionDiagnosticImpl(Diagnostic.ERROR, status.getCode(), status.getMessage());
 			myDiagnostic.addAll(BasicDiagnostic.toDiagnostic(status));
-    		    		
+
 			return null;
 		}
 	}
@@ -173,39 +173,39 @@ public class QvtInterpretedTransformation implements QvtTransformation {
 
 	protected QvtOperationalEnvFactory getEnvironmentFactory() {
 		if(myEnvFactory == null) {
-			myEnvFactory = new QvtOperationalEnvFactory();
+			myEnvFactory = new QvtOperationalEnvFactory(getResourceSet().getPackageRegistry());
 		}
     	return myEnvFactory;
     }
-	
+
 	protected void setEnvironmentFactory(QvtOperationalEnvFactory factory) {
 		myEnvFactory = factory;
 	}
-    
+
 	@Deprecated
 	private org.eclipse.m2m.internal.qvt.oml.runtime.generator.TransformationRunner.Out evaluate(ResourceSet rs, Module module, List<ModelContent> args, IContext context) {
 		QvtOperationalEnvFactory factory = getEnvironmentFactory();
-				
+
 		QvtOperationalEvaluationEnv evaluationEnv = factory.createEvaluationEnvironment(context, null);
 		// FIXME
 		setArguments(evaluationEnv, (OperationalTransformation) module, args, rs);
-		
+
 		CompiledUnit unit;
 		try {
 			unit = myModule.getUnit();
 		} catch (MdaException e) {
-			// bad but we can not do better until 
-			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=264335 is done 
+			// bad but we can not do better until
+			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=264335 is done
 			throw new IllegalStateException("unit must be available"); //$NON-NLS-1$
 		}
 		QvtOperationalFileEnv rootEnv = factory.createEnvironment(unit.getURI());
 
-		EvaluationVisitor<EPackage, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, EClass, EObject>		
+		EvaluationVisitor<EPackage, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, EClass, EObject>
 			evaluator = factory.createEvaluationVisitor(rootEnv, evaluationEnv, null);
-		
-		Trace traces = evaluationEnv.getAdapter(InternalEvaluationEnv.class).getTraces(); 
+
+		Trace traces = evaluationEnv.getAdapter(InternalEvaluationEnv.class).getTraces();
 		Object outObj = module.accept(evaluator);
-		
+
         if (false == outObj instanceof QvtEvaluationResult) {
             return new org.eclipse.m2m.internal.qvt.oml.runtime.generator.TransformationRunner.Out(Collections.<ModelExtentContents>emptyList(),
             		Collections.emptyList(), traces);
@@ -217,35 +217,35 @@ public class QvtInterpretedTransformation implements QvtTransformation {
 
 	private static void setArguments(QvtOperationalEvaluationEnv evalEnv, OperationalTransformation transformation,
 			List<ModelContent> args, ResourceSet compilerRS) {
-		List<ModelParameterExtent> tranformArgs = new ArrayList<ModelParameterExtent>(); 
+		List<ModelParameterExtent> tranformArgs = new ArrayList<ModelParameterExtent>();
 		int argCount = 0;
 		for (ModelParameter modelParam : transformation.getModelParameter()) {
-			ModelParameterExtent extent;			
+			ModelParameterExtent extent;
 			if(modelParam.getKind() != org.eclipse.m2m.internal.qvt.oml.expressions.DirectionKind.OUT) {
 				if(argCount >= args.size()) {
-					throw new IllegalArgumentException("Invalid count of input arguments"); //$NON-NLS-1$ 
+					throw new IllegalArgumentException("Invalid count of input arguments"); //$NON-NLS-1$
 				}
 
 				ModelContent nextArg = args.get(argCount++);
-			
+
 				if(nextArg == null) {
 					throw new IllegalArgumentException("Non-null model argument is required"); //$NON-NLS-1$
 		    	} else {
 		    		extent = new ModelParameterExtent(nextArg.getContent(), compilerRS, modelParam);
 		    	}
-				
+
 			} else {
 				extent = new ModelParameterExtent(compilerRS);
 			}
-			
+
 			evalEnv.addModelExtent(extent);
-	    	tranformArgs.add(extent);			
+	    	tranformArgs.add(extent);
 		}
 
 		List<ModelInstance> modelArgs = ModelParameterHelper.createModelArguments(transformation, tranformArgs);
-		evalEnv.getOperationArgs().addAll(modelArgs);		
+		evalEnv.getOperationArgs().addAll(modelArgs);
 	}
-	
+
 	@Override
 	public String toString() {
 		try {
@@ -255,31 +255,31 @@ public class QvtInterpretedTransformation implements QvtTransformation {
 		}
 		return super.toString();
 	}
-    
+
     private final QvtModule myModule;
     private QvtOperationalEnvFactory myEnvFactory;
-    
+
     private ExecutionDiagnostic myDiagnostic = ExecutionDiagnosticImpl.createOkInstance();
-        
+
     public OperationalTransformation getTransformation(IProgressMonitor monitor) {
     	try {
     		Module module = myModule.getModule();
-    	
+
     		return module instanceof OperationalTransformation ? (OperationalTransformation) module : null;
     	}
     	catch(MdaException e) {
     		IStatus status = e.getStatus();
-    		
+
     		myDiagnostic = new ExecutionDiagnosticImpl(Diagnostic.ERROR, status.getCode(), status.getMessage());
 			myDiagnostic.addAll(BasicDiagnostic.toDiagnostic(status));
-    		    		
+
 			return null;
     	}
     	finally {
     		monitor.done();
     	}
     }
-        
+
     public ExecutionDiagnostic getDiagnostic() {
     	return myDiagnostic;
     }

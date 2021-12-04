@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v20.html
- *   
+ *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *******************************************************************************/
@@ -34,7 +34,7 @@ import org.eclipse.ocl.utilities.UMLReflection;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Manages the override indicators for the given QVT element and annotation model. 
+ * Manages the override indicators for the given QVT element and annotation model.
  */
 class OverrideIndicatorManager implements IQVTReconcilingListener {
 
@@ -72,17 +72,17 @@ class OverrideIndicatorManager implements IQVTReconcilingListener {
 	 * Updates the override and implements annotations based
 	 * on the given compilation unit.
 	 *
-	 * @param unit the compilation unit 
+	 * @param unit the compilation unit
 	 * @param progressMonitor the progress monitor
 	 */
-	protected void updateAnnotations(CompiledUnit unit, IProgressMonitor progressMonitor) {		
+	protected void updateAnnotations(CompiledUnit unit, IProgressMonitor progressMonitor) {
 		if (progressMonitor.isCanceled()) {
 			return;
 		}
 
-		UMLReflection<?, EClassifier, EOperation, ?, ?, EParameter, ?, ?, ?, ?> uml = 
-			QvtOperationalEnvFactory.INSTANCE.createEnvironment().getUMLReflection();
-				
+		UMLReflection<?, EClassifier, EOperation, ?, ?, EParameter, ?, ?, ?, ?> uml =
+			QvtOperationalEnvFactory.INSTANCE.createEnvironment().getUMLReflection();	// Global instance used since only want the UMLReflection.
+
 		Map<Annotation, Position> annotationMap = Collections.emptyMap();
 
 		if(unit != null && unit.getUnitCST() != null) {
@@ -91,13 +91,13 @@ class OverrideIndicatorManager implements IQVTReconcilingListener {
 					if (progressMonitor.isCanceled()) {
 						return;
 					}
-					
+
 					if(methodCS.getAst() instanceof ImperativeOperation) {
 						ImperativeOperation imperativeOperation = (ImperativeOperation) methodCS.getAst();
 						if(imperativeOperation.getOverridden() != null) {
 							String text = NLS.bind(Messages.OverrideAnnotationText, SignatureUtil.getOperationSignature(uml, imperativeOperation.getOverridden()));
 							Annotation annotation = new Annotation(ANNOTATION_TYPE, false, text);
-							
+
 							Position position = new Position(methodCS.getStartOffset(), 1);
 							if(annotationMap.isEmpty()) {
 								annotationMap = new HashMap<Annotation, Position>();
@@ -108,7 +108,7 @@ class OverrideIndicatorManager implements IQVTReconcilingListener {
 				}
 			}
 		}
-		
+
 		if (progressMonitor.isCanceled()) {
 			return;
 		}
@@ -122,7 +122,7 @@ class OverrideIndicatorManager implements IQVTReconcilingListener {
 					fAnnotationModel.addAnnotation(mapEntry.getKey(), mapEntry.getValue());
 				}
 			}
-			
+
 			fOverrideAnnotations = annotationMap.keySet().toArray(new Annotation[annotationMap.keySet().size()]);
 		}
 	}
@@ -147,11 +147,13 @@ class OverrideIndicatorManager implements IQVTReconcilingListener {
 		}
 	}
 
+	@Override
 	public void reconciled(CompiledUnit unit, IProgressMonitor monitor) {
-		updateAnnotations(unit, new NullProgressMonitor());		
+		updateAnnotations(unit, new NullProgressMonitor());
 	}
-		
+
+	@Override
 	public void aboutToBeReconciled() {
 		// do nothing
-	}	
+	}
 }

@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2008, 2018 Borland Software Corporation and others.
- * 
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v20.html
- * 
+ *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *     Christopher Gerking - Bug394188
@@ -41,35 +41,35 @@ public class ExtOCLEnvironmentWithQVTAccessTest extends OCLEnvironmentWithQVTAcc
 
 	@Override
 	protected EcoreEvaluationEnvironment getEvaluationEnv(Query query) {
-		return QvtOperationalEnvFactory.INSTANCE.createEvaluationEnvironment(new Context(), null);
+		return QvtOperationalEnvFactory.getInstance().createEvaluationEnvironment(new Context(), null);
 	}
-	
+
 	@Override
-	protected Object evaluate(EcoreEvaluationEnvironment evalEnv, Query query) {	
+	protected Object evaluate(EcoreEvaluationEnvironment evalEnv, Query query) {
 		QvtOperationalEvaluationVisitorImpl visitor = QvtOperationalEvaluationVisitorImpl
 				.createNonTransformationExecutionContextVisitor(
-						QvtOperationalEnvFactory.INSTANCE.createEnvironment(),
+						QvtOperationalEnvFactory.getInstance().createEnvironment(),
 						(QvtOperationalEvaluationEnv)evalEnv,
 						new ImportToNonTransformCtxHelper(getImportedModules(), true)
 						//getImportedModules(), new HashMap<Module, ModuleInstance>(3), new HashSet<ModuleInstance>()
 						);
-		
-		return visitor.visitExpression(query.getExpression());		
+
+		return visitor.visitExpression(query.getExpression());
 	}
-	
+
 	@Override
 	protected Object evaluate(EcoreEvaluationEnvironment evalEnv, Query query, Object self) {
-		evalEnv.add(Environment.SELF_VARIABLE_NAME, self);		
+		evalEnv.add(Environment.SELF_VARIABLE_NAME, self);
 		return evaluate(evalEnv, query);
 	}
-	
+
 	@Test
 	public void testcallQueryThrowingException() throws Exception {
-		OCLHelper<EClassifier, EOperation, EStructuralFeature, Constraint> helper = fOCL.createOCLHelper();		
-		try {					
-			helper.setContext(EcorePackage.eINSTANCE.getENamedElement());			
+		OCLHelper<EClassifier, EOperation, EStructuralFeature, Constraint> helper = fOCL.createOCLHelper();
+		try {
+			helper.setContext(EcorePackage.eINSTANCE.getENamedElement());
 			helper.setValidating(true);
-			
+
 			org.eclipse.ocl.expressions.OCLExpression<EClassifier> q = helper.createQuery("callQueryThrowingException()");
 			assertNull(helper.getProblems());
 			try {
@@ -82,14 +82,14 @@ public class ExtOCLEnvironmentWithQVTAccessTest extends OCLEnvironmentWithQVTAcc
 				assertEquals("q1", e1.getModuleName());
 				assertEquals("throwingException", e1.getOperationName());
 				assertEquals(37, e1.getLineNumber());
-				
+
 				ExecutionStackTraceElement e2 = stackElements.get(1);
 				assertEquals("q2", e2.getModuleName());
 				assertEquals("callQueryThrowingException", e2.getOperationName());
 				assertEquals(28, e2.getLineNumber());
 			}
 		} catch (ParserException e) {
-			assertNotNull(helper.getProblems() != null);			
+			assertNotNull(helper.getProblems() != null);
 		}
 	}
 }

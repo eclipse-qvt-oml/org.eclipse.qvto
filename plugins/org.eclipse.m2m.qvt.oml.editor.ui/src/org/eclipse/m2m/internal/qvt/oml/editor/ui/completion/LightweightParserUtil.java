@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2007, 2018 Borland Software Corporation and others.
- * 
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v20.html
- * 
+ *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *******************************************************************************/
@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnvFactory;
 import org.eclipse.m2m.internal.qvt.oml.ast.parser.QvtOperationalVisitorCS;
@@ -49,14 +50,14 @@ public class LightweightParserUtil {
     public enum ParserTypeEnum {
         LIGHTWEIGHT_PARSER, LIGHTWEIGHT_TYPE_PARSER
     }
-    
+
     public static final int[] IMPERATIVE_OPERATION_TOKENS = {
-        QVTOParsersym.TK_mapping, 
+        QVTOParsersym.TK_mapping,
         QVTOParsersym.TK_helper,
         QVTOParsersym.TK_query,
         QVTOParsersym.TK_main
     };
-    
+
     public static final int[] OCLEXPRESSION_START_TOKENS = {
         QVTOParsersym.TK_RESET_ASSIGN, QVTOParsersym.TK_ADD_ASSIGN,
         QVTOParsersym.TK_EQUAL, QVTOParsersym.TK_NOT_EQUAL, QVTOParsersym.TK_NOT_EQUAL_EXEQ,
@@ -76,7 +77,7 @@ public class LightweightParserUtil {
         QVTOParsersym.TK_when,
         QVTOParsersym.TK_return
     };
-    
+
     public static final int[] OCLEXPRESSION_END_TOKENS = {
         QVTOParsersym.TK_BAR, QVTOParsersym.TK_QUESTIONMARK,
         QVTOParsersym.TK_COMMA, QVTOParsersym.TK_SEMICOLON,
@@ -85,8 +86,8 @@ public class LightweightParserUtil {
         QVTOParsersym.TK_RBRACE, QVTOParsersym.TK_RBRACKET, QVTOParsersym.TK_RPAREN,
         QVTOParsersym.TK_in,
     };
-    
-    public static final int[] OCLEXPRESSION_MANDATORY_TERMINATION_TOKENS = 
+
+    public static final int[] OCLEXPRESSION_MANDATORY_TERMINATION_TOKENS =
         uniteIntArrays(IMPERATIVE_OPERATION_TOKENS, new int[] {
                 QVTOParsersym.TK_init, QVTOParsersym.TK_end,
                 QVTOParsersym.TK_transformation, QVTOParsersym.TK_modeltype,
@@ -100,7 +101,7 @@ public class LightweightParserUtil {
         {QVTOParsersym.TK_LBRACE, QVTOParsersym.TK_RBRACE},
         {QVTOParsersym.TK_LBRACKET, QVTOParsersym.TK_RBRACKET},
     };
-    
+
     public static final int[] RESOLVE_FAMILY_TERMINALS = {
         QVTOParsersym.TK_resolve,
         QVTOParsersym.TK_resolveone,
@@ -111,14 +112,14 @@ public class LightweightParserUtil {
         QVTOParsersym.TK_invresolveIn,
         QVTOParsersym.TK_invresolveoneIn
     };
-    
+
     public static final int[] RESOLVEIN_FAMILY_TERMINALS = {
         QVTOParsersym.TK_resolveIn,
         QVTOParsersym.TK_resolveoneIn,
         QVTOParsersym.TK_invresolveIn,
         QVTOParsersym.TK_invresolveoneIn
     };
-    
+
     public static final String[] OCL_ITERATOR_TERMINALS = {
         PredefinedType.SELECT_NAME,
         PredefinedType.REJECT_NAME,
@@ -132,42 +133,42 @@ public class LightweightParserUtil {
         PredefinedType.SORTED_BY_NAME,
         PredefinedType.CLOSURE_NAME,
     };
-    
+
     public static final int[] QVTO_ITERATOR_TERMINALS_WITH_IMPLICIT_ITERATOR = {
         QVTOParsersym.TK_xselect,
         QVTOParsersym.TK_xcollect,
         QVTOParsersym.TK_selectOne,
         QVTOParsersym.TK_collectOne
     };
-    
-    public static final int[] QVTO_ITERATOR_TERMINALS = 
+
+    public static final int[] QVTO_ITERATOR_TERMINALS =
         uniteIntArrays(QVTO_ITERATOR_TERMINALS_WITH_IMPLICIT_ITERATOR,  new int[] {
                 QVTOParsersym.TK_collectselect,
                 QVTOParsersym.TK_collectselectOne
         });
-    
+
     public static final int[] MAPPING_CLAUSE_TOKENS = {
-        QVTOParsersym.TK_when, 
+        QVTOParsersym.TK_when,
         QVTOParsersym.TK_where
     };
-    
+
     public static final int[] MAPPING_CALL_TERMINALS = {
         QVTOParsersym.TK_map,
         QVTOParsersym.TK_xmap
     };
-    
+
     public static final int[] FOR_EXP_TERMINALS = {
         QVTOParsersym.TK_forEach,
         QVTOParsersym.TK_forOne
     };
-    
+
     public static int[] uniteIntArrays(int[] array1, int[] array2) {
         int[] result = new int[array1.length + array2.length];
         System.arraycopy(array1, 0, result, 0, array1.length);
         System.arraycopy(array2, 0, result, array1.length, array2.length);
         return result;
     }
-    
+
     public static final IToken getNextToken(IToken token) {
         IPrsStream prsStream = token.getIPrsStream();
         int nextTokenIndex = token.getTokenIndex() + 1;
@@ -189,7 +190,7 @@ public class LightweightParserUtil {
     public static final IToken getNextTokenByKind(IToken startToken, int kind) {
         return getNextTokenByKind(startToken, new int[] {kind});
     }
-    
+
     public static final IToken getNextTokenByKind(IToken startToken, int[] kinds) {
         IPrsStream prsStream = startToken.getIPrsStream();
         for (int i = startToken.getTokenIndex(), n = prsStream.getSize(); i < n; i++) {
@@ -200,11 +201,11 @@ public class LightweightParserUtil {
         }
         return null;
     }
-    
+
     public static final IToken getPreviousTokenByKind(IToken startToken, int kind) {
         return getPreviousTokenByKind(startToken, new int[] {kind});
     }
-    
+
     public static final IToken getPreviousTokenByKind(IToken startToken, int[] kinds) {
         IToken currentToken = startToken;
         while ((currentToken = LightweightParserUtil.getPreviousToken(currentToken)) != null) {
@@ -214,9 +215,9 @@ public class LightweightParserUtil {
         }
         return null;
     }
-    
+
     public static final String getTokenText(int tokenKind) {
-        return QVTOParsersym.orderedTerminalSymbols[tokenKind];        
+        return QVTOParsersym.orderedTerminalSymbols[tokenKind];
     }
 
     public static final OCLExpression<EClassifier> getOclExpression(IToken trailingToken, QvtCompletionData data, ParserTypeEnum parserType) {
@@ -258,7 +259,7 @@ public class LightweightParserUtil {
         }
         return null;
     }
-    
+
     public static final String getText(IToken start, IToken end) {
         int startOffset = start.getStartOffset();
         int endOffset = end.getEndOffset();
@@ -282,15 +283,15 @@ public class LightweightParserUtil {
         }
         return LightweightParserUtil.getText(tokens[0], tokens[tokens.length - 1]);
     }
-    
+
     public static final CSTNode parse(IToken[] tokens, UnitProxy unit, ParserTypeEnum parserType) {
         String script = LightweightParserUtil.getText(tokens);
         return parse(script, unit, parserType);
     }
-    
+
     public static final CSTNode parse(String script, UnitProxy unit, ParserTypeEnum parserType) {
         try {
-        	QvtOperationalEnv env = new QvtOperationalEnvFactory().createEnvironment();
+        	QvtOperationalEnv env = new QvtOperationalEnvFactory(EPackage.Registry.INSTANCE).createEnvironment();
             QVTOLexer lexer = new QVTOLexer(env, new OCLInput(script).getContent(), unit.getName(), 4);
             AbstractQVTParser parser = null;
             switch (parserType) {
@@ -353,7 +354,7 @@ public class LightweightParserUtil {
         }
         return null;
     }
-    
+
     public static final IToken getPairingBrace(IToken brace, boolean isForward) {
         int bracingPairKind = getBracingPairKind(brace, isForward);
         int lBraceKind = BRACING_PAIRS[bracingPairKind][0];
@@ -373,7 +374,7 @@ public class LightweightParserUtil {
         }
         return null;
     }
-    
+
     public static final int getBracingPairKind(IToken token, boolean isStart) {
         for (int i = 0; i < BRACING_PAIRS.length; i++) {
             int kind = isStart ? BRACING_PAIRS[i][0] : BRACING_PAIRS[i][1];
@@ -383,7 +384,7 @@ public class LightweightParserUtil {
         }
         return -1;
     }
-    
+
     public static final IToken[] getScopedIdentifier(IToken trailingToken) {
         boolean isColonColonExpected = QvtCompletionData.isKindOf(trailingToken, QVTOParsersym.TK_COLONCOLON);
         List<IToken> tokens = new LinkedList<IToken>();
@@ -405,18 +406,19 @@ public class LightweightParserUtil {
         } while ((currentToken = LightweightParserUtil.getPreviousToken(currentToken)) != null);
         return null; // unexpected start of stream!
     }
-    
+
     private static interface ILightweightParser {
         public EObject runParser() throws ParserException;
     }
-    
-    
+
+
     private static class RunnableLightweightParser extends LightweightParser implements ILightweightParser {
         public RunnableLightweightParser(QVTOLexer lexStream) {
             super(lexStream);
         }
-        
-        public CSTNode runParser() throws ParserException {
+
+        @Override
+		public CSTNode runParser() throws ParserException {
             return parser(-1);
         }
     }
@@ -425,8 +427,9 @@ public class LightweightParserUtil {
         public RunnableLightweightTypeParser(QVTOLexer lexStream) {
             super(lexStream);
         }
-        
-        public CSTNode runParser() throws ParserException {
+
+        @Override
+		public CSTNode runParser() throws ParserException {
             return parser(-1);
         }
     }

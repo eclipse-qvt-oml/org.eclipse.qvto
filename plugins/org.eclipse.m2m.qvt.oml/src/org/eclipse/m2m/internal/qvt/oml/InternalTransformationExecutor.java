@@ -304,7 +304,7 @@ public class InternalTransformationExecutor {
 	}
 
 	protected QvtOperationalEnvFactory getEnvironmentFactory() {
-		return fEnvFactory != null ? fEnvFactory : new QvtOperationalEnvFactory();
+		return fEnvFactory != null ? fEnvFactory : new QvtOperationalEnvFactory(getResourceSet().getPackageRegistry());
 	}
 
 	public void cleanup() {

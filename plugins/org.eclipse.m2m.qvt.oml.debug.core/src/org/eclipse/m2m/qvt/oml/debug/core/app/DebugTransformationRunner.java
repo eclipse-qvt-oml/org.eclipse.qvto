@@ -33,12 +33,12 @@ public class DebugTransformationRunner extends TransformationRunner {
 
 	private IQVTODebuggerShell fDebugShell;
 	private PrintWriter fErrorLog;
-	
-	public DebugTransformationRunner(URI transformationURI, 
-			EPackage.Registry packageRegistry, 
+
+	public DebugTransformationRunner(URI transformationURI,
+			EPackage.Registry packageRegistry,
 			List<URI> modelParamURIs) {
 		super(transformationURI, packageRegistry, modelParamURIs);
-		
+
 		fErrorLog = new PrintWriter(new OutputStream() {
 			@Override
 			public void write(int b) throws IOException {
@@ -46,61 +46,63 @@ public class DebugTransformationRunner extends TransformationRunner {
 			}
 		}, true);
 	}
-	
+
 	public void setErrorLog(PrintWriter errorLog) {
 		if(errorLog == null) {
 			throw new IllegalArgumentException();
 		}
 		this.fErrorLog = errorLog;
 	}
-	
+
 	@Override
 	protected QvtOperationalEnvFactory getEnvFactory() {
 		if(fDebugShell != null) {
-			return new DebugEnvironmentFactory(fDebugShell);
+			return new DebugEnvironmentFactory(fDebugShell, getExecutor().getResourceSet().getPackageRegistry());
 		}
 		return super.getEnvFactory();
 	}
-	
+
 	@Override
 	protected void handleLoadExtents(Diagnostic diagnostic) {
 	}
-	
+
 	@Override
 	protected void handleLoadTransformation(Diagnostic diagnostic) {
 	}
-	
+
+	@Override
 	protected void handleExecution(org.eclipse.m2m.qvt.oml.ExecutionDiagnostic execDiagnostic) {
 		List<ExecutionStackTraceElement> stackTrace = execDiagnostic.getStackTrace();
 		if(stackTrace != null && execDiagnostic.getCode() != ExecutionDiagnostic.USER_INTERRUPTED) {
 			//fErrorLog.println(execDiagnostic);
-			
+
 			if (!stackTrace.isEmpty()) {
-				fErrorLog.println("[QVTO Stack trace:]");				
+				fErrorLog.println("[QVTO Stack trace:]");
 				execDiagnostic.printStackTrace(fErrorLog);
 				fErrorLog.println();
 			}
 		}
-		
+
 		if(execDiagnostic.getException() != null) {
 			fErrorLog.println("[Java cause:]");
 			execDiagnostic.getException().printStackTrace(fErrorLog);
 		}
-		
+
 		fErrorLog.flush();
-	}	
-	
+	}
+
 	@Override
 	protected void handleSaveExtents(Diagnostic diagnostic) {
-		
+
 	}
 
 	/**
 	 * @since 2.6
 	 */
 	public DebuggableExecutorAdapter createDebuggableAdapter(final ExecutionContext context) {
-		
+
 		return new DebuggableExecutorAdapter() {
+			@Override
 			public Diagnostic execute() throws IllegalStateException {
 				if(fDebugShell == null) {
 					throw new IllegalStateException("Executor not connected to debugger"); //$NON-NLS-1$
@@ -110,9 +112,9 @@ public class DebugTransformationRunner extends TransformationRunner {
 				if(mainUnit != null) {
 					QVTODebugUtil.attachEnvironment(mainUnit);
 				}
-				
+
 				Diagnostic execDiagnostic = DebugTransformationRunner.this.execute(context);
-				
+
 				//if(execDiagnostic.getSeverity() != Diagnostic.OK) {
 					fErrorLog.println(execDiagnostic);
 				//}
@@ -120,13 +122,15 @@ public class DebugTransformationRunner extends TransformationRunner {
 				return execDiagnostic;
 			}
 
+			@Override
 			public CompiledUnit getUnit() {
 				return getExecutor().getUnit();
 			}
-			
+
+			@Override
 			public void connect(IQVTODebuggerShell debugShell) {
-				fDebugShell = debugShell;			
-			}			
+				fDebugShell = debugShell;
+			}
 		};
 	}
 }

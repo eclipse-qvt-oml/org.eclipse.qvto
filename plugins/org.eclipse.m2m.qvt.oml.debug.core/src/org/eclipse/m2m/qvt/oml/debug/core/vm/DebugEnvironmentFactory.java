@@ -19,6 +19,7 @@ import org.eclipse.emf.ecore.EEnumLiteral;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EPackage.Registry;
 import org.eclipse.emf.ecore.EParameter;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnv;
@@ -36,14 +37,20 @@ import org.eclipse.ocl.ecore.SendSignalAction;
 
 
 public final class DebugEnvironmentFactory extends QvtOperationalEnvFactory {
-						
+
 	private final IQVTODebuggerShell debuggerShell;
 	private long envUIDGenerator = 0;
-	
+
+	@Deprecated /* @deprecated see Bug 577620 pass a package registry */
 	public DebugEnvironmentFactory(IQVTODebuggerShell debuggerShell) {
-		this.debuggerShell = debuggerShell;			
+		this(debuggerShell, EPackage.Registry.INSTANCE);
 	}
-	
+
+	public DebugEnvironmentFactory(IQVTODebuggerShell debuggerShell, Registry packageRegistry) {
+		super(packageRegistry);
+		this.debuggerShell = debuggerShell;
+	}
+
 	@Override
 	public EvaluationEnvironment<EClassifier, EOperation, EStructuralFeature, EClass, EObject> createEvaluationEnvironment(
 			EvaluationEnvironment<EClassifier, EOperation, EStructuralFeature, EClass, EObject> parent) {
@@ -55,7 +62,8 @@ public final class DebugEnvironmentFactory extends QvtOperationalEnvFactory {
 
 		return super.createEvaluationEnvironment(parent);
 	}
-	
+
+	@Override
 	public QvtOperationalEvaluationEnv createEvaluationEnvironment(IContext context, QvtOperationalEvaluationEnv parent) {
 		return new DebugEvaluationEnvironment(context, parent, envUIDGenerator++);
 	}
@@ -69,17 +77,17 @@ public final class DebugEnvironmentFactory extends QvtOperationalEnvFactory {
 		if ((env instanceof QvtOperationalEnv == false) || (evalEnv instanceof QvtOperationalEvaluationEnv == false)) {
 			return super.createEvaluationVisitor(env, evalEnv, extentMap);
 		}
-		
+
 		if ((debuggerShell instanceof IQVTODebuggerShellExtension) && ((IQVTODebuggerShellExtension)debuggerShell).isSessionStarted()) {
 			return super.createEvaluationVisitor(env, evalEnv, extentMap);
 		}
 
-	    // ADD SYNC mechanism, for this point being a QVTO VM started, as from here we have access to the 
+	    // ADD SYNC mechanism, for this point being a QVTO VM started, as from here we have access to the
 	    // evaluator => DBG creation event?
-	    
-		QVTODebugEvaluator evaluatorVisitor = new QVTODebugEvaluator((QvtOperationalEnv) env, 
+
+		QVTODebugEvaluator evaluatorVisitor = new QVTODebugEvaluator((QvtOperationalEnv) env,
 				(QvtOperationalEvaluationEnv) evalEnv, debuggerShell);
-		
+
 		QvtOperationalEvaluationVisitor result = evaluatorVisitor.createDebugInterceptor();
 		return result;
 	}

@@ -35,23 +35,23 @@ import org.eclipse.m2m.qvt.oml.ModelExtent;
 
 public class TransformationRunner  {
 
-	private final URI fTransformationURI;	
+	private final URI fTransformationURI;
 	private final TracesAwareExecutor fExecutor;
 	private final List<URI> fModelParamURIs;
 	private URI fTraceFileURI;
 	private boolean fIsSaveTrace;
 	private boolean fIsIncrementalUpdate;
-	
+
 	private BasicDiagnostic fDiagnostic;
-	private List<ModelExtent> fModelParams;		
+	private List<ModelExtent> fModelParams;
 	private ModelExtentHelper fExtentHelper;
 	private org.eclipse.m2m.qvt.oml.util.Trace fIncrementalTrace;
-	
-	
+
+
 	public TransformationRunner(URI transformationURI, EPackage.Registry packageRegistry, List<URI> modelParamURIs) {
 		this(getTransformation(transformationURI, packageRegistry), modelParamURIs);
 	}
-	
+
 	protected TransformationRunner(Transformation transformation, List<URI> modelParamURIs) {
 		if (transformation == null || modelParamURIs == null
 				|| modelParamURIs.contains(null)) {
@@ -62,24 +62,24 @@ public class TransformationRunner  {
 		fTransformationURI = transformation.getURI();
 		fModelParamURIs = modelParamURIs;
 	}
-	
+
 	private static Transformation getTransformation(URI transformationURI, EPackage.Registry packageRegistry) {
-		return packageRegistry == null ? new CstTransformation(transformationURI) : 
+		return packageRegistry == null ? new CstTransformation(transformationURI) :
 			new CstTransformation(transformationURI, packageRegistry);
 	}
-		
+
 	protected InternalTransformationExecutor getExecutor() {
 		return fExecutor;
 	};
-	
+
 	public URI getTransformationURI() {
 		return fTransformationURI;
 	}
-	
+
 	public void setTraceFile(URI traceFileURI) {
 		fTraceFileURI = traceFileURI;
 	}
-	
+
 	public void setSaveTrace(boolean isSaveTrace) {
 		fIsSaveTrace = isSaveTrace;
 	}
@@ -92,39 +92,39 @@ public class TransformationRunner  {
 		if(fDiagnostic != null) {
 			return fDiagnostic;
 		}
-		
+
 		fDiagnostic = QvtPlugin.createDiagnostic("Transformation runner initialize"); //$NON-NLS-1$
-		
+
 		Diagnostic loadDiagnostic = fExecutor.loadTransformation(new NullProgressMonitor());
 		if(!isSuccess(loadDiagnostic)) {
 			fDiagnostic.add(loadDiagnostic);
 		}
 
 		handleLoadTransformation(loadDiagnostic);
-		
+
 		OperationalTransformation transformation = fExecutor.getTransformation();
 		if(transformation == null) {
 			return fDiagnostic;
 		}
-		
+
 		// Note: initialized here already loaded transformation is required
 		fExtentHelper = new ModelExtentHelper(transformation, fModelParamURIs, fExecutor.getResourceSet());
-		
-		Diagnostic extentsDiagnostic = Diagnostic.OK_INSTANCE; 
+
+		Diagnostic extentsDiagnostic = Diagnostic.OK_INSTANCE;
 		try {
 			fModelParams = fExtentHelper.loadExtents();
 		} catch (DiagnosticException e) {
 			extentsDiagnostic = e.getDiagnostic();
 		}
-		
+
 		handleLoadExtents(extentsDiagnostic);
 		if(!isSuccess(extentsDiagnostic)) {
 			fDiagnostic.add(extentsDiagnostic);
 		}
-		
+
 		fIncrementalTrace = null;
 		if (fIsIncrementalUpdate) {
-			Diagnostic traceDiagnostic = Diagnostic.OK_INSTANCE; 
+			Diagnostic traceDiagnostic = Diagnostic.OK_INSTANCE;
 
 			ModelContent traceContent = EmfUtil.safeLoadModel(fTraceFileURI, fExecutor.getResourceSet());
 			if (traceContent != null) {
@@ -134,63 +134,63 @@ public class TransformationRunner  {
 				traceDiagnostic = QvtPlugin.createWarnDiagnostic(
 						NLS.bind(Messages.FailToLoadTraceForIncrementalUpdateExecution, fTraceFileURI));
 			}
-			
+
 			handleLoadTrace(traceDiagnostic);
 			if(!isSuccess(traceDiagnostic)) {
 				fDiagnostic.add(traceDiagnostic);
 			}
 		}
-		
-		// FIXME - 
+
+		// FIXME -
 		// add validation for configuration properties and param count
 		// into the internal executor
 
 		// TODO - collect WARN, INFO diagnostics?
 		return fDiagnostic;
 	}
-	
+
 	protected QvtOperationalEnvFactory getEnvFactory() {
-		return new QvtOperationalEnvFactory(); 
+		return new QvtOperationalEnvFactory(fExecutor.getResourceSet().getPackageRegistry());
 	}
-	
+
 	protected void handleLoadTransformation(Diagnostic diagnostic) {
 		// do nothing
-	}	
-			
+	}
+
 	protected void handleLoadExtents(Diagnostic diagnostic) {
 		// do nothing
-	}	
+	}
 
 	protected void handleLoadTrace(Diagnostic diagnostic) {
 		// do nothing
-	}	
+	}
 
 	protected void handleExecution(ExecutionDiagnostic execDiagnostic) {
 		// do nothing
 	}
-	
+
 	protected void handleSaveExtents(Diagnostic diagnostic) {
 		// do nothing
-	}		
+	}
 
 
 	public Diagnostic execute(ExecutionContext context) {
 		Diagnostic diagnostic = initialize();
-		
+
 		if(!isSuccess(diagnostic)) {
 			return diagnostic;
 		}
 
 		fExecutor.setEnvironmentFactory(getEnvFactory());
-		try {			
+		try {
 			ModelExtent[] params = fModelParams.toArray(new ModelExtent[fModelParams.size()]);
-			
+
 			if (fIncrementalTrace != null) {
 				context.getSessionData().setValue(QVTEvaluationOptions.INCREMENTAL_UPDATE_TRACE, fIncrementalTrace);
 			}
 			ExecutionDiagnostic execDiagnostic = fExecutor.execute(context, params);
 			handleExecution(execDiagnostic);
-			
+
 			if(!isSuccess(execDiagnostic)) {
 				// skip saving any output
 				return execDiagnostic;
@@ -199,7 +199,7 @@ public class TransformationRunner  {
 			// can continue and save output
 			Diagnostic saveExtentsDiagnostic = fExtentHelper.saveExtents(context.getSessionData().getValue(QVTEvaluationOptions.FLAG_QVTO_UNPARSE_ENABLED));
 			handleSaveExtents(saveExtentsDiagnostic);
-			
+
 			if(!isSuccess(saveExtentsDiagnostic)) {
 				return saveExtentsDiagnostic;
 			}
@@ -212,10 +212,10 @@ public class TransformationRunner  {
 			return execDiagnostic;
 		} finally {
 			fExecutor.cleanup();
-		}			
+		}
 	}
-	
-	private Diagnostic saveTraces(Trace trace) { 
+
+	private Diagnostic saveTraces(Trace trace) {
 		if(fTraceFileURI != null && fIsSaveTrace) {
 			try {
 				new TraceSerializer(trace).saveTraceModel(fTraceFileURI);
@@ -225,7 +225,7 @@ public class TransformationRunner  {
 						message, new Object[] { e });
 			}
 		}
-		
+
 		return Diagnostic.OK_INSTANCE;
 	}
 }
