@@ -1,16 +1,17 @@
 /*******************************************************************************
  * Copyright (c) 2007, 2018 Borland Software Corporation and others.
- * 
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v20.html
- *   
+ *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *     Alex Paperno - bug 416584
  *     Christine Gerpheide - bug 432969
  *     Christopher Gerking - bug 537041
+ *     Ed Willink - bug 577620
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.ast.env;
 
@@ -46,20 +47,30 @@ import org.eclipse.ocl.ecore.EcoreEnvironmentFactory;
 import org.eclipse.ocl.ecore.SendSignalAction;
 
 /**
- * A factory class for operational QVT environments creation.  
+ * A factory class for operational QVT environments creation.
  */
 public class QvtOperationalEnvFactory extends EcoreEnvironmentFactory {
 
 	/**
-     * A shared instance of the QV environment factory using the global package registry 
-     * for creating environments.
-     * <p>
-     * FIXME - Using a copy of the global registry until it's ensured that QVT environments do not 
-     * store into its package registry imported metamodels, so other EMF clients are not affected.     
-	 */	
-	public static final QvtOperationalEnvFactory INSTANCE = new QvtOperationalEnvFactory();
-		
-	/* TODO - Do we need a default constructor? */
+     * A shared instance of the QVT environment factory using a global QVT package registry that
+     * delegates to the EMF global package registry
+     *
+     * @deprecated See Bug 577620 - use of the global QVT package.registry is discouraged.
+	 */
+	@Deprecated
+	public static final QvtOperationalEnvFactory INSTANCE = new QvtOperationalEnvFactory(new EPackageRegistryImpl(EPackage.Registry.INSTANCE));
+
+	public static QvtOperationalEnvFactory getInstance() {		// Debug aid to facilitate deprecation removal
+		return INSTANCE;
+	}
+
+	/**
+	 * Construct a QVT environment factory with a new QVT Package Registry that delegates to the
+	 * global EMF package registry.
+	 *
+     * @deprecated See Bug 577620 - use of an explicit package registry from a ResourceSet is encouraged.
+	 */
+	@Deprecated
 	public QvtOperationalEnvFactory() {
 		super(new EPackageRegistryImpl(EPackage.Registry.INSTANCE));
 	}
@@ -67,13 +78,13 @@ public class QvtOperationalEnvFactory extends EcoreEnvironmentFactory {
 	/**
 	 * Initializes me with an <code>EPackage.Registry</code> that the
      * environments I create will use to look up packages.
-     * 
+     *
      * @param reg my package registry (must not be <code>null</code>)
 	 */
 	public QvtOperationalEnvFactory(Registry reg) {
 		super(reg);
 	}
-	
+
 	@Override
 	public QvtOperationalEnv createEnvironment() {
 		QvtOperationalEnv env = new QvtOperationalEnv(getEPackageRegistry(), null);
@@ -86,7 +97,7 @@ public class QvtOperationalEnvFactory extends EcoreEnvironmentFactory {
 		env.setFactory(this);
 		return env;
 	}
-	
+
 	@Override
     public QvtOperationalEnv createEnvironment(Environment<EPackage, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, EClass, EObject> parent) {
         if (!(parent instanceof QvtOperationalEnv)) {
@@ -101,18 +112,18 @@ public class QvtOperationalEnvFactory extends EcoreEnvironmentFactory {
 		env.setFactory(this);
 		return env;
 	}
-	
-	public QvtOperationalModuleEnv createModuleEnvironment(final Module module) {		
+
+	public QvtOperationalModuleEnv createModuleEnvironment(final Module module) {
 		QvtOperationalModuleEnv env = new QvtOperationalModuleEnv(getEPackageRegistry(), module.eResource());
-		env.setFactory(this);		
+		env.setFactory(this);
 		env.setContextModule(module);
-		QvtOperationalStdLibrary.INSTANCE.importTo(env);		
+		QvtOperationalStdLibrary.INSTANCE.importTo(env);
 		return env;
 	}
 
 	public QvtOperationalModuleEnv createModuleEnvironment(final Module module, QvtOperationalFileEnv parentEnv) {
 		QvtOperationalModuleEnv moduleEnv = new QvtOperationalModuleEnv(parentEnv.getEPackageRegistry(), parentEnv.getTypeResolver().getResource());
-		moduleEnv.setFactory(this);		
+		moduleEnv.setFactory(this);
 		moduleEnv.setContextModule(module);
 		QvtOperationalStdLibrary.INSTANCE.importTo(moduleEnv);
 		parentEnv.addInnerEnvironment(moduleEnv);
@@ -120,8 +131,8 @@ public class QvtOperationalEnvFactory extends EcoreEnvironmentFactory {
 		moduleEnv.setASTNodeToCSTNodeMap(parentEnv.getASTNodeToCSTNodeMap());
 		return moduleEnv;
 	}
-	
-	
+
+
 	@Override
 	public QvtOperationalEnv createOperationContext(
 			Environment<EPackage, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, EClass, EObject> parent,
@@ -129,11 +140,11 @@ public class QvtOperationalEnvFactory extends EcoreEnvironmentFactory {
 		QvtOperationalEnv newEnv = createEnvironment(parent);
 		QvtOperationalEnv parentEnv = (QvtOperationalEnv) parent;
 		newEnv.setASTNodeToCSTNodeMap(parentEnv.getASTNodeToCSTNodeMap());
-		
-		newEnv.setContextOperation(operation);		
+
+		newEnv.setContextOperation(operation);
 		return newEnv;
 	}
-	
+
 	@Override
 	public EvaluationEnvironment<EClassifier, EOperation, EStructuralFeature, EClass, EObject> createEvaluationEnvironment(
 			EvaluationEnvironment<EClassifier, EOperation, EStructuralFeature, EClass, EObject> parent) {
@@ -145,21 +156,21 @@ public class QvtOperationalEnvFactory extends EcoreEnvironmentFactory {
 
 		return super.createEvaluationEnvironment(parent);
 	}
-	
+
 	public QvtOperationalEvaluationEnv createEvaluationEnvironment(IContext context, QvtOperationalEvaluationEnv parent) {
 		return new QvtOperationalEvaluationEnv(context, parent);
 	}
-	
+
 	@Override
 	public EvaluationVisitor<EPackage, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, EClass, EObject> createEvaluationVisitor(
 			Environment<EPackage, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, EClass, EObject> env,
 			EvaluationEnvironment<EClassifier, EOperation, EStructuralFeature, EClass, EObject> evalEnv,
 			Map<? extends EClass, ? extends Set<? extends EObject>> extentMap) {
-		
+
 		if((env instanceof QvtOperationalEnv == false) || (evalEnv instanceof QvtOperationalEvaluationEnv == false)) {
 			return super.createEvaluationVisitor(env, evalEnv, extentMap);
 		}
-		
+
 		InternalEvaluator visitor = (InternalEvaluator) QvtOperationalEvaluationVisitorImpl.createVisitor((QvtOperationalEnv)env, (QvtOperationalEvaluationEnv)evalEnv);
 
 		// Wrap in any decorators
@@ -171,7 +182,7 @@ public class QvtOperationalEnvFactory extends EcoreEnvironmentFactory {
 				QvtPlugin.getDefault().log(new Status(IStatus.ERROR, QvtPlugin.ID, message, e));
 			}
 		}
-		
+
 		return visitor;
 	}
 }
