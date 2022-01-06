@@ -17,17 +17,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceProxy;
-import org.eclipse.core.resources.IResourceProxyVisitor;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchMatch;
+import org.eclipse.jdt.core.search.SearchParticipant;
+import org.eclipse.jdt.core.search.SearchPattern;
+import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxException;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxUnit;
@@ -36,7 +41,7 @@ import org.eclipse.m2m.internal.qvt.oml.blackbox.LoadContext;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.ResolutionContext;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.java.JavaBlackboxProvider;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.URIUtils;
-import org.eclipse.m2m.internal.qvt.oml.runtime.project.ProjectDependencyTracker;
+import org.eclipse.m2m.qvt.oml.blackbox.java.Module;
 
 public class JdtBlackboxProvider extends JavaBlackboxProvider {
 
@@ -50,22 +55,15 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 		if (project == null) {
 			return Collections.emptyList();			
 		}
-		
-		Set<IProject> referencedProjects = ProjectDependencyTracker.getAllReferencedProjects(project, true);
-		
-		List<IProject> projects = new ArrayList<IProject>(referencedProjects.size() + 1);
-		projects.add(project);
-		projects.addAll(referencedProjects);
-
+				
 		List<BlackboxUnitDescriptor> descriptors = new ArrayList<BlackboxUnitDescriptor>();
-		for (IProject p : projects) {
-			final List<String> classes = getAllClasses(p, resolutionContext);
-			
-			for (String qualifiedName : classes) {
-				BlackboxUnitDescriptor jdtUnitDescriptor = getJdtUnitDescriptor(project, qualifiedName);
-				if (jdtUnitDescriptor != null) {
-					descriptors.add(jdtUnitDescriptor);
-				}
+		
+		final List<String> classes = getAllClasses(project, resolutionContext);
+		
+		for (String qualifiedName : classes) {
+			BlackboxUnitDescriptor jdtUnitDescriptor = getJdtUnitDescriptor(project, qualifiedName);
+			if (jdtUnitDescriptor != null) {
+				descriptors.add(jdtUnitDescriptor);
 			}
 		}
 		
@@ -151,38 +149,28 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 		final List<String> classes = new ArrayList<String>();
 
 		try {
-			IJavaProject javaProject = JavaCore.create(project);
-			IResource folder = ResourcesPlugin.getWorkspace().getRoot().findMember(javaProject.getOutputLocation());
+			SearchPattern searchPattern = SearchPattern.createPattern(Module.class.getCanonicalName(),
+					IJavaSearchConstants.ANNOTATION_TYPE, 
+					IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE,
+					SearchPattern.R_EXACT_MATCH);
 			
-			if (folder != null) {
-				final String folderPath = folder.getFullPath().toString();
-	
-				folder.accept(new IResourceProxyVisitor() {
-	
-					public boolean visit(IResourceProxy proxy) throws CoreException {
-						if (proxy.getType() == IResource.FOLDER) {
-							return true;
-						}
-						if (proxy.getType() == IResource.FILE) {
-							if (proxy.getName().endsWith(".class")) {
-								if (!proxy.getName().contains("$")) {
-									String filePath = proxy.requestFullPath().toString();
-									filePath = filePath.substring(0, filePath.length() - 6);
-									if (filePath.startsWith(folderPath)) {
-										filePath = filePath.substring(folderPath.length() + 1);
-									}
-									String fqn = filePath.replace('/', '.');
-									if (context.getImports().isEmpty() || context.getImports().contains(fqn)) {
-										classes.add(fqn);
-									}
-								}
-							}
-						}
-						return false;
+			SearchParticipant[] searchParticipants = {SearchEngine.getDefaultSearchParticipant()};
+			
+			IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[] {JavaCore.create(project)});
+		 
+			SearchRequestor searchRequestor = new SearchRequestor() {
+				public void acceptSearchMatch(SearchMatch match) {
+					Object element = match.getElement();
+					
+					if (element instanceof IType) {
+						String fqn = ((IType) element).getFullyQualifiedName();
+						classes.add(fqn);
 					}
-	
-				}, IResource.NONE);
-			}
+				}
+			};
+		 
+			SearchEngine searchEngine = new SearchEngine();
+			searchEngine.search(searchPattern, searchParticipants, searchScope, searchRequestor, null);
 		} catch (CoreException e) {
 			// ignore
 		}
