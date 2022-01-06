@@ -8,15 +8,7 @@
  *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
-<<<<<<< Upstream, based on origin/ewillink/566216
-<<<<<<< Upstream, based on ewillink/565747
- *     Christopher Gerking - bugs 472482, 537041, 562177
-=======
- *     Christopher Gerking - bugs 537041, 562177, 566216
->>>>>>> 925cb1f [566216] Add parser test case to demonstrate the LSP violation
-=======
- *     Christopher Gerking - bugs 537041, 562177, 566230
->>>>>>> 561088c [566230] Add parser test case
+ *     Christopher Gerking - bugs 472482, 537041, 562177, 566216, 566230
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml;
 
@@ -52,6 +44,7 @@ import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaModelStatus;
 import org.eclipse.jdt.core.IJavaProject;
@@ -59,6 +52,7 @@ import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2m.internal.qvt.oml.QvtMessage;
+import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxRegistry;
 import org.eclipse.m2m.internal.qvt.oml.common.MDAConstants;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
@@ -287,8 +281,6 @@ public class TestQvtParser extends TestCase {
 		
 		copyData("sources/" + myData.getDir(), "parserTestData/sources/" + myData.getDir()); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		prepareJava();
-
 		final File folder = getDestinationFolder();
 		assertTrue("Invalid folder " + folder, folder.exists() && folder.isDirectory()); //$NON-NLS-1$
 
@@ -300,8 +292,8 @@ public class TestQvtParser extends TestCase {
 				return URI.createFileURI(absolutePath);
 			}
 		});
-
-		setupPluginXml();
+		
+		prepareJava();
 	}
 
 	@Override
@@ -427,6 +419,9 @@ public class TestQvtParser extends TestCase {
 			
 			IPluginImport qvtTestImport = pluginModel.createImport(AllTests.BUNDLE_ID);
 			pluginBase.add(qvtTestImport);
+			
+			IPluginImport qvtImport = pluginModel.createImport(QvtPlugin.ID);
+			pluginBase.add(qvtImport);
 
 			pluginModel.getExtensions().add(pluginExtension);
 			pluginModel.save();
@@ -542,8 +537,9 @@ public class TestQvtParser extends TestCase {
 		destPath = destPath.makeRelativeTo(workspacePath).makeAbsolute();
 
 		IPath binPath = destPath.append("bin"); //$NON-NLS-1$
+		IPath srcPath = destPath.append("src"); //$NON-NLS-1$
 
-		if (workspace.getRoot().exists(binPath)) {
+		if (workspace.getRoot().exists(binPath) || workspace.getRoot().exists(srcPath)) {
 			IProjectDescription desc = myProject.getProject().getDescription();
 
 			NatureUtils.addNature(desc, JavaCore.NATURE_ID);
@@ -554,10 +550,17 @@ public class TestQvtParser extends TestCase {
 
 			IJavaProject javaProject = JavaCore.create(myProject.getProject());
 			
-			javaProject.setOutputLocation(binPath, monitor);
+			if (workspace.getRoot().exists(binPath)) {
+				javaProject.setOutputLocation(binPath, monitor);
+			}
+				
+			List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>(3);
 			
-			List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>(2);
-			
+			if (workspace.getRoot().exists(srcPath)) {		
+				IClasspathAttribute testAttribute = JavaCore.newClasspathAttribute(IClasspathAttribute.TEST, Boolean.toString(true));
+				classpath.add(JavaCore.newSourceEntry(srcPath, new IPath[] {}, new IPath[] {}, null, new IClasspathAttribute[] {testAttribute}));
+			}
+									
 			classpath.add(JavaRuntime.getDefaultJREContainerEntry());				
 			classpath.add(ClasspathComputer.createContainerEntry());
 						
@@ -567,6 +570,10 @@ public class TestQvtParser extends TestCase {
 			IJavaModelStatus status = JavaConventions.validateClasspath(javaProject, entries, binPath);
 			assertTrue(status.isOK());
 			javaProject.setRawClasspath(entries, monitor);
+						
+			setupPluginXml();
+			
+			JavaCore.rebuildIndex(monitor);
 		}
 	}
 
