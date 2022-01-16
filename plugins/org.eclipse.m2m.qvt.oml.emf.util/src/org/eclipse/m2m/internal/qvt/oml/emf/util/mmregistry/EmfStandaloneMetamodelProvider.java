@@ -14,9 +14,17 @@ package org.eclipse.m2m.internal.qvt.oml.emf.util.mmregistry;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EFactory;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EPackage.Registry;
+import org.eclipse.emf.ecore.impl.EPackageRegistryImpl;
+import org.eclipse.emf.ecore.plugin.EcorePlugin;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.m2m.internal.qvt.oml.emf.util.EmfUtil;
 
 public class EmfStandaloneMetamodelProvider implements IMetamodelProvider {
 	
@@ -35,7 +43,41 @@ public class EmfStandaloneMetamodelProvider implements IMetamodelProvider {
     }
     
     public EPackage.Registry getPackageRegistry() {
-    	return fRegistry;
+    	
+   		final ResourceSet resourceSet = new ResourceSetImpl();
+		resourceSet.setPackageRegistry(fRegistry);
+		resourceSet.getURIConverter().getURIMap().putAll(EcorePlugin.computePlatformURIMap(true));
+		
+		@SuppressWarnings("serial")
+		EPackage.Registry registry = new EPackageRegistryImpl(fRegistry) {
+						
+			@Override
+			public EPackage getEPackage(String nsURI) {
+				
+				EPackage ePackage = super.getEPackage(nsURI);
+				
+				if (ePackage == null) {
+					if (nsURI != null && MetamodelRegistry.isMetamodelFileName(nsURI)) {
+				
+						URI uri = URI.createURI(nsURI);
+											
+						try {
+							Resource r = resourceSet.getResource(uri, true);
+													
+							if (r != null) {
+								ePackage = EmfUtil.getFirstEPackageContent(r);
+							}
+						} catch(Throwable t) {
+							return null;
+						};
+					}
+				};
+									
+				return ePackage;
+			}
+		};
+					
+		return registry;
     }
     
     public IMetamodelDesc[] getMetamodels() {    	
