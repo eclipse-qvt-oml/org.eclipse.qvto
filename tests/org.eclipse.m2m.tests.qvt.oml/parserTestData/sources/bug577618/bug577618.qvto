@@ -1,0 +1,9 @@
+modeltype TEST uses "platform:/resource/ParserTest/sources/bug577618/bug577618.ecore";
+
+transformation bug577618();
+
+main() {
+	object TestClass {
+		testAttribute := "test";
+	}
+}
