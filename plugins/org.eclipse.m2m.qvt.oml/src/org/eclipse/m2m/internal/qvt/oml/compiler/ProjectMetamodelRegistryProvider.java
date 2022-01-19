@@ -80,7 +80,13 @@ public class ProjectMetamodelRegistryProvider implements IMetamodelRegistryProvi
 		
 		URI uri = context.getURI();
 		if(!uri.isPlatformResource()) {
-			return delegateProvider.getRegistry(context);
+			
+			if (BlackboxUnitResolver.isBlackboxUnitURI(uri) && uri.hasFragment()) {
+				uri = URI.createPlatformResourceURI(uri.fragment(), true);
+			}
+			else {
+				return delegateProvider.getRegistry(context);
+			}
 		}
 		
 		IPath wsLocation = new Path(uri.toPlatformString(true));		
