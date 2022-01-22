@@ -34,7 +34,9 @@ import org.eclipse.m2m.tests.qvt.oml.bbox.Bug289982_Library;
 import org.eclipse.m2m.tests.qvt.oml.bbox.Bug425066_Library;
 import org.eclipse.m2m.tests.qvt.oml.bbox.Bug427237_Library;
 import org.eclipse.m2m.tests.qvt.oml.bbox.Bug565747_Library;
+import org.eclipse.m2m.tests.qvt.oml.bbox.Bug577992_Library;
 import org.eclipse.m2m.tests.qvt.oml.bbox.SimpleJavaLibrary;
+import org.eclipse.m2m.tests.qvt.oml.bbox.bug577992.Bug577992Package;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -600,6 +602,19 @@ public class TransformTests extends TestCase {
         		new PluginDependencyProjectData("bug573659", "bug573659_referenced", true), //$NON-NLS-1$ //$NON-NLS-2$
         		new FilesToFilesData("bug570407").includeMetamodelFile("bug570407.ecore"),
         		new FilesToFilesData("bug573718"), //$NON-NLS-1$ 
+        		new FilesToFilesData("bug577992") { //$NON-NLS-1$
+        			@Override
+        			public List<? extends EPackage> getUsedPackages() {
+        				List<EPackage> packages = new ArrayList<EPackage>(super.getUsedPackages());
+        				packages.add(Bug577992Package.eINSTANCE);
+        				return packages;
+        			}
+        			
+        			@Override
+        			public void prepare(BlackboxRegistry blackboxRegistry) {
+        				blackboxRegistry.registerModule(Bug577992_Library.class);
+        			}
+        		},
         	};
     }
 

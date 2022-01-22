@@ -1,0 +1,20 @@
+transformation bug577992();
+
+--import bbqvtomm.qvto.MyLibrary;
+import org.eclipse.m2m.tests.qvt.oml.bbox.Bug577992_Library;
+
+modeltype bug577992 uses "http://bug577992";
+
+main() {
+	var value = "test";
+	var c1 : TestClass = object DynamicTestClass {};
+	var c2 : TestClass = object DynamicTestClass {
+		attr := value;
+	};
+	
+    c1.copyName(c2);
+    
+    assert fatal (c1.attr = value);
+}
+
+intermediate class DynamicTestClass extends TestClass {}
