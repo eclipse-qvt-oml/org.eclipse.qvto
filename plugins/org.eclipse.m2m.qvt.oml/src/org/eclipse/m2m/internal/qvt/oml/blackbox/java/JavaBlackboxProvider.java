@@ -71,7 +71,7 @@ public abstract class JavaBlackboxProvider extends BlackboxProvider {
 
 			@Override
 			protected void loadModule(QvtOperationalModuleEnv moduleEnv, final Class<?> javaModuleClass) {
-				handlerFactory = new JavaMethodHandlerFactory(moduleEnv.getOCLStandardLibrary());
+				handlerFactory = new JavaMethodHandlerFactory(moduleEnv);
 
 				Module module = moduleEnv.getModuleContextType();
 				// FIXME - workaround to make Environment available with the

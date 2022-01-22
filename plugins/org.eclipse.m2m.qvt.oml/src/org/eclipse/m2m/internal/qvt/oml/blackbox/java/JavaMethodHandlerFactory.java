@@ -13,16 +13,30 @@
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.blackbox.java;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.emf.common.util.BasicDiagnostic;
+import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EOperation;
+import org.eclipse.emf.ecore.EParameter;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.m2m.internal.qvt.oml.NLS;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.InternalEvaluationEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
+import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
+import org.eclipse.m2m.internal.qvt.oml.emf.util.EmfUtil;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModuleInstance;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.NumberConversions;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.QvtInterruptedExecutionException;
@@ -38,9 +52,20 @@ class JavaMethodHandlerFactory {
 	private static int FAILURE_COUNT_TOLERANCE = 5;
 
 	final private Object fInvalid;
-
+	final private QvtOperationalModuleEnv fModuleEnv;
+	
+	JavaMethodHandlerFactory(QvtOperationalModuleEnv moduleEnv) {
+		fInvalid = moduleEnv.getOCLStandardLibrary().getInvalid();
+		fModuleEnv = moduleEnv;
+	}
+	
+	/**
+	 * @deprecated Call {@link #JavaMethodHandlerFactory(QvtOperationalModuleEnv)} instead.
+	 */
+	@Deprecated
 	JavaMethodHandlerFactory(OCLStandardLibrary<EClassifier> oclStdLib) {
 		fInvalid = oclStdLib.getInvalid();
+		fModuleEnv = null;
 	}
 
 	CallHandler createHandler(Method method) {
@@ -159,6 +184,18 @@ class JavaMethodHandlerFactory {
 				argIndex++;
 			}
 			if (fIsContextual) {
+				
+				// wrap dynamic EObject in proxy
+				if(source instanceof EObject) {
+					EObject eObject = (EObject) source;
+					
+					if (EmfUtil.isDynamic(eObject) && !fCachedParamTypes[argIndex].isAssignableFrom(eObject.getClass())) {
+						if (fCachedParamTypes[argIndex].isInterface()) {
+							source = convertEObjectToProxy(eObject, fCachedParamTypes[argIndex]);
+						}
+					}
+				}
+				
 				resultArgs[argIndex] = source;
 				argIndex++;
 			}
@@ -176,12 +213,22 @@ class JavaMethodHandlerFactory {
 				if(fRequiresNumConversion) {
 					nextArg = NumberConversions.convertNumber(nextArg, fCachedParamTypes[argIndex]);
 				}
+				// wrap dynamic EObject in proxy 
+				if(nextArg instanceof EObject) {
+					EObject eObject = (EObject) nextArg;
+					
+					if (EmfUtil.isDynamic(eObject) && !fCachedParamTypes[argIndex].isAssignableFrom(eObject.getClass())) {
+						if (fCachedParamTypes[argIndex].isInterface()) {
+							nextArg = convertEObjectToProxy(eObject, fCachedParamTypes[argIndex]);
+						}
+					}
+				}
 				resultArgs[argIndex++] = nextArg;
 			}
 
 			return resultArgs;
 		}
-
+				
 		private boolean requiresNumberConversion() {
 			assert fMethod != null;
 
@@ -191,6 +238,86 @@ class JavaMethodHandlerFactory {
 				}
 			}
 			return false;
+		}
+		
+		private Object convertEObjectToProxy(final EObject eObject, Class<?> proxyClass) {
+			
+			InvocationHandler handler = new InvocationHandler() {
+				
+				public Object invoke(Object proxy, Method method, Object[] args) throws InvocationTargetException, IllegalAccessException {
+									
+					List<EOperation> operations = eObject.eClass().getEAllOperations();
+					
+					for (EOperation operation : operations) {
+						if (isMatch(method, operation)) {							
+							return eObject.eInvoke(operation, args == null ? ECollections.newBasicEList() : ECollections.newBasicEList(args));
+						}
+					}
+					
+					List<EStructuralFeature> features = eObject.eClass().getEAllStructuralFeatures();
+					
+					for (EStructuralFeature feature : features) {
+						if (method.getName().equalsIgnoreCase("get" + feature.getName())) { //$NON-NLS-1$
+							return eObject.eGet(feature);
+						}
+						else if (method.getName().equalsIgnoreCase("set" + feature.getName())) { //$NON-NLS-1$
+							Object newValue = feature.isMany() ? ECollections.newBasicEList(args) : args.length > 0 ? args[0] : null;
+							eObject.eSet(feature, newValue);
+							return null;
+						}
+					};
+					
+					return method.invoke(eObject, args);
+				}
+			};
+			
+			return Proxy.newProxyInstance(proxyClass.getClassLoader(), new Class<?>[] {proxyClass}, handler);
+		}
+		
+		private boolean isMatch(Method method, EOperation operation) {
+			if (!operation.getName().equals(method.getName())) {
+				return false;
+			}
+				
+			EClassifier eType = fModuleEnv.getUMLReflection().getOCLType(operation.getEType());
+			
+			List<String> nsURIs;
+			Java2QVTTypeResolver typeResolver;
+			EClassifier eClassifier;
+		
+			if (eType != null) {
+				nsURIs = Collections.singletonList(eType.getEPackage().getNsURI());
+				typeResolver = new Java2QVTTypeResolver(fModuleEnv, nsURIs, new BasicDiagnostic());
+				eClassifier = typeResolver.toEClassifier(method.getGenericReturnType(), Java2QVTTypeResolver.STRICT_TYPE);
+			
+				if (eClassifier != eType) {
+					return false;
+				}
+			}
+				
+			List<Class<?>> parameterTypes = Arrays.asList(method.getParameterTypes());
+			List<EParameter> eParameters = operation.getEParameters();
+			
+			if (parameterTypes.size() != eParameters.size()) {
+				return false;
+			}
+				
+			Iterator<Class<?>> paramTypesIterator = parameterTypes.iterator();
+		
+			for (EParameter param : eParameters) {
+				eType = fModuleEnv.getUMLReflection().getOCLType(param.getEType());
+				nsURIs = Collections.singletonList(eType.getEPackage().getNsURI());
+				
+				Class<?> parameterType = paramTypesIterator.next();
+				typeResolver = new Java2QVTTypeResolver(fModuleEnv, nsURIs, new BasicDiagnostic());
+				eClassifier = typeResolver.toEClassifier(parameterType, Java2QVTTypeResolver.STRICT_TYPE);
+				
+				if (eClassifier != eType) {
+					return false;
+				}
+			}
+			
+			return true;
 		}
 	}
 }
