@@ -11,6 +11,11 @@
 			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" output="parserTestData/sources/bug577992/bin" path="parserTestData/sources/bug577992/src">
+		<attributes>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" output="parserTestData/sources/bug573752/bin" path="parserTestData/sources/bug573752/src">
 		<attributes>
 			<attribute name="test" value="true"/>

@@ -16,6 +16,13 @@
             genModel="models/generics.genmodel"/>
    </extension>
 
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <package
+            uri="http://bug577992"
+            class="org.eclipse.m2m.tests.qvt.oml.bbox.bug577992.Bug577992Package"
+            genModel="parserTestData/sources/bug577992/bug577992.genmodel"/>
+   </extension>
+	
    <extension
          point="org.eclipse.m2m.qvt.oml.runtime.qvtTransformation">
       <transformation
