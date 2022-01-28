@@ -44,12 +44,19 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.codegen.ecore.genmodel.GenModelPackage;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jdt.launching.LibraryLocation;
 import org.eclipse.m2m.internal.qvt.oml.QvtMessage;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxRegistry;
 import org.eclipse.m2m.internal.qvt.oml.common.MDAConstants;
@@ -70,6 +77,7 @@ import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.pde.core.plugin.IPluginExtension;
 import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.project.IBundleProjectDescription;
+import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
 import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
 import org.eclipse.pde.internal.core.project.PDEProject;
@@ -275,6 +283,25 @@ public class TestQvtParser extends TestCase {
 		if(myProject == null) {
 			myProject = new TestProject(name, new String[] {}, 0);
 		}
+		
+		copyData("sources/" + myData.getDir(), "parserTestData/sources/" + myData.getDir()); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		prepareJava();
+
+		final File folder = getDestinationFolder();
+		assertTrue("Invalid folder " + folder, folder.exists() && folder.isDirectory()); //$NON-NLS-1$
+
+		resSet = TestUtil.getMetamodelResolutionRS(new ResourceSetImpl(), myData.getMetamodels(), new TestUtil.UriProvider() {
+
+			@Override
+			public URI getModelUri(String model) {
+				String absolutePath = getFile(folder, model).getAbsolutePath();
+				return URI.createFileURI(absolutePath);
+			}
+		});
+
+		setupPluginXml();
+
 	}
 
 	@Override
@@ -310,24 +337,9 @@ public class TestQvtParser extends TestCase {
 	@Override
 	@Test
 	public void runTest() throws Exception {
-		copyData("sources/" + myData.getDir(), "parserTestData/sources/" + myData.getDir()); //$NON-NLS-1$ //$NON-NLS-2$
 
-		prepareJava();
-
-		final File folder = getDestinationFolder();
-		assertTrue("Invalid folder " + folder, folder.exists() && folder.isDirectory()); //$NON-NLS-1$
-
-		resSet = TestUtil.getMetamodelResolutionRS(new ResourceSetImpl(), myData.getMetamodels(), new TestUtil.UriProvider() {
-
-			@Override
-			public URI getModelUri(String model) {
-				String absolutePath = getFile(folder, model).getAbsolutePath();
-				return URI.createFileURI(absolutePath);
-			}
-		});
-
-		setupPluginXml();
-
+		File folder = getDestinationFolder();
+		
 		myCompiled = compile(folder);
 
 		assertTrue("No results", myCompiled.length > 0); //$NON-NLS-1$
@@ -389,11 +401,11 @@ public class TestQvtParser extends TestCase {
 			pluginBase.setId(myProject.getProject().getName());
 
 			IPluginExtension pluginExtension = pluginModel.createExtension();
-			pluginExtension.setPoint("org.eclipse.emf.ecore.generated_package");
+			pluginExtension.setPoint(EcorePackage.eCONTENT_TYPE + "." + EcorePlugin.GENERATED_PACKAGE_PPID);
 
 			for (URI metamodelUri : myData.getMetamodels()) {
 				String metamodelFileName = metamodelUri.trimFileExtension().lastSegment();
-				URI genmodelUri = metamodelUri.trimSegments(1).appendSegment(metamodelFileName).appendFileExtension("genmodel");
+				URI genmodelUri = metamodelUri.trimSegments(1).appendSegment(metamodelFileName).appendFileExtension(GenModelPackage.eNAME);
 				IPath genmodelPath = relativePath.append(genmodelUri.toString());
 
 				if (workspace.getRoot().exists(genmodelPath)) {
@@ -526,22 +538,38 @@ public class TestQvtParser extends TestCase {
 		IPath workspacePath = workspace.getRoot().getLocation();
 
 		destPath = destPath.makeRelativeTo(workspacePath).makeAbsolute();
-
+				
+		IPath srcPath = destPath.append("src"); //$NON-NLS-1$
 		IPath binPath = destPath.append("bin"); //$NON-NLS-1$
 
-		if (workspace.getRoot().exists(binPath)) {
+		if (workspace.getRoot().exists(srcPath) || workspace.getRoot().exists(binPath)) {
 			IProjectDescription desc = myProject.getProject().getDescription();
 
 			NatureUtils.addNature(desc, JavaCore.NATURE_ID);
-
-			myProject.getProject().setDescription(desc,
-					new NullProgressMonitor());
+			
+			IProgressMonitor monitor = new NullProgressMonitor();
+			
+			myProject.getProject().setDescription(desc, monitor);
 
 			IJavaProject javaProject = JavaCore.create(myProject.getProject());
 
 			if (workspace.getRoot().exists(binPath)) {
-				javaProject.setOutputLocation(binPath,
-						new NullProgressMonitor());
+				javaProject.setOutputLocation(binPath, monitor);
+			}
+			
+			if (workspace.getRoot().exists(srcPath)) {				
+				IVMInstall vm = JavaRuntime.getDefaultVMInstall();
+				LibraryLocation[] libs = JavaRuntime.getLibraryLocations(vm);
+				List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>();
+				
+				for (LibraryLocation lib : libs) {
+					classpath.add(JavaCore.newLibraryEntry(lib.getSystemLibraryPath(), null, null));
+				}
+				
+				classpath.add(ClasspathComputer.createContainerEntry());
+				classpath.add(JavaCore.newSourceEntry(srcPath));
+				
+				javaProject.setRawClasspath(classpath.toArray(new IClasspathEntry[classpath.size()]), monitor);
 			}
 		}
 	}
