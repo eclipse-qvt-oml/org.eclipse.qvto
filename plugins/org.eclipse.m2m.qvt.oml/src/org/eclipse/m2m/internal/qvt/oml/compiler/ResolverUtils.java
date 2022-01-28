@@ -155,4 +155,20 @@ public class ResolverUtils {
 			}
 		};
 	}
+	
+	public static String getQueryValue(URI uri, String key) {
+		if (uri.hasQuery()) {
+			String[] queries = uri.query().split("&"); //$NON-NLS-1$
+			
+			for(String query : queries) {
+				String[] parts = query.split("="); //$NON-NLS-1$
+				
+				if (parts.length > 1 && key.equals(parts[0])) {
+					 return parts[1];
+				}
+			}
+		}
+		
+		return null;
+	}
 }

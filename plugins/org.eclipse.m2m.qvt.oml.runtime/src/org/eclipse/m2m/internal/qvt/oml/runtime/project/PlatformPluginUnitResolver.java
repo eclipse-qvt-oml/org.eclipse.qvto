@@ -104,12 +104,14 @@ public class PlatformPluginUnitResolver extends DelegatingUnitResolver {
 	}
 
 	public static void setupResolver(PlatformPluginUnitResolver resolver, boolean useBlackbox, boolean useDeployed) {
+		UnitResolver blackboxResolver = new BlackboxUnitResolver(URI.createPlatformPluginURI(resolver.fBundle.getSymbolicName(), true));
+		
 		if(useBlackbox && !useDeployed) {
-			resolver.setParent(BlackboxUnitResolver.DEFAULT);
+			resolver.setParent(blackboxResolver);
 		} else if(useBlackbox && useDeployed) {
 			resolver.setParent(new CompositeUnitResolver(
 					DeployedImportResolver.INSTANCE, 
-					BlackboxUnitResolver.DEFAULT));
+					blackboxResolver));
 		}		
 	}
 	

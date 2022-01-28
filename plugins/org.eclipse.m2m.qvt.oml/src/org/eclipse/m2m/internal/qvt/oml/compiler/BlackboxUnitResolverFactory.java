@@ -22,7 +22,7 @@ public class BlackboxUnitResolverFactory extends UnitResolverFactory {
 
 	@Override
 	public UnitResolver getResolver(URI uri) {
-		return BlackboxUnitResolver.DEFAULT;
+		return new BlackboxUnitResolver(uri);
 	}
 
 	@Override
