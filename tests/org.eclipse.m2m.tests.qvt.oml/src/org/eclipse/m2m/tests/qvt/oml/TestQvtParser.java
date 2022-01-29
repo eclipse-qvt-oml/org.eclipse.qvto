@@ -541,7 +541,7 @@ public class TestQvtParser extends TestCase {
 				
 		IPath srcPath = destPath.append("src"); //$NON-NLS-1$
 		IPath binPath = destPath.append("bin"); //$NON-NLS-1$
-					
+
 		if (workspace.getRoot().exists(srcPath) || workspace.getRoot().exists(binPath)) {
 			IProjectDescription desc = myProject.getProject().getDescription();
 
@@ -554,7 +554,26 @@ public class TestQvtParser extends TestCase {
 			IJavaProject javaProject = JavaCore.create(myProject.getProject());
 
 			if (workspace.getRoot().exists(binPath)) {
-				javaProject.setOutputLocation(binPath, monitor);
+				javaProject.getOutputLocation();
+			}
+			
+			if (workspace.getRoot().exists(srcPath)) {				
+				List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>();
+				
+				IVMInstall vm = JavaRuntime.getDefaultVMInstall();
+				
+				if (vm != null) {
+					LibraryLocation[] libs = JavaRuntime.getLibraryLocations(vm);
+									
+					for (LibraryLocation lib : libs) {
+						classpath.add(JavaCore.newLibraryEntry(lib.getSystemLibraryPath(), null, null));
+					}
+				}
+				
+				classpath.add(ClasspathComputer.createContainerEntry());
+				classpath.add(JavaCore.newSourceEntry(srcPath));
+				
+				javaProject.setRawClasspath(classpath.toArray(new IClasspathEntry[classpath.size()]), monitor);
 			}
 		}
 	}
