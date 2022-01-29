@@ -537,14 +537,16 @@ public class TestQvtParser extends TestCase {
 		IPath srcPath = destPath.append("src"); //$NON-NLS-1$
 		IPath binPath = destPath.append("bin"); //$NON-NLS-1$
 
-		if (workspace.getRoot().exists(binPath)) {
+		if (workspace.getRoot().exists(srcPath) || workspace.getRoot().exists(binPath)) {
 			IProjectDescription desc = myProject.getProject().getDescription();
 
 			if (!NatureUtils.hasNature(desc, JavaCore.NATURE_ID)) {
 				NatureUtils.addNature(desc, JavaCore.NATURE_ID);
 			}
-					
-			myProject.getProject().setDescription(desc, new NullProgressMonitor());
+			
+			if (myProject.getProject().exists() && myProject.getProject().isOpen()) {
+				myProject.getProject().setDescription(desc, new NullProgressMonitor());
+			}
 
 			IJavaProject javaProject = JavaCore.create(myProject.getProject());
 
