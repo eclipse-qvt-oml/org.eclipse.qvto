@@ -573,7 +573,7 @@ public class TestQvtParser extends TestCase {
 				classpath.add(ClasspathComputer.createContainerEntry());
 				classpath.add(JavaCore.newSourceEntry(srcPath));
 				
-				javaProject.setRawClasspath(classpath.toArray(new IClasspathEntry[classpath.size()]), monitor);
+//				javaProject.setRawClasspath(classpath.toArray(new IClasspathEntry[classpath.size()]), monitor);
 			}
 		}
 	}
