@@ -51,8 +51,12 @@ import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jdt.launching.LibraryLocation;
 import org.eclipse.m2m.internal.qvt.oml.QvtMessage;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxRegistry;
 import org.eclipse.m2m.internal.qvt.oml.common.MDAConstants;
@@ -73,6 +77,7 @@ import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.pde.core.plugin.IPluginExtension;
 import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.project.IBundleProjectDescription;
+import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
 import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
 import org.eclipse.pde.internal.core.project.PDEProject;
@@ -534,11 +539,23 @@ public class TestQvtParser extends TestCase {
 
 		destPath = destPath.makeRelativeTo(workspacePath).makeAbsolute();
 				
+		IPath srcPath = destPath.append("src"); //$NON-NLS-1$
 		IPath binPath = destPath.append("bin"); //$NON-NLS-1$
+					
+		if (workspace.getRoot().exists(srcPath) || workspace.getRoot().exists(binPath)) {
+			IProjectDescription desc = myProject.getProject().getDescription();
 
-		if (workspace.getRoot().exists(binPath)) {
+			NatureUtils.addNature(desc, JavaCore.NATURE_ID);
 			
-			throw new UnsupportedOperationException("fail");
+			IProgressMonitor monitor = new NullProgressMonitor();
+			
+			myProject.getProject().setDescription(desc, monitor);
+
+			IJavaProject javaProject = JavaCore.create(myProject.getProject());
+
+			if (workspace.getRoot().exists(binPath)) {
+				javaProject.setOutputLocation(binPath, monitor);
+			}
 		}
 	}
 
