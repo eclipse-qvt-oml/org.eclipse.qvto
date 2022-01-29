@@ -567,7 +567,7 @@ public class TestQvtParser extends TestCase {
 			IClasspathEntry[] entries = classpath.toArray(new IClasspathEntry[classpath.size()]);
 			
 			if(!javaProject.hasClasspathCycle(entries)) {
-				javaProject.setRawClasspath(entries, monitor);
+				javaProject.setRawClasspath(entries, false, monitor);
 			}
 		}
 	}
