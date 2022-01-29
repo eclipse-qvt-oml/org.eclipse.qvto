@@ -534,25 +534,11 @@ public class TestQvtParser extends TestCase {
 
 		destPath = destPath.makeRelativeTo(workspacePath).makeAbsolute();
 				
-		IPath srcPath = destPath.append("src"); //$NON-NLS-1$
 		IPath binPath = destPath.append("bin"); //$NON-NLS-1$
 
-		if (workspace.getRoot().exists(srcPath) || workspace.getRoot().exists(binPath)) {
-			IProjectDescription desc = myProject.getProject().getDescription();
-
-			if (!NatureUtils.hasNature(desc, JavaCore.NATURE_ID)) {
-				NatureUtils.addNature(desc, JavaCore.NATURE_ID);
-			}
+		if (workspace.getRoot().exists(binPath)) {
 			
-			if (myProject.getProject().exists() && myProject.getProject().isOpen()) {
-				myProject.getProject().setDescription(desc, new NullProgressMonitor());
-			}
-
-			IJavaProject javaProject = JavaCore.create(myProject.getProject());
-
-			if (workspace.getRoot().exists(binPath)) {
-				javaProject.setOutputLocation(binPath, new NullProgressMonitor());
-			}
+			throw new UnsupportedOperationException("fail");
 		}
 	}
 
