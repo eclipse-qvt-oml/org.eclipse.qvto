@@ -51,12 +51,8 @@ import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.JavaRuntime;
-import org.eclipse.jdt.launching.LibraryLocation;
 import org.eclipse.m2m.internal.qvt.oml.QvtMessage;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxRegistry;
 import org.eclipse.m2m.internal.qvt.oml.common.MDAConstants;
@@ -77,7 +73,6 @@ import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.pde.core.plugin.IPluginExtension;
 import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.project.IBundleProjectDescription;
-import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
 import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
 import org.eclipse.pde.internal.core.project.PDEProject;
@@ -555,21 +550,6 @@ public class TestQvtParser extends TestCase {
 
 			if (workspace.getRoot().exists(binPath)) {
 				javaProject.setOutputLocation(binPath, monitor);
-			}
-			
-			if (workspace.getRoot().exists(srcPath)) {				
-				IVMInstall vm = JavaRuntime.getDefaultVMInstall();
-				LibraryLocation[] libs = JavaRuntime.getLibraryLocations(vm);
-				List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>();
-				
-				for (LibraryLocation lib : libs) {
-					classpath.add(JavaCore.newLibraryEntry(lib.getSystemLibraryPath(), null, null));
-				}
-				
-				classpath.add(ClasspathComputer.createContainerEntry());
-				classpath.add(JavaCore.newSourceEntry(srcPath));
-				
-				javaProject.setRawClasspath(classpath.toArray(new IClasspathEntry[classpath.size()]), monitor);
 			}
 		}
 	}
