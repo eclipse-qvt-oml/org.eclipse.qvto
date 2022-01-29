@@ -56,6 +56,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2m.internal.qvt.oml.QvtMessage;
+import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxRegistry;
 import org.eclipse.m2m.internal.qvt.oml.common.MDAConstants;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
@@ -421,7 +422,7 @@ public class TestQvtParser extends TestCase {
 				}
 			}
 			
-			IPluginImport qvtTestImport = pluginModel.createImport(AllTests.BUNDLE_ID);
+			IPluginImport qvtTestImport = pluginModel.createImport(QvtPlugin.ID);
 			pluginBase.add(qvtTestImport);
 
 			pluginModel.getExtensions().add(pluginExtension);
@@ -558,7 +559,7 @@ public class TestQvtParser extends TestCase {
 			List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>(3);
 			
 			classpath.add(JavaRuntime.getDefaultJREContainerEntry());				
-//			classpath.add(ClasspathComputer.createContainerEntry());
+			classpath.add(ClasspathComputer.createContainerEntry());
 			
 			if (workspace.getRoot().exists(srcPath)) {				
 //				classpath.add(JavaCore.newSourceEntry(srcPath));
