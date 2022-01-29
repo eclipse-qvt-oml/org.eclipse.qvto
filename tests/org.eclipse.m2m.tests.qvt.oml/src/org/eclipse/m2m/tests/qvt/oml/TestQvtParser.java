@@ -54,9 +54,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
-import org.eclipse.jdt.launching.LibraryLocation;
 import org.eclipse.m2m.internal.qvt.oml.QvtMessage;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxRegistry;
 import org.eclipse.m2m.internal.qvt.oml.common.MDAConstants;
@@ -554,27 +552,19 @@ public class TestQvtParser extends TestCase {
 			IJavaProject javaProject = JavaCore.create(myProject.getProject());
 
 			if (workspace.getRoot().exists(binPath)) {
-				javaProject.getOutputLocation();
+				javaProject.setOutputLocation(binPath, monitor);
 			}
 			
+			List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>();
+			
+			classpath.add(JavaRuntime.getDefaultJREContainerEntry());				
+			classpath.add(ClasspathComputer.createContainerEntry());
+			
 			if (workspace.getRoot().exists(srcPath)) {				
-				List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>();
-				
-				IVMInstall vm = JavaRuntime.getDefaultVMInstall();
-				
-				if (vm != null) {
-					LibraryLocation[] libs = JavaRuntime.getLibraryLocations(vm);
-									
-					for (LibraryLocation lib : libs) {
-						classpath.add(JavaCore.newLibraryEntry(lib.getSystemLibraryPath(), null, null));
-					}
-				}
-				
-				classpath.add(ClasspathComputer.createContainerEntry());
 				classpath.add(JavaCore.newSourceEntry(srcPath));
-				
-//				javaProject.setRawClasspath(classpath.toArray(new IClasspathEntry[classpath.size()]), monitor);
 			}
+			
+			javaProject.setRawClasspath(classpath.toArray(new IClasspathEntry[classpath.size()]), monitor);
 		}
 	}
 
