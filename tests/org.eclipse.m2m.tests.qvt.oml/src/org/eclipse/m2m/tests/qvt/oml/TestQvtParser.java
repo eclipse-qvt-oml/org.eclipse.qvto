@@ -562,7 +562,7 @@ public class TestQvtParser extends TestCase {
 			classpath.add(ClasspathComputer.createContainerEntry());
 			
 			if (workspace.getRoot().exists(srcPath)) {				
-//				classpath.add(JavaCore.newSourceEntry(srcPath));
+				classpath.add(JavaCore.newSourceEntry(srcPath));
 			}
 			
 			IClasspathEntry[] entries = classpath.toArray(new IClasspathEntry[classpath.size()]);
