@@ -555,7 +555,7 @@ public class TestQvtParser extends TestCase {
 				javaProject.setOutputLocation(binPath, monitor);
 			}
 			
-			List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>();
+			List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>(3);
 			
 			classpath.add(JavaRuntime.getDefaultJREContainerEntry());				
 			classpath.add(ClasspathComputer.createContainerEntry());
@@ -564,7 +564,11 @@ public class TestQvtParser extends TestCase {
 				classpath.add(JavaCore.newSourceEntry(srcPath));
 			}
 			
-			javaProject.setRawClasspath(classpath.toArray(new IClasspathEntry[classpath.size()]), monitor);
+			IClasspathEntry[] entries = classpath.toArray(new IClasspathEntry[classpath.size()]);
+			
+			if(!javaProject.hasClasspathCycle(entries)) {
+				javaProject.setRawClasspath(entries, monitor);
+			}
 		}
 	}
 
