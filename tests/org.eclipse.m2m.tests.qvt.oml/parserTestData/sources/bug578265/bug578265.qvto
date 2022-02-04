@@ -1,0 +1,7 @@
+transformation bug578265();
+
+import org.eclipse.m2m.tests.qvt.oml.Bug578265_Library;
+
+main() {
+	var test : String = doEchoFromSimpleJavaLibrary("test");
+}
