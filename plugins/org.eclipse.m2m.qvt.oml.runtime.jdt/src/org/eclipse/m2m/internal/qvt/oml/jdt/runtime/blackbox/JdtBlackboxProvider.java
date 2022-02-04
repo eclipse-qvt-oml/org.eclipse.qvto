@@ -37,6 +37,7 @@ import org.eclipse.m2m.internal.qvt.oml.blackbox.LoadContext;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.ResolutionContext;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.java.JavaBlackboxProvider;
 import org.eclipse.m2m.internal.qvt.oml.compiler.BlackboxUnitResolver;
+import org.eclipse.m2m.internal.qvt.oml.compiler.ResolverUtils;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.URIUtils;
 import org.eclipse.m2m.internal.qvt.oml.runtime.project.ProjectDependencyTracker;
 
@@ -114,8 +115,8 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 						
 				JdtDescriptor descriptor = new JdtDescriptor(qualifiedName, moduleJavaClass) {
 					@Override
-					protected String getFragment() {
-						return javaProject.getElementName();
+					protected String getUnitQuery() {
+						return URI_BLACKBOX_JDT_QUERY + "=" + javaProject.getElementName(); //$NON-NLS-1$
 					}
 				};
 				
@@ -140,7 +141,10 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 	}
 
 	private IProject getProject(ResolutionContext resolutionContext) {
-		IResource resource = URIUtils.getResource(resolutionContext.getURI());
+		URI uri = resolutionContext.getURI();
+		uri = reconvert(uri);
+						
+		IResource resource = URIUtils.getResource(uri);
 
 		if (resource == null || !resource.exists()) {
 			return null;
@@ -215,6 +219,18 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 		ProjectClassLoader.resetProjectClassLoader(javaProject);
 		descriptors.remove(javaProject.getProject());
 	}
+	
+	private static URI reconvert(URI uri) {		
+		if (BlackboxUnitResolver.isBlackboxUnitURI(uri)) {
+			String projectName = ResolverUtils.getQueryValue(uri, URI_BLACKBOX_JDT_QUERY);
+			
+			if (projectName != null) {
+				return URI.createPlatformResourceURI(projectName, true);
+			}
+		}
+		
+		return uri;
+	}
 		
 	private class JdtDescriptor extends JavaBlackboxProvider.JavaUnitDescriptor {
 		
@@ -271,13 +287,7 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 		
 		@Override
 		public URI reconvertURI() {
-			URI uri = getURI();
-			
-			if (BlackboxUnitResolver.isBlackboxUnitURI(uri) && uri.hasFragment()) {
-				return URI.createPlatformResourceURI(uri.fragment(), true);
-			}
-			
-			return uri;
+			return reconvert(getURI());
 		}
 	}
 
