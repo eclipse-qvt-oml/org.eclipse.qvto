@@ -44,6 +44,11 @@ public class TestQvtExecutor extends TransformationExecutorTest {
 			public String getTestDataFolder() {
 				return data.getTestDataFolder();
 			};
+			
+			@Override
+			public String getBundle() {
+				return data.getBundle();
+			}
 		};
 	}
 		

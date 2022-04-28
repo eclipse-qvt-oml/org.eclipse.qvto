@@ -85,7 +85,17 @@ public class JavalessQvtTest extends TestQvtInterpreter {
 			throw new IllegalArgumentException("Not a valid javaless test"); //$NON-NLS-1$
 		}
 		
-		return new JavalessFilesToFilesData(testData);
+		return new JavalessFilesToFilesData(testData) {
+			@Override
+			public String getBundle() {
+				return testData.getBundle();
+			}
+			
+			@Override
+			public String getTestDataFolder() {
+				return testData.getTestDataFolder();
+			}
+		};
 	}
 	
 	@Override
@@ -145,6 +155,7 @@ public class JavalessQvtTest extends TestQvtInterpreter {
             "bug425066", //$NON-NLS-1$
             "bug565747", //$NON-NLS-1$
             "bug566216", //$NON-NLS-1$
+            "bug507955", //$NON-NLS-1$
 
     		// EObjects are created inside blackbox transformation and later merged with javaless objects 
             "bug427237a", //$NON-NLS-1$

@@ -93,18 +93,18 @@ public class TestQvtStandaloneExecutor extends TestQvtExecutor {
 		return rs;
 	}
 	
-	static class FileUriCreator extends UriCreator {
+	class FileUriCreator extends UriCreator {
 		
 		FileUriCreator(String name) {
 			super(name);
 		}
 		
 		URI getTransformationUri() {
-			return URI.createFileURI(new File("").getAbsolutePath()).appendSegment(getTestDataFolder()).appendSegment(ModelTestData.MODEL_FOLDER).appendSegment(getName()).appendSegment(getName()).appendFileExtension(MDAConstants.QVTO_FILE_EXTENSION);
+			return URI.createFileURI(new File("").getAbsolutePath()).trimSegments(1).appendSegment(data.getBundle()).appendSegment(data.getTestDataFolder()).appendSegment(ModelTestData.MODEL_FOLDER).appendSegment(getName()).appendSegment(getName()).appendFileExtension(MDAConstants.QVTO_FILE_EXTENSION);
 		}
 		
 		public URI getModelUri(String name) {
-			return URI.createFileURI(new File("").getAbsolutePath()).appendSegment(getTestDataFolder()).appendSegment(ModelTestData.MODEL_FOLDER).appendSegment(getName()).appendSegment(name);
+			return URI.createFileURI(new File("").getAbsolutePath()).trimSegments(1).appendSegment(data.getBundle()).appendSegment(data.getTestDataFolder()).appendSegment(ModelTestData.MODEL_FOLDER).appendSegment(getName()).appendSegment(name);
 		}
 		
 	}

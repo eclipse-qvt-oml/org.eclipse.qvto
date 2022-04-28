@@ -33,8 +33,8 @@ import org.eclipse.m2m.internal.qvt.oml.common.MdaException;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
 import org.eclipse.m2m.internal.qvt.oml.compiler.ExeXMISerializer;
 import org.eclipse.m2m.internal.qvt.oml.runtime.launch.QvtLaunchUtil;
-import org.eclipse.m2m.tests.qvt.oml.AllTests;
 import org.eclipse.m2m.tests.qvt.oml.TestProject;
+import org.eclipse.m2m.tests.qvt.oml.callapi.TransformationExecutorTest.UriCreator;
 import org.eclipse.m2m.tests.qvt.oml.transform.ModelTestData;
 import org.eclipse.m2m.tests.qvt.oml.transform.TransformTests;
 import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
@@ -55,11 +55,13 @@ public class TestExecutableTransfCopy extends TestCase {
 	
 	private static final String TEST_DIR_NAME = "transfExecCopy"; //$NON-NLS-1$
 	
-	// TODO - the following tests redefine virtual operations which are called from imported modules
 	private static final Set<String> BANNED_TASKS = new HashSet<String>(Arrays.asList(
+			// TODO - the following tests redefine virtual operations which are called from imported modules
 			"importedvirtuals", //$NON-NLS-1$
 			"virt", //$NON-NLS-1$
-			"bug566236"
+			"bug566236", //$NON-NLS-1$
+			// TODO - the following test uses a workspace blackbox which is not copied
+			"bug507955" //$NON-NLS-1$
 			));
 
     @Parameters(name="{0}")
@@ -88,7 +90,20 @@ public class TestExecutableTransfCopy extends TestCase {
     	URI transformationURI = URI.createFileURI(getDestFile("QVToCopy.qvto").getAbsolutePath());
 
     	List<URI> transfParamURIs = new ArrayList<URI>(2);
-    	transfParamURIs.add(new TransformationExecutorTest.UriCreator(myData.getName()).getTransformationUri());
+    	
+    	UriCreator uriCreator = new UriCreator(myData.getName()) {
+    		@Override
+    		public String getBundle() {
+    			return myData.getBundle();
+    		};
+    		
+    		@Override
+    		public String getTestDataFolder() {
+    			return myData.getTestDataFolder();
+    		};
+    	};
+    	
+    	transfParamURIs.add(uriCreator.getTransformationUri());
     	final URI execTransfURI = URI.createFileURI(getDestFile(myData.getName() + '.' + ExeXMISerializer.COMPILED_XMI_FILE_EXTENSION).getAbsolutePath());
     	transfParamURIs.add(execTransfURI);
     	
@@ -149,8 +164,8 @@ public class TestExecutableTransfCopy extends TestCase {
     }
     
     private void copyModelData() throws Exception {
-    	File srcFolder = TestUtil.getPluginRelativeFile(AllTests.BUNDLE_ID, myData.getTestDataFolder() 
-    			+ IPath.SEPARATOR + ModelTestData.MODEL_FOLDER + IPath.SEPARATOR + TEST_DIR_NAME); 
+    	File srcFolder = TestUtil.getPluginRelativeFile(myData.getBundle(), myData.getTestDataFolder()
+    			+ IPath.SEPARATOR + ModelTestData.MODEL_FOLDER + IPath.SEPARATOR + TEST_DIR_NAME);
         File destFolder = getDestFolder();
         destFolder.mkdirs();
         FileUtil.copyFolder(srcFolder, destFolder);

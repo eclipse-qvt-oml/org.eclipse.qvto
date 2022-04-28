@@ -25,34 +25,18 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.emf.codegen.ecore.genmodel.GenModelPackage;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.EcorePackage;
-import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.jdt.core.IClasspathAttribute;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaModelStatus;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaConventions;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2m.internal.qvt.oml.QvtMessage;
-import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxRegistry;
 import org.eclipse.m2m.internal.qvt.oml.common.MDAConstants;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
@@ -60,23 +44,11 @@ import org.eclipse.m2m.internal.qvt.oml.compiler.CompiledUnit;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QVTOCompiler;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QvtCompilerOptions;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitProxy;
-import org.eclipse.m2m.internal.qvt.oml.emf.util.EmfUtil;
 import org.eclipse.m2m.internal.qvt.oml.project.builder.WorkspaceUnitResolver;
-import org.eclipse.m2m.internal.qvt.oml.project.nature.NatureUtils;
 import org.eclipse.m2m.internal.qvt.oml.runtime.project.TransformationUtil;
 import org.eclipse.m2m.tests.qvt.oml.ParserTests.TestData;
 import org.eclipse.m2m.tests.qvt.oml.util.ProblemSourceAnnotationHelper;
 import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
-import org.eclipse.pde.core.plugin.IPluginBase;
-import org.eclipse.pde.core.plugin.IPluginElement;
-import org.eclipse.pde.core.plugin.IPluginExtension;
-import org.eclipse.pde.core.plugin.IPluginImport;
-import org.eclipse.pde.core.project.IBundleProjectDescription;
-import org.eclipse.pde.internal.core.ClasspathComputer;
-import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
-import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
-import org.eclipse.pde.internal.core.project.PDEProject;
-import org.eclipse.pde.internal.core.util.CoreUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,7 +62,6 @@ import junit.framework.TestCase;
  * @author pkobiakov
  */
 @RunWith(Parameterized.class)
-@SuppressWarnings("restriction")
 public class TestQvtParser extends TestCase {
 
 	public TestQvtParser(TestData data) {
@@ -308,22 +279,8 @@ public class TestQvtParser extends TestCase {
 		}
 
 		BlackboxRegistry.INSTANCE.cleanup();
-
-		IJavaProject javaProject = JavaCore.create(myProject.getProject());
-		if (javaProject.exists()) {
-			IProgressMonitor monitor = new NullProgressMonitor();
-			javaProject.setRawClasspath(null, monitor);
-			javaProject.setOutputLocation(javaProject.getPath().append("bin"), monitor); //$NON-NLS-1$
-			IProjectDescription desc = myProject.getProject().getDescription();
-			NatureUtils.removeNature(desc, JavaCore.NATURE_ID);
-			myProject.getProject().setDescription(desc, monitor);
-		}
 		
-		IFile pluginXml = PDEProject.getPluginXml(myProject.getProject());
-		IFile manifest = PDEProject.getManifest(myProject.getProject());
-		
-		pluginXml.delete(true, null);
-		manifest.delete(true, null);
+		TestUtil.disposeJava(myProject);
 	}
 
 	public TestProject getTestProject() {
@@ -375,61 +332,7 @@ public class TestQvtParser extends TestCase {
 			// }
 		}
 	}
-
-	private void setupPluginXml() throws CoreException {
-
-		IWorkspace workspace = myProject.getProject().getWorkspace();
-		IPath workspacePath = workspace.getRoot().getLocation();
-
-		IPath destinationPath = new Path(getDestinationFolder().getPath());
-		IPath relativePath = destinationPath.makeRelativeTo(workspacePath).makeAbsolute();
-
-		if (workspace.getRoot().exists(relativePath)) {
-
-			CoreUtility.addNatureToProject(myProject.getProject(), IBundleProjectDescription.PLUGIN_NATURE, new NullProgressMonitor());
-
-			IFile pluginXml = PDEProject.getPluginXml(myProject.getProject());
-			IFile manifest = PDEProject.getManifest(myProject.getProject());
-			WorkspacePluginModelBase pluginModel = new WorkspaceBundlePluginModel(manifest, pluginXml);
-
-			IPluginBase pluginBase = pluginModel.getPluginBase();
-			pluginBase.setId(myProject.getProject().getName());
-			pluginBase.setVersion(Platform.getBundle(AllTests.BUNDLE_ID).getVersion().toString());
-
-			IPluginExtension pluginExtension = pluginModel.createExtension();
-			pluginExtension.setPoint(EcorePackage.eCONTENT_TYPE + "." + EcorePlugin.GENERATED_PACKAGE_PPID); //$NON-NLS-1$
-
-			for (URI metamodelUri : myData.getMetamodels()) {
-				String metamodelFileName = metamodelUri.trimFileExtension().lastSegment();
-				URI genmodelUri = metamodelUri.trimSegments(1).appendSegment(metamodelFileName).appendFileExtension(GenModelPackage.eNAME);
-				IPath genmodelPath = relativePath.append(genmodelUri.toString());
-
-				if (workspace.getRoot().exists(genmodelPath)) {
-					URI fileUri = URI.createFileURI(destinationPath.append(metamodelUri.toString()).toString());
-					EPackage ePackage = EmfUtil.getFirstEPackageContent(resSet.getResource(fileUri, true));
-
-					IPluginElement element = pluginModel.createElement(pluginExtension);
-					element.setName("package");
-					element.setAttribute("uri", ePackage.getNsURI().toString());
-					element.setAttribute("genModel", genmodelPath.removeFirstSegments(1).toString());
-					pluginExtension.add(element);
-
-					URI platformUri = URI.createPlatformResourceURI(relativePath.append(metamodelUri.toString()).toString(), false);
-					resSet.getURIConverter().getURIMap().put(platformUri, fileUri);
-				}
-			}
-			
-			IPluginImport qvtTestImport = pluginModel.createImport(AllTests.BUNDLE_ID);
-			pluginBase.add(qvtTestImport);
-			
-			IPluginImport qvtImport = pluginModel.createImport(QvtPlugin.ID);
-			pluginBase.add(qvtImport);
-
-			pluginModel.getExtensions().add(pluginExtension);
-			pluginModel.save();
-		}
-	}
-
+	
 	protected File getDestinationFolder() {
 		return new File(myProject.getProject().getLocation().toString() + "/sources/" + myData.getDir());
 	}
@@ -531,50 +434,7 @@ public class TestQvtParser extends TestCase {
 	}
 
 	protected void prepareJava() throws CoreException {
-		IPath destPath = new Path(getDestinationFolder().getPath());
-
-		IWorkspace workspace = myProject.getProject().getWorkspace();
-		IPath workspacePath = workspace.getRoot().getLocation();
-
-		destPath = destPath.makeRelativeTo(workspacePath).makeAbsolute();
-
-		IPath binPath = destPath.append("bin"); //$NON-NLS-1$
-				
-		if (workspace.getRoot().exists(binPath)) {
-			IProjectDescription desc = myProject.getProject().getDescription();
-
-			NatureUtils.addNature(desc, JavaCore.NATURE_ID);
-			
-			IProgressMonitor monitor = new NullProgressMonitor();
-			
-			myProject.getProject().setDescription(desc, monitor);
-
-			IJavaProject javaProject = JavaCore.create(myProject.getProject());
-			
-			javaProject.setOutputLocation(binPath, monitor);
-				
-			List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>(3);
-			
-			IPath srcPath = destPath.append("src"); //$NON-NLS-1$
-			if (workspace.getRoot().exists(srcPath)) {		
-				IClasspathAttribute testAttribute = JavaCore.newClasspathAttribute(IClasspathAttribute.TEST, Boolean.toString(true));
-				classpath.add(JavaCore.newSourceEntry(srcPath, new IPath[] {}, new IPath[] {}, null, new IClasspathAttribute[] {testAttribute}));
-			}
-									
-			classpath.add(JavaRuntime.getDefaultJREContainerEntry());				
-			classpath.add(ClasspathComputer.createContainerEntry());
-						
-			IClasspathEntry[] entries = classpath.toArray(new IClasspathEntry[classpath.size()]);
-			
-			assertFalse(javaProject.hasClasspathCycle(entries));
-			IJavaModelStatus status = JavaConventions.validateClasspath(javaProject, entries, binPath);
-			assertTrue(status.isOK());
-			javaProject.setRawClasspath(entries, monitor);
-		}
-			
-		setupPluginXml();
-			
-		JavaCore.rebuildIndex(null);
+		TestUtil.prepareJava(myProject, getDestinationFolder(), myData.getMetamodels(), resSet);
 	}
 
 	private final TestData myData;

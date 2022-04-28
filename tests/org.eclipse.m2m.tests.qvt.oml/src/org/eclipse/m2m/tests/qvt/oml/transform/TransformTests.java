@@ -615,6 +615,28 @@ public class TransformTests extends TestCase {
         				blackboxRegistry.registerModule(Bug577992_Library.class);
         			}
         		},
+        		new FilesToFilesData("bug507955") { //$NON-NLS-1$
+        			@Override
+        			public String getBundle() {
+        				return "org.eclipse.m2m.tests.qvto.transformationProject"; //$NON-NLS-1$
+        			}
+        			
+        			@Override
+        			public String getTestDataFolder() {
+        				return "transforms"; //$NON-NLS-1$
+        			}
+        			
+        			@Override
+        			public void prepare(BlackboxRegistry blackboxRegistry) {
+        				try {
+        					Class<?> libraryClass = Class.forName("org.eclipse.m2m.tests.qvt.oml.bbox.Bug507955_Library"); //$NON-NLS-1$
+        					blackboxRegistry.registerModule(libraryClass);
+        				}
+        				catch(ClassNotFoundException e) {
+        					fail(e.getMessage());
+        				}
+        			};
+        		}
         	};
     }
 

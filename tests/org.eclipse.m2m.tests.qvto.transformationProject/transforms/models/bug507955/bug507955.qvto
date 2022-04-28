@@ -1,0 +1,13 @@
+import org.eclipse.m2m.tests.qvt.oml.bbox.Bug507955_Library;
+
+modeltype ecore uses "http://www.eclipse.org/emf/2002/Ecore";
+
+transformation bug507955();
+
+main() {
+	var eClass = object EClass{};
+	var mirror = mirrorBug507955(eClass);
+	assert fatal (eClass = mirror);
+}
+
+blackbox helper mirrorBug507955(c : EClass) : EClass;

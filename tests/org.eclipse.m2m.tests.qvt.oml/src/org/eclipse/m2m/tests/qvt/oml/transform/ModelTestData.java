@@ -56,6 +56,7 @@ import junit.framework.TestCase;
 public abstract class ModelTestData {
 	
 	public static final String MODEL_FOLDER = "models"; //$NON-NLS-1$
+	public static final String TEST_DATA_FOLDER = "parserTestData"; //$NON-NLS-1$
 	
     public ModelTestData(String name, ExecutionContext context) {
         myName = name;
@@ -147,6 +148,8 @@ public abstract class ModelTestData {
 //    	trace.getTraceRecordMap().clear();
 //    	trace.getSourceToTraceRecordMap().clear();
 //    	trace.getTargetToTraceRecordMap().clear();
+    	
+    	TestUtil.disposeJava(project);
     }
     
     abstract public List<URI> getIn(IProject project); 
@@ -191,6 +194,7 @@ public abstract class ModelTestData {
 		}
     	
 		res.save(Collections.emptyMap());
+		TestUtil.prepareJava(project, getDestFolder(project.getProject()), ecoreFileMetamodels, getResourceSet(project.getProject()));
 		project.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);		
     }
     
@@ -244,7 +248,7 @@ public abstract class ModelTestData {
     }
     
     public String getTestDataFolder() {
-    	return "parserTestData"; //$NON-NLS-1$
+    	return TEST_DATA_FOLDER;
     }
     
     public String getBundle() {

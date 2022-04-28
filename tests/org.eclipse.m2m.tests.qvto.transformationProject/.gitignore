@@ -1,2 +1,3 @@
 /target/
 /.polyglot.build.properties
+/transforms/models/bug507955/bin/
