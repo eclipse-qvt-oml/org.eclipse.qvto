@@ -37,7 +37,7 @@ public class BlackboxRegistry {
 	public static final BlackboxRegistry INSTANCE = EMFPlugin.IS_ECLIPSE_RUNNING ? new BlackboxRegistry.Eclipse()
 			: new BlackboxRegistry();
 
-	private final StandaloneBlackboxProvider fStandaloneProvider = new StandaloneBlackboxProvider();
+	private final StandaloneBlackboxProvider fStandaloneProvider = StandaloneBlackboxProvider.INSTANCE;
 	private final List<BlackboxProvider> fProviders;
 
 	public BlackboxRegistry() {
@@ -125,7 +125,6 @@ public class BlackboxRegistry {
 		Eclipse() {
 			fProviders = new LinkedList<BlackboxProvider>();
 			readProviders(fProviders);
-			fProviders.addAll(super.getProviders());
 		}
 
 		private void readProviders(List<BlackboxProvider> providers) {

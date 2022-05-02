@@ -26,6 +26,8 @@ import org.eclipse.m2m.internal.qvt.oml.blackbox.ResolutionContext;
 
 public class StandaloneBlackboxProvider extends JavaBlackboxProvider {
 	
+	public static final StandaloneBlackboxProvider INSTANCE = new StandaloneBlackboxProvider();
+	
 	private Map<String, JavaUnitDescriptor> fDescriptorMap = new LinkedHashMap<String, JavaUnitDescriptor>();
 	
 	@Override

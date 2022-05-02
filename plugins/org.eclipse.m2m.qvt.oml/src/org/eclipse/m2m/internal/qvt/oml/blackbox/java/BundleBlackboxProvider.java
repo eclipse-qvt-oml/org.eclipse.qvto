@@ -28,7 +28,7 @@ import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxUnitDescriptor;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.ResolutionContext;
 
 
-public class BundleBlackboxProvider extends JavaBlackboxProvider {
+public class BundleBlackboxProvider extends OSGiBlackboxProvider {
 	
 	private static final String EXTENSION_POINT = "javaBlackboxUnits"; //$NON-NLS-1$
 		
@@ -106,17 +106,34 @@ public class BundleBlackboxProvider extends JavaBlackboxProvider {
 	@Override
 	public BlackboxUnitDescriptor getUnitDescriptor(String qualifiedName, ResolutionContext resolutionContext) {
 		// TODO - Should we necessarily be available in all contexts ? 
-		return getDescriptorMap().get(qualifiedName);
+		BlackboxUnitDescriptor descriptor = getDescriptorMap().get(qualifiedName);
+		
+		if (descriptor != null) {
+			return descriptor;
+		}
+		
+		return super.getUnitDescriptor(qualifiedName, resolutionContext);
 	}
 
 	@Override
-	public Collection<BlackboxUnitDescriptor> getUnitDescriptors(ResolutionContext resolutionContext) {
+	public Collection<BlackboxUnitDescriptor> getUnitDescriptors(ResolutionContext resolutionContext) {		
+		Collection<? extends BlackboxUnitDescriptor> parentDescriptors = super.getUnitDescriptors(resolutionContext);
+		
+		Map<String, BlackboxUnitDescriptor> descriptorMap = new LinkedHashMap<String, BlackboxUnitDescriptor>(parentDescriptors.size());
+		
+		for (BlackboxUnitDescriptor d : parentDescriptors) {
+			descriptorMap.put(d.getQualifiedName(), d);
+		}
+		
 		// TODO - Should we necessarily be available in all contexts ?
-		return getDescriptorMap().values();
+		descriptorMap.putAll(getDescriptorMap());
+		
+		return descriptorMap.values();
 	}
 	
 	@Override
 	public void cleanup() {
+		super.cleanup();
 		fDescriptorMap = null;
 	}
 	
