@@ -1,5 +1,0 @@
-library dupImportLibrary;
-
-import emf.tools;
-import /*<warn>*/emf.tools/*</warn>*/;
-import Strings;

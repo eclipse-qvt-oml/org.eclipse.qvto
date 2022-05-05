@@ -1,8 +1,0 @@
-transformation simpleproperty;
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-property foo: String = 'foo';
-
-mapping main(model: ecore::EPackage): ecore::EPackage {
-        name := foo;
-}

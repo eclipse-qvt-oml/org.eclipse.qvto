@@ -1,7 +1,0 @@
-transformation endsectfull;
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-mapping main(in p : ecore::EPackage): ecore::EPackage {
-    init {}
-    end {}
-}

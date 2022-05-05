@@ -1,8 +1,0 @@
-transformation dynamicpackage;
-
-// Tests access to metamodel published via "org.eclipse.emf.ecore.dynamic_package" extension point
-modeltype DYNP uses "http://www.eclipse.org/m2m/qvt/oml/test_dynamicpkg";
-
-main() {
-	var p : DYNP::DynClass := object DynClass {}; 
-}

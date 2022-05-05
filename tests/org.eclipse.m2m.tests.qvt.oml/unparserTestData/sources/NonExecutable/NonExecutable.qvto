@@ -1,4 +1,0 @@
-modeltype ECORE "strict" uses ecore('http://www.eclipse.org/emf/2002/Ecore');
-
-transformation Ecore2Ecore(in input : ECORE, out output : ECORE);
-

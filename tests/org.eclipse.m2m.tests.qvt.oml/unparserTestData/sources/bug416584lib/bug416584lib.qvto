@@ -1,7 +1,0 @@
-library libT;
-
-configuration property libProp : Integer;
-
-helper lib_helper() : String {
-	return 'lib_helper ' + libProp.repr();
-}

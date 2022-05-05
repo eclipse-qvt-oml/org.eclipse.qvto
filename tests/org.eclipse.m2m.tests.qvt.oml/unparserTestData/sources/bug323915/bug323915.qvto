@@ -1,6 +1,0 @@
-import org.bar.Foo;
-transformation bug323915() access FooJavaLib;
-
-main() {
-	testThrowRuntimeException()
-}

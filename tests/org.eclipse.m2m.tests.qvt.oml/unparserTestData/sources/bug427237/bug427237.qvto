@@ -1,6 +1,0 @@
-modeltype Ecore "strict" uses ecore('http://www.eclipse.org/emf/2002/Ecore');
-
-blackbox transformation bug427237(in e : Ecore, out o : Ecore);
-
-configuration property prop : Integer;
-

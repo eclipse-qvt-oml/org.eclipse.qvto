@@ -1,7 +1,0 @@
-transformation emptyinit;
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-mapping patch(): ecore::EPackage {
-    init {}
-        name := 'foo';
-}

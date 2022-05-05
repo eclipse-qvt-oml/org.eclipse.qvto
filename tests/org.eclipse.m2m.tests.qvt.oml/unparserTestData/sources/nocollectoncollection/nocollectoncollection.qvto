@@ -1,9 +1,0 @@
-transformation nocollectoncollection;
-
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-mapping bar(in c: Collection(String)): ecore::EPackage {
-	init {		
-	    var foo := c->collect(e | e);	
-	}
-}

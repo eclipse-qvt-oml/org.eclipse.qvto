@@ -1,9 +1,0 @@
-transformation omittedobject;
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-mapping main(pack: ecore::EPackage): ecore::EPackage {
-    name := 'foo';
-}
-
-mapping foo(pack: ecore::EPackage): ecore::EPackage {
-}

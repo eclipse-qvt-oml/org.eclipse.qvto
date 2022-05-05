@@ -1,7 +1,0 @@
-transformation modifyfeature;
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-mapping impl(pack: ecore::EPackage): ecore::EPackage {
-        name := 'foo';
-        eClassifiers += object ecore::EClass { name := 'tag'; };
-}

@@ -1,9 +1,0 @@
-transformation propertycollect;
-
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-property a = ('sdfsd')->collect(n | n)->any(true);
-
-mapping main(in model: ecore::EPackage): ecore::EPackage {
-    	name := a;
-}

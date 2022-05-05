@@ -1,8 +1,0 @@
-modeltype SIMPLEUML uses "http://www.eclipse.org/qvt/1.0.0/Operational/examples/simpleuml";
-modeltype ECORE uses "http://www.eclipse.org/emf/2002/Ecore";
-	
-transformation transf3(inout uml : SIMPLEUML);
-
-mapping createUmlClass(name : String) : Class {
-	result.name := name;
-}

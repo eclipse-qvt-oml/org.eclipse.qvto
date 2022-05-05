@@ -1,8 +1,0 @@
-modeltype ECORE uses "http://www.eclipse.org/emf/2002/Ecore";
-modeltype SIMPLEUML uses 'http://www.eclipse.org/qvt/1.0.0/Operational/examples/simpleuml';
-modeltype RDB uses "http://www.eclipse.org/qvt/1.0.0/Operational/examples/rdb";
-
-transformation twoInputs(in uml : SIMPLEUML, in rdb : RDB, out ECORE);
-
-mapping main() {
-}

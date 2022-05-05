@@ -1,5 +1,0 @@
-library Lib2;
-
-helper testHelper2() : String {
-	return "";
-}

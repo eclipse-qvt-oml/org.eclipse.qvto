@@ -1,7 +1,0 @@
-transformation optionalout;
-
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-mapping base(): ecore::EPackage {
-        name := 'simple'
-}

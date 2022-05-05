@@ -1,5 +1,0 @@
-library TestLib;
-
-helper getDictValueForAKey(in key : String, in aDict : Dict (String, OclAny)) : OclAny {
-	return aDict->get(key);
-}

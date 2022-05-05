@@ -1,9 +1,0 @@
-import org.eclipse.m2m.tests.qvt.oml.bbox.StandaloneBBoxModule;
-
-modeltype Ecore "strict" uses ecore('http://www.eclipse.org/emf/2002/Ecore');
-
-library bug326871_lib;
-
-blackbox helper echoFromBBoxModule(s : String) : String;
-	
-blackbox helper modifyClassName(e : EClass, s: String) : EClass;

@@ -1,7 +1,0 @@
-library m3;
-
-modeltype Ecore3 uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-query q3(inout ee : Ecore3::ENamedElement) : String{
-	return 'value:'
-}

@@ -1,5 +1,0 @@
-import org.bar.Foo;
-
-library bug289982_undefinedLib access FooJavaLib;
-
-blackbox /*<warn>*/helper nonContextualHelper/*</warn>*/();

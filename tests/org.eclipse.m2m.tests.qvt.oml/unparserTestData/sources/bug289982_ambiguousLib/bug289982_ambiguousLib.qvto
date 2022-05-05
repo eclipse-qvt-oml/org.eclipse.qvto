@@ -1,6 +1,0 @@
-import org.bar.Foo;
-
-library bug289982_ambiguousLib access Bug289982_Lib;
-
-blackbox /*<warn>*/query ambiguousQuery(c : Sequence(String)) : Integer/*</warn>*/;
-

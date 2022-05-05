@@ -1,5 +1,0 @@
-library somelib;
-
-helper OclAny::toString() : String {
-	return self.repr()
-}

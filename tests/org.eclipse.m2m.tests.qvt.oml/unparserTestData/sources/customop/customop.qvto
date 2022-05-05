@@ -1,8 +1,0 @@
-transformation customop;
-
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-modeltype SIMPLEUML uses 'http://www.eclipse.org/qvt/1.0.0/Operational/examples/simpleuml';
-
-mapping main(model: simpleuml::Model): ecore::EPackage {
-        name := model.getCustomProperty('bar');
-}

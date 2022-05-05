@@ -1,8 +1,0 @@
-transformation addclassviaoutinocl;
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-mapping main(in pack: ecore::EPackage): ecore::EPackage {
-        name := 'foo';
-        eClassifiers := OrderedSet { object ecore::EClass {name := 'tag'; } };
-
-}

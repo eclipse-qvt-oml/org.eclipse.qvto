@@ -1,7 +1,0 @@
-transformation addrealtostring;
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-mapping main(pack: ecore::EPackage): ecore::EPackage {
-    name := 'foo' + 10.toString();
-    eClassifiers += object ecore::EClass { name := 'tag' + 10.1.toString(); };
-}

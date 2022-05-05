@@ -1,5 +1,0 @@
-library b1;
-
-query foo_b1(): String {
-	return 'b1'
-}

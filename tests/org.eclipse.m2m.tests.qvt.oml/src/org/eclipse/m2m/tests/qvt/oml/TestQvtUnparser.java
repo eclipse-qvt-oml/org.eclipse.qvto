@@ -37,7 +37,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EPackage.Registry;
@@ -58,6 +60,13 @@ import org.eclipse.m2m.internal.qvt.oml.emf.util.urimap.MetamodelURIMappingHelpe
 import org.eclipse.m2m.internal.qvt.oml.evaluator.QVTEvaluationOptions;
 import org.eclipse.m2m.internal.qvt.oml.project.builder.WorkspaceUnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.runtime.project.TransformationUtil;
+import org.eclipse.m2m.tests.qvt.oml.UnparserTests.AntTestData;
+import org.eclipse.m2m.tests.qvt.oml.UnparserTests.ApiTestData;
+import org.eclipse.m2m.tests.qvt.oml.UnparserTests.DeployedTestData;
+import org.eclipse.m2m.tests.qvt.oml.UnparserTests.ExternLibTestData;
+import org.eclipse.m2m.tests.qvt.oml.UnparserTests.ModelsTestData;
+import org.eclipse.m2m.tests.qvt.oml.UnparserTests.PluginProjectTestData;
+import org.eclipse.m2m.tests.qvt.oml.UnparserTests.SourcesTestData;
 import org.eclipse.m2m.tests.qvt.oml.UnparserTests.TestData;
 import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
 import org.junit.After;
@@ -73,7 +82,7 @@ import junit.framework.TestCase;
 public class TestQvtUnparser extends TestCase {
 
 	public TestQvtUnparser(TestData data) {
-		super(data.getDir());
+		super(data.getName());
 		myData = data;
 	}
 
@@ -81,391 +90,783 @@ public class TestQvtUnparser extends TestCase {
 	public static Iterable<TestData> data() {
 		return Arrays.asList(
 				new TestData[] {
-						new TestData("A",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("abstractresult",0,0,1),  //$NONXXX	//1: preMarked
-						new TestData("accessbooleans",0,0),  //$NONXXX
-						new TestData("addclass",0,0),  //$NONXXX
-						new TestData("addclassviamodificationininit",0,0,1),  //$NONXXX	//1: preMarked
-						new TestData("addclassviaoutinocl",0,0),  //$NONXXX
-						new TestData("addclassviasequence",0,0),  //$NONXXX
-						new TestData("addrealtostring",0,0),  //$NONXXX
-						new TestData("addundefined",0,0,26),  //$NONXXX	//26: preMarked
-						new TestData("allinstances",0,0),  //$NONXXX
-						new TestData("AnotherTransformation",0,0),  //$NONXXX
-						new TestData("AnyExtension",0,0),  //$NONXXX
+						new ModelsTestData("A",0,0,1) {  //$NONXXX	// 1*4: target names in resolve expressions
+							@Override
+							public String getDir() {
+								return "bug358709";  //$NONXXX
+							}
+						},
+						new ModelsTestData("abstractresult",0,0,1),  //$NONXXX	//1: preMarked
+						new ModelsTestData("accessbooleans",0,0),  //$NONXXX
+						new ModelsTestData("addclass",0,0),  //$NONXXX
+						new ModelsTestData("addclassviamodificationininit",0,0,1),  //$NONXXX	//1: preMarked
+						new ModelsTestData("addclassviaoutinocl",0,0),  //$NONXXX
+						new ModelsTestData("addclassviasequence",0,0),  //$NONXXX
+						new ModelsTestData("addrealtostring",0,0),  //$NONXXX
+						new ModelsTestData("addundefined",0,0,26),  //$NONXXX	//26: preMarked
+						new ModelsTestData("allinstances",0,0),  //$NONXXX
+						new PluginProjectTestData("AnotherTransformation",0,0) {  //$NONXXX
+							
+							@Override
+							public String getFolder() {
+								return Path.EMPTY.toString();
+							}
+							
+							@Override
+							public String getSubFolder() {
+								return Path.EMPTY.toString();
+							}
+							
+							@Override
+							public String getDir() {
+								return "transforms";  //$NONXXX
+							}
+						},	
+						new ModelsTestData("AnyExtension",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "oclany";  //$NONXXX
+							}
+						},
 						new TestData("assert_log_minimal",0,0),  //$NONXXX
-						new TestData("assert_log",0,0),  //$NONXXX
-						new TestData("assignresultininit",0,0),  //$NONXXX
-						new TestData("assigntonullowner",0,0,1),  //$NONXXX	//1: preMarked
-						new TestData("assigntoprimfeature",0,0,1),  //$NONXXX	//1: preMarked
-						new TestData("auxtransf",0,0),  //$NONXXX
-						new TestData("b1",0,0),  //$NONXXX
-						new TestData("bagorderedsetintersection",0,0),  //$NONXXX
-						new TestData("Base",0,0),  //$NONXXX
-						new TestData("blackboxlib_237781",0,0),  //$NONXXX
+						new SourcesTestData("assert_log",0,0),  //$NONXXX
+						new ModelsTestData("assignresultininit",0,0),  //$NONXXX
+						new ModelsTestData("assigntonullowner",0,0,1),  //$NONXXX	//1: preMarked
+						new ModelsTestData("assigntoprimfeature",0,0,1),  //$NONXXX	//1: preMarked
+						new ModelsTestData("auxtransf",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "stacktrace";  //$NONXXX
+							}
+						},
+						new SourcesTestData("b1",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "imp";  //$NONXXX
+							}
+						},
+						new ModelsTestData("bagorderedsetintersection",0,0),  //$NONXXX
+						new ModelsTestData("Base",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug414555";  //$NONXXX
+							}
+						},
+						new ModelsTestData("blackboxlib_237781",0,0),  //$NONXXX
 						new TestData("blackboxlib_uri",0,0),  //$NONXXX
-						new TestData("blackboxlib_annotation_java",0,0),  //$NONXXX
-						new TestData("blackboxlibASTmodel",0,0),  //$NONXXX
-						new TestData("blackboxlib_context",0,0),  //$NONXXX
-						new TestData("bodywithsemicolon",0,0),  //$NONXXX
-						new TestData("boxing",0,0),  //$NONXXX
-						new TestData("bug204126_1",0,0,1),  //$NONXXX // 4: target names in resolve expressions
-						new TestData("bug204126_2",0,0,1),  //$NONXXX // 4: target names in resolve expressions
-						new TestData("bug204126_3",0,0,1),  //$NONXXX // 4: target names in resolve expressions
-						new TestData("bug204126_4",0,0,1),  //$NONXXX // 4: target names in resolve expressions
-						new TestData("bug204126_5",0,0,1),  //$NONXXX // 4: target names in resolve expressions
-						new TestData("bug204126_6",0,0,1),  //$NONXXX // 4: target names in resolve expressions
-						new TestData("bug204126_7",0,0,1),  //$NONXXX // 4: target names in resolve expressions
-						new TestData("bug205303_1",0,0,1+4),  //$NONXXX // 1:preMarked,16: target names in resolve expressions
-						new TestData("bug205303_2",0,0,1+6),  //$NONXXX // 1:preMarked,24: target names in resolve expressions
-						new TestData("bug_214938",0,0),  //$NONXXX
-						new TestData("bug216317",0,0,2),  //$NONXXX // 2*4: target names in resolve expressions
-						new TestData("bug219075_1",0,0),  //$NONXXX
-						new TestData("bug224094",0,0),  //$NONXXX
-						new TestData("bug233984",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("bug2437_1",0,0,4),  //$NONXXX // 4*2: implicit set conversion of OCL analyzer
-						new TestData("bug2437_2",0,0),  //$NONXXX
-						new TestData("bug2437_3",0,0),  //$NONXXX
-						new TestData("bug2437_4",0,0,1),  //$NONXXX // 1*2: implicit set conversion of OCL analyzer
-						new TestData("bug2437_5",0,0,1),  //$NONXXX // 1*2: implicit set conversion of OCL analyzer
-						new TestData("bug244701",0,0),  //$NONXXX
-						new TestData("bug267917",0,0),  //$NONXXX
-						new TestData("bug268636lib",0,0),  //$NONXXX
-						new TestData("bug272869lib",0,0),  //$NONXXX
-						new TestData("bug2732",0,0,2),  //$NONXXX
-						new TestData("bug2741",0,0),  //$NONXXX
-						new TestData("bug274105_274505",0,0,9),  //$NONXXX // 9*2: implicit set conversion of OCL analyzer
-						new TestData("bug2787",0,0,1),  //$NONXXX // 1*2: implicit set conversion of OCL analyzer
-						new TestData("bug2839",0,0,1),  //$NONXXX // 1*2: implicit set conversion of OCL analyzer
-						new TestData("bug289982_ambiguousLib",0,0),  //$NONXXX
-						new TestData("bug289982_lib",0,0),  //$NONXXX
-						new TestData("bug289982_lib_failed",0,0),  //$NONXXX
-						new TestData("bug289982_undefinedLib",0,0),  //$NONXXX
-						new TestData("bug294127",0,0),  //$NONXXX
-						new TestData("bug301134",0,0),  //$NONXXX
-						new TestData("bug314443",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("bug323915",0,0),  //$NONXXX
-						new TestData("bug325192",0,0,4),  //$NONXXX // 4*2: implicit set conversion of OCL analyzer
-						new TestData("bug326871",0,0),  //$NONXXX
-						new TestData("bug326871_lib",0,0),  //$NONXXX
-						new TestData("bug326871_standalone",0,0),  //$NONXXX
-						new TestData("bug370098",0,0),  //$NONXXX
-						new TestData("bug377882",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("bug388325",0,0),  //$NONXXX
-						new TestData("bug388801",0,0),  //$NONXXX
-						new TestData("bug392156",0,0,2+12),  //$NONXXX	//2*2: implicit set conversion of OCL analyzer, 12*4: target names in resolve expressions
-						new TestData("bug392429",0,0),  //$NONXXX
-						new TestData("bug397215",0,0),  //$NONXXX
-						new TestData("bug397398",0,0),  //$NONXXX
-						new TestData("bug400233_lib",0,0),  //$NONXXX
-						new TestData("bug400720",0,0),  //$NONXXX
-						new TestData("bug404647",0,0),  //$NONXXX
-						new TestData("bug410470",0,0),  //$NONXXX
-						new TestData("bug413130",0,0),  //$NONXXX
-						new TestData("bug413131",0,0,1),  //$NONXXX	//42: t6 EAttribute vs. EReference
-						new TestData("bug414363",0,0),  //$NONXXX
-						new TestData("bug414472",0,0),  //$NONXXX
-						new TestData("bug414619",0,0),  //$NONXXX
-						new TestData("bug414642",0,0),  //$NONXXX
-						new TestData("bug415024",0,0),  //$NONXXX
-						new TestData("bug415029",0,0),  //$NONXXX
-						new TestData("bug415209",0,0),  //$NONXXX
-						new TestData("bug415310",0,0),  //$NONXXX
-						new TestData("bug415315",0,0),  //$NONXXX
-						new TestData("bug415661",0,0),  //$NONXXX
-						new TestData("bug416584lib",0,0),  //$NONXXX
-						new TestData("bug417751",0,0),  //$NONXXX
-						new TestData("bug417779",0,0),  //$NONXXX
-						new TestData("bug417996",0,0,2),  //$NONXXX	// 2: order of properties changed
-						new TestData("bug418512",0,0),  //$NONXXX
-						new TestData("bug418961_lib",0,0),  //$NONXXX
-						new TestData("bug419299",0,0),  //$NONXXX
-						new TestData("bug422315",0,0),  //$NONXXX
-						new TestData("bug424086",0,0,2),  //$NONXXX	// 2: target names in resolve expressions
-						new TestData("bug424584",0,0),  //$NONXXX
-						new TestData("bug424740",0,0),  //$NONXXX
-						new TestData("bug424896",0,0),  //$NONXXX
-						new TestData("bug424912",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("bug424979",0,0,10),  //$NONXXX	// 10*2: implicit set conversion of OCL analyzer
-						new TestData("bug425069a",0,0),  //$NONXXX
-						new TestData("bug425634",0,0,10),  //$NONXXX	// 10*4: target names in resolve expressions
-						new TestData("bug427237",0,0),  //$NONXXX
-						new TestData("bug427348",0,0),  //$NONXXX
-						new TestData("bug428028",0,0),  //$NONXXX
-						new TestData("bug428316",0,0),  //$NONXXX
-						new TestData("bug428618",0,0,1),  //$NONXXX // 1*2: implicit set conversion of OCL analyzer
-						new TestData("bug432786",0,0,2),  //$NONXXX	// 2*4: target names in resolve expressions
-						new TestData("bug433292",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("bug433585",0,0),  //$NONXXX
-						new TestData("bug440514",0,0),  //$NONXXX
-						new TestData("bug449445",0,0),  //$NONXXX
-						new TestData("bug449912",0,0),  //$NONXXX
-						new TestData("bug457433",0,0),  //$NONXXX
-						new TestData("bug463395",0,0),  //$NONXXX
-						new TestData("bug463396",0,0),  //$NONXXX
-						new TestData("bug463572_lib",0,0),  //$NONXXX
-						new TestData("bug466705",0,0),  //$NONXXX
-						new TestData("bug467325",0,0),  //$NONXXX
-						new TestData("bug467600",0,0),  //$NONXXX
-						new TestData("bug467600_Bag",0,0),  //$NONXXX
-						new TestData("bug467600_Collection",0,0),  //$NONXXX
-						new TestData("bug467600_List",0,0),  //$NONXXX
-						new TestData("bug467600_OrderedSet",0,0),  //$NONXXX
-						new TestData("bug467600_Sequence",0,0),  //$NONXXX
-						new TestData("bug467600_Set",0,0),  //$NONXXX
-						new TestData("bugzilla443",0,0),  //$NONXXX
-						new TestData("C",0,0),  //$NONXXX
-						new TestData("calldump",0,0),  //$NONXXX
-						new TestData("calloclIsUndefinedforundefined",0,0),  //$NONXXX
-						new TestData("callvirtforundefined",0,0),  //$NONXXX
-						new TestData("castinttodouble",0,0),  //$NONXXX
-						new TestData("chainedAssignments_261024",0,0),  //$NONXXX
-						new TestData("CheckMemoryLeak",0,0),  //$NONXXX
-						new TestData("ChildInTreeInput",0,0),  //$NONXXX
-						new TestData("collectionMappingResult",0,0),  //$NONXXX
-						new TestData("collectreturntype",0,0),  //$NONXXX
+						new ModelsTestData("blackboxlib_annotation_java",0,0),  //$NONXXX
+						new SourcesTestData("blackboxlibASTmodel",0,0),  //$NONXXX
+						new ModelsTestData("blackboxlib_context",0,0),  //$NONXXX
+						new SourcesTestData("bodywithsemicolon",0,0),  //$NONXXX
+						new ModelsTestData("boxing",0,0),  //$NONXXX
+						new ModelsTestData("bug204126_1",0,0,1),  //$NONXXX // 4: target names in resolve expressions
+						new ModelsTestData("bug204126_2",0,0,1),  //$NONXXX // 4: target names in resolve expressions
+						new ModelsTestData("bug204126_3",0,0,1),  //$NONXXX // 4: target names in resolve expressions
+						new ModelsTestData("bug204126_4",0,0,1),  //$NONXXX // 4: target names in resolve expressions
+						new ModelsTestData("bug204126_5",0,0,1),  //$NONXXX // 4: target names in resolve expressions
+						new ModelsTestData("bug204126_6",0,0,1),  //$NONXXX // 4: target names in resolve expressions
+						new ModelsTestData("bug204126_7",0,0,1),  //$NONXXX // 4: target names in resolve expressions
+						new ModelsTestData("bug205303_1",0,0,1+4),  //$NONXXX // 1:preMarked,16: target names in resolve expressions
+						new SourcesTestData("bug205303_2",0,0,1+6),  //$NONXXX // 1:preMarked,24: target names in resolve expressions
+						new ModelsTestData("bug_214938",0,0),  //$NONXXX
+						new ModelsTestData("bug216317",0,0,2),  //$NONXXX // 2*4: target names in resolve expressions
+						new ModelsTestData("bug219075_1",0,0),  //$NONXXX
+						new ModelsTestData("bug224094",0,0),  //$NONXXX
+						new ModelsTestData("bug233984",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new ModelsTestData("bug2437_1",0,0,4),  //$NONXXX // 4*2: implicit set conversion of OCL analyzer
+						new ModelsTestData("bug2437_2",0,0),  //$NONXXX
+						new ModelsTestData("bug2437_3",0,0),  //$NONXXX
+						new ModelsTestData("bug2437_4",0,0,1),  //$NONXXX // 1*2: implicit set conversion of OCL analyzer
+						new ModelsTestData("bug2437_5",0,0,1),  //$NONXXX // 1*2: implicit set conversion of OCL analyzer
+						new ModelsTestData("bug244701",0,0),  //$NONXXX
+						new ModelsTestData("bug267917",0,0),  //$NONXXX
+						new SourcesTestData("bug268636lib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug268636";  //$NONXXX
+							}
+						},
+						new SourcesTestData("bug272869lib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug272869";  //$NONXXX
+							}
+						},
+						new ModelsTestData("bug2732",0,0,2),  //$NONXXX
+						new ModelsTestData("bug2741",0,0),  //$NONXXX
+						new ModelsTestData("bug274105_274505",0,0,9),  //$NONXXX // 9*2: implicit set conversion of OCL analyzer
+						new ModelsTestData("bug2787",0,0,1),  //$NONXXX // 1*2: implicit set conversion of OCL analyzer
+						new ModelsTestData("bug2839",0,0,1),  //$NONXXX // 1*2: implicit set conversion of OCL analyzer
+						new SourcesTestData("bug289982_ambiguousLib",0,0),  //$NONXXX
+						new ModelsTestData("bug289982_lib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug289982";  //$NONXXX
+							}
+						},
+						new ModelsTestData("bug289982_lib_failed",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug289982_failed";  //$NONXXX
+							}
+						},
+						new SourcesTestData("bug289982_undefinedLib",0,0),  //$NONXXX
+						new ModelsTestData("bug294127",0,0),  //$NONXXX
+						new ModelsTestData("bug301134",0,0),  //$NONXXX
+						new ModelsTestData("bug314443",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new ModelsTestData("bug323915",0,0),  //$NONXXX
+						new ModelsTestData("bug325192",0,0,4),  //$NONXXX // 4*2: implicit set conversion of OCL analyzer
+						new ModelsTestData("bug326871",0,0),  //$NONXXX
+						new ModelsTestData("bug326871_lib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug326871a";  //$NONXXX
+							}
+						},
+						new ModelsTestData("bug326871_standalone",0,0),  //$NONXXX
+						new ModelsTestData("bug370098",0,0),  //$NONXXX
+						new ModelsTestData("bug377882",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("bug388325",0,0),  //$NONXXX
+						new ModelsTestData("bug388801",0,0),  //$NONXXX
+						new ModelsTestData("bug392156",0,0,2+12),  //$NONXXX	//2*2: implicit set conversion of OCL analyzer, 12*4: target names in resolve expressions
+						new ModelsTestData("bug392429",0,0),  //$NONXXX
+						new ModelsTestData("bug397215",0,0),  //$NONXXX
+						new ModelsTestData("bug397398",0,0),  //$NONXXX
+						new ModelsTestData("bug400233_lib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug400233";  //$NONXXX
+							}
+						},
+						new ModelsTestData("bug400720",0,0),  //$NONXXX
+						new ModelsTestData("bug404647",0,0),  //$NONXXX
+						new ModelsTestData("bug410470",0,0),  //$NONXXX
+						new SourcesTestData("bug413130",0,0),  //$NONXXX
+						new ModelsTestData("bug413131",0,0,1),  //$NONXXX	//42: t6 EAttribute vs. EReference
+						new SourcesTestData("bug414363",0,0),  //$NONXXX
+						new ModelsTestData("bug414472",0,0),  //$NONXXX
+						new SourcesTestData("bug414619",0,0),  //$NONXXX
+						new ModelsTestData("bug414642",0,0),  //$NONXXX
+						new ModelsTestData("bug415024",0,0),  //$NONXXX
+						new ModelsTestData("bug415029",0,0),  //$NONXXX
+						new ModelsTestData("bug415209",0,0),  //$NONXXX
+						new ModelsTestData("bug415310",0,0),  //$NONXXX
+						new ModelsTestData("bug415315",0,0),  //$NONXXX
+						new ModelsTestData("bug415661",0,0),  //$NONXXX
+						new ModelsTestData("bug416584lib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug416584";  //$NONXXX
+							}
+						},
+						new ModelsTestData("bug417751",0,0),  //$NONXXX
+						new ModelsTestData("bug417779",0,0),  //$NONXXX
+						new ModelsTestData("bug417996",0,0,2),  //$NONXXX	// 2: order of properties changed
+						new ModelsTestData("bug418512",0,0),  //$NONXXX
+						new ModelsTestData("bug418961_lib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug418961";  //$NONXXX
+							}
+						},
+						new ModelsTestData("bug419299",0,0),  //$NONXXX
+						new ModelsTestData("bug422315",0,0),  //$NONXXX
+						new ModelsTestData("bug424086",0,0,2),  //$NONXXX	// 2: target names in resolve expressions
+						new ModelsTestData("bug424584",0,0),  //$NONXXX
+						new ModelsTestData("bug424740",0,0),  //$NONXXX
+						new ModelsTestData("bug424896",0,0),  //$NONXXX
+						new SourcesTestData("bug424912",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("bug424979",0,0,10),  //$NONXXX	// 10*2: implicit set conversion of OCL analyzer
+						new ModelsTestData("bug425069a",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug425069";  //$NONXXX
+							}
+						},
+						new SourcesTestData("bug425634",0,0,10),  //$NONXXX	// 10*4: target names in resolve expressions
+						new ModelsTestData("bug427237",0,0),  //$NONXXX
+						new ModelsTestData("bug427348",0,0),  //$NONXXX
+						new SourcesTestData("bug428028",0,0),  //$NONXXX
+						new ModelsTestData("bug428316",0,0),  //$NONXXX
+						new ModelsTestData("bug428618",0,0,1),  //$NONXXX // 1*2: implicit set conversion of OCL analyzer
+						new ModelsTestData("bug432786",0,0,2),  //$NONXXX	// 2*4: target names in resolve expressions
+						new ModelsTestData("bug433292",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new SourcesTestData("bug433585",0,0),  //$NONXXX
+						new ModelsTestData("bug440514",0,0),  //$NONXXX
+						new ModelsTestData("bug449445",0,0),  //$NONXXX
+						new ModelsTestData("bug449912",0,0),  //$NONXXX
+						new ModelsTestData("bug457433",0,0),  //$NONXXX
+						new ModelsTestData("bug463395",0,0),  //$NONXXX
+						new ModelsTestData("bug463396",0,0),  //$NONXXX
+						new ModelsTestData("bug463572_lib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug463572";  //$NONXXX
+							}
+						},
+						new ModelsTestData("bug466705",0,0),  //$NONXXX
+						new ModelsTestData("bug467325",0,0),  //$NONXXX
+						new ModelsTestData("bug467600",0,0),  //$NONXXX
+						new ModelsTestData("bug467600_Bag",0,0),  //$NONXXX
+						new ModelsTestData("bug467600_Collection",0,0),  //$NONXXX
+						new ModelsTestData("bug467600_List",0,0),  //$NONXXX
+						new ModelsTestData("bug467600_OrderedSet",0,0),  //$NONXXX
+						new ModelsTestData("bug467600_Sequence",0,0),  //$NONXXX
+						new ModelsTestData("bug467600_Set",0,0),  //$NONXXX
+						new ModelsTestData("bugzilla443",0,0),  //$NONXXX
+						new ModelsTestData("C",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug475123";  //$NONXXX
+							}
+						},
+						new SourcesTestData("calldump",0,0),  //$NONXXX
+						new ModelsTestData("calloclIsUndefinedforundefined",0,0),  //$NONXXX
+						new ModelsTestData("callvirtforundefined",0,0),  //$NONXXX
+						new ModelsTestData("castinttodouble",0,0),  //$NONXXX
+						new ModelsTestData("chainedAssignments_261024",0,0),  //$NONXXX
+						new DeployedTestData("CheckMemoryLeak",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "intermprop_cleanup";  //$NONXXX
+							}
+						},
+						new DeployedTestData("ChildInTreeInput",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "callapi";  //$NONXXX
+							}
+						},
+						new ModelsTestData("collectionMappingResult",0,0),  //$NONXXX
+						new SourcesTestData("collectreturntype",0,0),  //$NONXXX
 						new TestData("ColorSettingPreviewCode",0,0),  //$NONXXX
-						new TestData("compatible",0,0),  //$NONXXX
-						new TestData("computeExp_250403",0,0),  //$NONXXX
-						new TestData("configpropstype",0,0),  //$NONXXX
-						new TestData("constructors",0,0),  //$NONXXX
-						new TestData("contextlesscall",0,0,1),  //$NONXXX	//1: preMarked
-						new TestData("continue_break",0,0),  //$NONXXX
-						new TestData("continue_perf",0,0),  //$NONXXX
-						new TestData("copynameviacontextmapping",0,0),  //$NONXXX
-						new TestData("customop",0,0),  //$NONXXX
-						new TestData("deprecated_importLocation",0,0),  //$NONXXX
-						new TestData("deprecated_rename",0,0),  //$NONXXX
-						new TestData("dicttype",0,0),  //$NONXXX
-						new TestData("doubleQuoteStrings_262734",0,0),  //$NONXXX
-						new TestData("dupImportLibrary",0,0),  //$NONXXX
+						new SourcesTestData("compatible",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug468303";  //$NONXXX
+							}
+						},
+						new ModelsTestData("computeExp_250403",0,0),  //$NONXXX
+						new SourcesTestData("configpropstype",0,0),  //$NONXXX
+						new ModelsTestData("constructors",0,0),  //$NONXXX
+						new ModelsTestData("contextlesscall",0,0,1),  //$NONXXX	//1: preMarked
+						new ModelsTestData("continue_break",0,0),  //$NONXXX
+						new ModelsTestData("continue_perf",0,0),  //$NONXXX
+						new ModelsTestData("copynameviacontextmapping",0,0),  //$NONXXX
+						new ModelsTestData("customop",0,0),  //$NONXXX
+						new SourcesTestData("deprecated_importLocation",0,0),  //$NONXXX
+						new SourcesTestData("deprecated_rename",0,0),  //$NONXXX
+						new ModelsTestData("dicttype",0,0),  //$NONXXX
+						new ModelsTestData("doubleQuoteStrings_262734",0,0),  //$NONXXX
+						new SourcesTestData("dupImportLibrary",0,0),  //$NONXXX
 						new TestData("DuplicatedNamesDetection",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("dynamicpackage",0,0),  //$NONXXX
-						new TestData("Ecore2Ecore",0,0),  //$NONXXX
-						new TestData("Ecore2EcoreExt",0,0),  //$NONXXX
-						new TestData("ecore2uml_",0,0),  //$NONXXX
+						new SourcesTestData("dynamicpackage",0,0),  //$NONXXX
+						new DeployedTestData("Ecore2Ecore",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "callapi";  //$NONXXX
+							}
+						},
+						new DeployedTestData("Ecore2EcoreExt",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "callapi";  //$NONXXX
+							}
+						},
+						new AntTestData("ecore2uml",0,0),  //$NONXXX
 						//new TestData("Ecore2UML",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("emptyExtents",0,0),  //$NONXXX
-						new TestData("emptyinit",0,0),  //$NONXXX
-						new TestData("emptymodule",0,0),  //$NONXXX
-						new TestData("emptyout",0,0),  //$NONXXX
-						new TestData("endsectfull",0,0),  //$NONXXX
-						new TestData("endsectimplicitpopulation",0,0),  //$NONXXX
-						new TestData("endsectimplicitpopulationnoinit",0,0),  //$NONXXX
-						new TestData("endsectinitnopopulation",0,0),  //$NONXXX
-						new TestData("endsectonly",0,0),  //$NONXXX
-						new TestData("endsectpopulationnoinit",0,0),  //$NONXXX
-						new TestData("endsectresultpatch",0,0),  //$NONXXX
-						new TestData("entryOp",0,0),  //$NONXXX
-						new TestData("equndefined",0,0,28),  //$NONXXX // 28:preMarked
-						new TestData("escape_sequences_250630",0,0),  //$NONXXX
-						new TestData("exec1",0,0),  //$NONXXX
-						new TestData("exec2",0,0),  //$NONXXX
-						new TestData("exec3",0,0),  //$NONXXX
-						new TestData("exec3_lib",0,0),  //$NONXXX
-						new TestData("exists",0,0),  //$NONXXX
-						new TestData("ExtendedLibrary",0,0),  //$NONXXX
-						new TestData("firstlast",0,0),  //$NONXXX
+						new ModelsTestData("emptyExtents",0,0),  //$NONXXX
+						new SourcesTestData("emptyinit",0,0),  //$NONXXX
+						new SourcesTestData("emptymodule",0,0),  //$NONXXX
+						new ModelsTestData("emptyout",0,0),  //$NONXXX
+						new SourcesTestData("endsectfull",0,0),  //$NONXXX
+						new SourcesTestData("endsectimplicitpopulation",0,0),  //$NONXXX
+						new SourcesTestData("endsectimplicitpopulationnoinit",0,0),  //$NONXXX
+						new SourcesTestData("endsectinitnopopulation",0,0),  //$NONXXX
+						new SourcesTestData("endsectonly",0,0),  //$NONXXX
+						new SourcesTestData("endsectpopulationnoinit",0,0),  //$NONXXX
+						new ModelsTestData("endsectresultpatch",0,0),  //$NONXXX
+						new ModelsTestData("entryOp",0,0),  //$NONXXX
+						new ModelsTestData("equndefined",0,0,28),  //$NONXXX // 28:preMarked
+						new ModelsTestData("escape_sequences_250630",0,0),  //$NONXXX
+						new ApiTestData("exec1",0,0),  //$NONXXX
+						new ApiTestData("exec2",0,0),  //$NONXXX
+						new ApiTestData("exec3",0,0),  //$NONXXX
+						new ApiTestData("exec3_lib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "exec3_withImport";  //$NONXXX
+							}
+						},
+						new ModelsTestData("exists",0,0),  //$NONXXX
+						new SourcesTestData("ExtendedLibrary",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug438038";  //$NONXXX
+							}
+						},
+						new ModelsTestData("firstlast",0,0),  //$NONXXX
 						new TestData("firstunparsertest",0,0),  //$NONXXX
-						new TestData("FooLibImport",0,0),  //$NONXXX
-						new TestData("forExp_245275",0,0),  //$NONXXX
-						new TestData("getpropfromundefined",0,0),  //$NONXXX
+						new ExternLibTestData("FooLibImport",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "com/foo";  //$NONXXX
+							}
+						},
+						new ModelsTestData("forExp_245275",0,0),  //$NONXXX
+						new ModelsTestData("getpropfromundefined",0,0),  //$NONXXX
 						new TestData("HelpersAndQueries",0,0),  //$NONXXX
-						new TestData("helperSimpleDef_252173",0,0),  //$NONXXX
-						new TestData("imp",0,0),  //$NONXXX
-						new TestData("implicitpopulation",0,0),  //$NONXXX
-						new TestData("implicitpopulationwithinit",0,0),  //$NONXXX
-						new TestData("implicitSrcImport",0,0),  //$NONXXX
-						new TestData("imported",0,0),  //$NONXXX
-						new TestData("imported2",0,0),  //$NONXXX
-						new TestData("importedFileUnit",0,0),  //$NONXXX
+						new ModelsTestData("helperSimpleDef_252173",0,0),  //$NONXXX
+						new ModelsTestData("imp",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "propuseprop";  //$NONXXX
+							}
+						},
+						new SourcesTestData("implicitpopulation",0,0),  //$NONXXX
+						new SourcesTestData("implicitpopulationwithinit",0,0),  //$NONXXX
+						new SourcesTestData("implicitSrcImport",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "implicitCallSrc";  //$NONXXX
+							}
+						},
+						new ModelsTestData("imported",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "fqntraces";  //$NONXXX
+							}
+						},
+						new ModelsTestData("imported2",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "fqnMainCalls_272937";  //$NONXXX
+							}
+						},
+						new SourcesTestData("importedFileUnit",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "dupImportFileUnit/ns";  //$NONXXX
+							}
+						},
 						new TestData("ImportedLib",0,0),  //$NONXXX
-						new TestData("ImportedMappingTest",0,0,1),  //$NONXXX // 1: preMarked
-						new TestData("ImportedTransf1",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("ImportedTransf2",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("ImportedTransf4",0,0),  //$NONXXX
-						new TestData("incompatible",0,0),  //$NONXXX
-						new TestData("initsectresultpatch",0,0),  //$NONXXX
-						new TestData("inoutcontextparam",0,0),  //$NONXXX
-						new TestData("inoutcontextparamnoresult",0,0),  //$NONXXX
-						new TestData("inoutMapping",0,0),  //$NONXXX
-						new TestData("InplaceEcore",0,0),  //$NONXXX
+						new ModelsTestData("ImportedMappingTest",0,0,1) {  //$NONXXX // 1: preMarked
+							@Override
+							public String getDir() {
+								return "importedvirtuals";  //$NONXXX
+							}
+						},
+						new ModelsTestData("ImportedTransf1",0,0,2) {  //$NONXXX	// 1: ordering of top level eClassifiers changed
+							@Override
+							public String getDir() {
+								return "import_access_extends";  //$NONXXX
+							}
+						},
+						new ModelsTestData("ImportedTransf2",0,0,2) {  //$NONXXX	// 1: ordering of top level eClassifiers changed
+							@Override
+							public String getDir() {
+								return "import_access_extends";  //$NONXXX
+							}
+						},
+						new ModelsTestData("ImportedTransf4",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "import_access_extends";  //$NONXXX
+							}
+						},
+						new SourcesTestData("incompatible",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug468303";  //$NONXXX
+							}
+						},
+						new ModelsTestData("initsectresultpatch",0,0),  //$NONXXX
+						new ModelsTestData("inoutcontextparam",0,0),  //$NONXXX
+						new ModelsTestData("inoutcontextparamnoresult",0,0),  //$NONXXX
+						new ModelsTestData("inoutMapping",0,0),  //$NONXXX
+						new DeployedTestData("InplaceEcore",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "callapi";  //$NONXXX
+							}
+						},
 						new TestData("IntermediateData",0,0),  //$NONXXX
-						new TestData("intermediateprop_imported",0,0),  //$NONXXX
-						new TestData("intermediateprop_resolve",0,0,2),  //$NONXXX	// 2: preMarked
-						new TestData("intermediateprop_trace",0,0),  //$NONXXX
-						new TestData("intermProperties",0,0,4),  //$NONXXX	// 2: ordering of properties changed
-						new TestData("intermSimple",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("intermWithCrossRefs",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("intermWithExtends",0,0),  //$NONXXX
-						new TestData("intermWithoutExtent",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("invalidcollectioncast",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("invalidConfigProp",0,0),  //$NONXXX
-						new TestData("invresolve_",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("invresolvebyrule",0,0,1+1),  //$NONXXX	// 1: preMarked, 1*4: target names in resolve expressions
-						new TestData("isunique",0,0),  //$NONXXX
-						new TestData("iterateoverintset",0,0),  //$NONXXX
-						new TestData("iteratetest",0,0),  //$NONXXX
-						new TestData("javakeywords",0,0),  //$NONXXX
-						new TestData("lateresolve",0,0,2+1),  //$NONXXX	// 2: preMarked, 1*4: target names in resolve expressions
-						new TestData("LateResolveBase",0,0),  //$NONXXX
-						new TestData("lateresolvebyrule",0,0,2+1),  //$NONXXX	// 2: preMarked, 1*4: target names in resolve expressions
-						new TestData("lateresolve_many",0,0,3),  //$NONXXX	// 2: ordering of top level eClassifiers changed
-						new TestData("Lib",0,0),  //$NONXXX
-						new TestData("Lib1",0,0),  //$NONXXX
-						new TestData("Lib2",0,0),  //$NONXXX
-						new TestData("LibForAccess",0,0),  //$NONXXX
-						new TestData("LibForExtends",0,0),  //$NONXXX
-						new TestData("listLiteral_259754",0,0),  //$NONXXX
-						new TestData("localstrings",0,0),  //$NONXXX
-						new TestData("m3",0,0),  //$NONXXX
-						new TestData("mapDisjuncts",0,0,5),  //$NONXXX	// 5*4: target names in resolve expressions
-						new TestData("mapInherits",0,0,4),  //$NONXXX	// 4*4: target names in resolve expressions
-						new TestData("mapkeyword",0,0,1),  //$NONXXX	// 1: preMarked
-						new TestData("mapMerges",0,0,4),  //$NONXXX	// 4*4: target names in resolve expressions
-						new TestData("mapMultipleInherits",0,0),  //$NONXXX
+						new ModelsTestData("intermediateprop_imported",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "intermediateprop_import";  //$NONXXX
+							}
+						},
+						new ModelsTestData("intermediateprop_resolve",0,0,2),  //$NONXXX	// 2: preMarked
+						new ModelsTestData("intermediateprop_trace",0,0),  //$NONXXX
+						new ModelsTestData("intermProperties",0,0,4),  //$NONXXX	// 2: ordering of properties changed
+						new ModelsTestData("intermSimple",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new ModelsTestData("intermWithCrossRefs",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new ModelsTestData("intermWithExtends",0,0),  //$NONXXX
+						new ModelsTestData("intermWithoutExtent",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new ModelsTestData("invalidcollectioncast",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new ModelsTestData("invalidConfigProp",0,0),  //$NONXXX
+						new ModelsTestData("invresolve_",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("invresolvebyrule",0,0,1+1),  //$NONXXX	// 1: preMarked, 1*4: target names in resolve expressions
+						new ModelsTestData("isunique",0,0),  //$NONXXX
+						new ModelsTestData("iterateoverintset",0,0),  //$NONXXX
+						new ModelsTestData("iteratetest",0,0),  //$NONXXX
+						new ModelsTestData("javakeywords",0,0),  //$NONXXX
+						new ModelsTestData("lateresolve",0,0,2+1),  //$NONXXX	// 2: preMarked, 1*4: target names in resolve expressions
+						new ModelsTestData("LateResolveBase",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug463416";  //$NONXXX
+							}
+						},
+						new ModelsTestData("lateresolvebyrule",0,0,2+1),  //$NONXXX	// 2: preMarked, 1*4: target names in resolve expressions
+						new ModelsTestData("lateresolve_many",0,0,3),  //$NONXXX	// 2: ordering of top level eClassifiers changed
+						new ModelsTestData("Lib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug463410";  //$NONXXX
+							}
+						},
+						new DeployedTestData("Lib1",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "org/eclipse";  //$NONXXX
+							}
+						},
+						new DeployedTestData("Lib2",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "a/b";  //$NONXXX
+							}
+						},
+						new ModelsTestData("LibForAccess",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "fqn_noncontextual";  //$NONXXX
+							}
+						},
+						new ModelsTestData("LibForExtends",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "fqn_noncontextual";  //$NONXXX
+							}
+						},
+						new ModelsTestData("listLiteral_259754",0,0),  //$NONXXX
+						new ModelsTestData("localstrings",0,0),  //$NONXXX
+						new ModelsTestData("m3",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "imports_transformations";  //$NONXXX
+							}
+						},
+						new ModelsTestData("mapDisjuncts",0,0,5),  //$NONXXX	// 5*4: target names in resolve expressions
+						new ModelsTestData("mapInherits",0,0,4),  //$NONXXX	// 4*4: target names in resolve expressions
+						new ModelsTestData("mapkeyword",0,0,1),  //$NONXXX	// 1: preMarked
+						new ModelsTestData("mapMerges",0,0,4),  //$NONXXX	// 4*4: target names in resolve expressions
+						new ModelsTestData("mapMultipleInherits",0,0),  //$NONXXX
 						new TestData("MappingBody",0,0),  //$NONXXX
-						new TestData("mappingBodyExpressions_252358",0,0),  //$NONXXX
+						new ModelsTestData("mappingBodyExpressions_252358",0,0),  //$NONXXX
 						new TestData("MappingExtensionDisjuncts",0,0),  //$NONXXX
 						new TestData("MappingExtensionInherits",0,0),  //$NONXXX
 						new TestData("MappingExtensionMerges",0,0),  //$NONXXX
 						new TestData("Mappings",0,0),  //$NONXXX
 						new TestData("MappingsWhenClause",0,0),  //$NONXXX
-						new TestData("mappingWithNoResultTrace_266854",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("mappingWithNoResultTrace_266854",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
 						new TestData("markedTest",0,0),  //$NONXXX
-						new TestData("misplacedTopElements",0,0),  //$NONXXX
-						new TestData("mm_header1",0,0),  //$NONXXX
-						new TestData("mm_header2",0,0),  //$NONXXX
-						new TestData("mm_header3",0,0),  //$NONXXX
-						new TestData("mm_header4",0,0),  //$NONXXX
-						new TestData("mm_modifyvar",0,0),  //$NONXXX
+						new SourcesTestData("misplacedTopElements",0,0),  //$NONXXX
+						new ModelsTestData("mm_header1",0,0),  //$NONXXX
+						new ModelsTestData("mm_header2",0,0),  //$NONXXX
+						new ModelsTestData("mm_header3",0,0),  //$NONXXX
+						new ModelsTestData("mm_header4",0,0),  //$NONXXX
+						new ModelsTestData("mm_modifyvar",0,0),  //$NONXXX
 						new TestData("ModelExtents",0,0),  //$NONXXX
-						new TestData("modifyfeature",0,0),  //$NONXXX
-						new TestData("modifyparam",0,0),  //$NONXXX
-						new TestData("modifyresult",0,0),  //$NONXXX
-						new TestData("modifyvar",0,0),  //$NONXXX
-						new TestData("moduleProperty",0,0),  //$NONXXX
-						new TestData("multilineStrings_262733",0,0),  //$NONXXX
-						new TestData("multipletracerecords",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("multiresultpars",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("nested",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("nestednativeops",0,0),  //$NONXXX
-						new TestData("nestedPropertiesAssignment_262757",0,0,2+1),  //$NONXXX	// 2*2: implicit set conversion of OCL analyzer, 1*4: target names in resolve expressions
-						new TestData("NestedTransformation",0,0),  //$NONXXX
-						new TestData("NewLibrary",0,0),  //$NONXXX
-						new TestData("NewTransformation",0,0),  //$NONXXX
-						new TestData("nocollectoncollection",0,0),  //$NONXXX
-						new TestData("noglobalallinstances",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("NonExecutable",0,0),  //$NONXXX
-						new TestData("nullsource",0,0),  //$NONXXX
-						new TestData("objectExp",0,0),  //$NONXXX
-						new TestData("objectExpBodyExpressions_253051",0,0),  //$NONXXX
-						new TestData("oclAllInstances",0,0),  //$NONXXX
-						new TestData("oclastype",0,0),  //$NONXXX
-						new TestData("ocl_test",0,0,3),  //$NONXXX	// 3: preMarked
-						new TestData("omittedobject",0,0),  //$NONXXX
-						new TestData("omittedobjectwithinit",0,0),  //$NONXXX
+						new SourcesTestData("modifyfeature",0,0),  //$NONXXX
+						new SourcesTestData("modifyparam",0,0),  //$NONXXX
+						new SourcesTestData("modifyresult",0,0),  //$NONXXX
+						new ModelsTestData("modifyvar",0,0),  //$NONXXX
+						new ModelsTestData("moduleProperty",0,0),  //$NONXXX
+						new ModelsTestData("multilineStrings_262733",0,0),  //$NONXXX
+						new ModelsTestData("multipletracerecords",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("multiresultpars",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("nested",0,0,1) {  //$NONXXX	// 1*4: target names in resolve expressions
+							@Override
+							public String getDir() {
+								return "compositetransf";  //$NONXXX
+							}
+						},
+						new ModelsTestData("nestednativeops",0,0),  //$NONXXX
+						new ModelsTestData("nestedPropertiesAssignment_262757",0,0,2+1),  //$NONXXX	// 2*2: implicit set conversion of OCL analyzer, 1*4: target names in resolve expressions
+						new ModelsTestData("NestedTransformation",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug433937_referenced/root/other";  //$NONXXX
+							}
+						},
+						new ModelsTestData("NewLibrary",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug390088";  //$NONXXX
+							}
+						},
+						new ModelsTestData("NewTransformation",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug392153";  //$NONXXX
+							}
+						},
+						new SourcesTestData("nocollectoncollection",0,0),  //$NONXXX
+						new SourcesTestData("noglobalallinstances",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new DeployedTestData("NonExecutable",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "callapi";  //$NONXXX
+							}
+						},
+						new ModelsTestData("nullsource",0,0),  //$NONXXX
+						new ModelsTestData("objectExp",0,0),  //$NONXXX
+						new ModelsTestData("objectExpBodyExpressions_253051",0,0),  //$NONXXX
+						new ModelsTestData("oclAllInstances",0,0),  //$NONXXX
+						new ModelsTestData("oclastype",0,0),  //$NONXXX
+						new ModelsTestData("ocl_test",0,0,3),  //$NONXXX	// 3: preMarked
+						new ModelsTestData("omittedobject",0,0),  //$NONXXX
+						new ModelsTestData("omittedobjectwithinit",0,0),  //$NONXXX
 						new TestData("OperationalTransformation1",0,0),  //$NONXXX
-						new TestData("optionalout",0,0),  //$NONXXX
-						new TestData("orderedsetdoesnotconformtoset",0,0),  //$NONXXX
-						new TestData("OtherTransformation",0,0),  //$NONXXX
-						new TestData("outininitvar",0,0),  //$NONXXX
-						new TestData("overload",0,0,3),  //$NONXXX	// 3: preMarked
-						new TestData("overload_205062",0,0),  //$NONXXX
-						new TestData("overload_multipleParams",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("overload_singleParam",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new SourcesTestData("optionalout",0,0),  //$NONXXX
+						new SourcesTestData("orderedsetdoesnotconformtoset",0,0),  //$NONXXX
+						new PluginProjectTestData("OtherTransformation",0,0) {  //$NONXXX
+														
+							@Override
+							public String getFolder() {
+								return "transforms";  //$NONXXX
+							}
+							
+							@Override
+							public String getSubFolder() {
+								return "root";  //$NONXXX
+							}
+							
+							@Override
+							public String getDir() {
+								return "other";  //$NONXXX
+							}
+						},
+						new SourcesTestData("outininitvar",0,0),  //$NONXXX
+						new ModelsTestData("overload",0,0,3),  //$NONXXX	// 3: preMarked
+						new ModelsTestData("overload_205062",0,0),  //$NONXXX
+						new ModelsTestData("overload_multipleParams",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new ModelsTestData("overload_singleParam",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
 						new TestData("OverridingMappings",0,0),  //$NONXXX
-						new TestData("populationSection",0,0,1),  //$NONXXX	// 1: preMarked
-						new TestData("primtypesecore",0,0),  //$NONXXX
-						new TestData("propertycollect",0,0,1),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer,
-						new TestData("props",0,0),  //$NONXXX
-						new TestData("q1",0,0),  //$NONXXX
-						new TestData("queries",0,0),  //$NONXXX
-						new TestData("referencedLib",0,0),  //$NONXXX
-						new TestData("ReferencedTransformation",0,0),  //$NONXXX
-						new TestData("registeredDynamic",0,0),  //$NONXXX
-						new TestData("removeclassesinwhile",0,0),  //$NONXXX
-						new TestData("resolveall",0,0,1+4+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 4*4: target names in resolve expressions, 1: ordering of top level eClassifiers changed
-						new TestData("resolvebeforeoutcompletion",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("resolvebyrule",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("populationSection",0,0,1),  //$NONXXX	// 1: preMarked
+						new ModelsTestData("primtypesecore",0,0),  //$NONXXX
+						new ModelsTestData("propertycollect",0,0,1),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer,
+						new SourcesTestData("props",0,0),  //$NONXXX
+						new ExternLibTestData("q1",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "org";  //$NONXXX
+							}
+						},
+						new ModelsTestData("queries",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "importedprops";  //$NONXXX
+							}
+						},
+						new TestData("referencedLib",0,0) {  //$NONXXX
+							@Override
+							public String getFolder() {
+								return "parserTestData";  //$NONXXX
+							}
+							
+							@Override
+							public String getSubFolder() {
+								return "editor";  //$NONXXX
+							}
+							
+							@Override
+							public String getDir() {
+								return "testhyperlinks";  //$NONXXX
+							}
+						},
+						new ModelsTestData("ReferencedTransformation",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug433937_referenced";  //$NONXXX
+							}
+						},
+						new DeployedTestData("registeredDynamic",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "dynamicmodel";  //$NONXXX
+							}
+						},
+						new ModelsTestData("removeclassesinwhile",0,0),  //$NONXXX
+						new ModelsTestData("resolveall",0,0,1+4+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 4*4: target names in resolve expressions, 1: ordering of top level eClassifiers changed
+						new ModelsTestData("resolvebeforeoutcompletion",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("resolvebyrule",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
 						new TestData("ResolveExpressions",0,0,2),  //$NONXXX	// 2*4: target names in resolve expressions
-						new TestData("resolve_invresolveoneIn",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("resolve_lateresolveoneIn",0,0),  //$NONXXX
-						new TestData("resolve_lateresolveoneInaccess",0,0),  //$NONXXX
-						new TestData("resolvenoinput",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("resolve_notype",0,0,1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1: ordering of top level eClassifiers changed
-						new TestData("resolve_resolveIn",0,0,1+1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1*4: target names in resolve expressions, 1: ordering of top level eClassifiers changed
-						new TestData("resolve_resolveone",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("resolve_resolveoneIn",0,0,1+2),  //$NONXXX	// 1*4: target names in resolve expressions, 1: ordering of top level eClassifiers changed
-						new TestData("resolve_type",0,0,1+1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1*4: target names in resolve expressions, 1: ordering of top level eClassifiers changed
-						new TestData("resolve_vardecl",0,0,1+1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1*4: target names in resolve expressions, 1: ordering of top level eClassifiers changed
-						new TestData("resolve_vardeclcond",0,0,1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1: ordering of top level eClassifiers changed
-						new TestData("resolve_vardeclcondwithvar",0,0,1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1: ordering of top level eClassifiers changed
-						new TestData("returnundefinedfromquery",0,0),  //$NONXXX
-						new TestData("RootTransfForExtends",0,0),  //$NONXXX
-						new TestData("scr17812",0,0),  //$NONXXX
-						new TestData("scr18514",0,0,2),  //$NONXXX	// 2: preMarked
-						new TestData("scr18572",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("scr18739",0,0),  //$NONXXX
-						new TestData("scr18783",0,0),  //$NONXXX
-						new TestData("scr19364",0,0),  //$NONXXX
-						new TestData("scr20038",0,0),  //$NONXXX
-						new TestData("scr20041",0,0),  //$NONXXX
-						new TestData("scr20469",0,0),  //$NONXXX
-						new TestData("scr20471",0,0),  //$NONXXX
-						new TestData("scr20667",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("scr20811",0,0),  //$NONXXX
-						new TestData("scr21121",0,0),  //$NONXXX
-						new TestData("scr21329",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("scr23070",0,0),  //$NONXXX
-						new TestData("scr878",0,0),  //$NONXXX
-						new TestData("setundefinedtoprimitive",0,0,1),  //$NONXXX	// 1: preMarked
-						new TestData("simple",0,0),  //$NONXXX
-						new TestData("simpleconfigproperty",0,0),  //$NONXXX
-						new TestData("simpleproperty",0,0),  //$NONXXX
-						new TestData("simplerename",0,0),  //$NONXXX
-						new TestData("simpleresolve",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
-						new TestData("simplestXCollectShorthand",0,0),  //$NONXXX
-						new TestData("simpletag",0,0),  //$NONXXX
-						new TestData("Simpleuml_To_Rdb",0,0,2),  //$NONXXX
-						new TestData("skippopulation",0,0,1),  //$NONXXX	// 1: preMarked
-						new TestData("slashSingleLineComments_266478",0,0),  //$NONXXX
-						new TestData("somelib",0,0),  //$NONXXX
-						new TestData("stdlibelement",0,0),  //$NONXXX
-						new TestData("stdlibList",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
-						new TestData("stdlibModel",0,0),  //$NONXXX
-						new TestData("stdlibString",0,0),  //$NONXXX
-						new TestData("stringescaping",0,0),  //$NONXXX
-						new TestData("subobjects",0,0),  //$NONXXX
-						new TestData("successLib",0,0),  //$NONXXX
-						new TestData("T2",0,0),  //$NONXXX
-						new TestData("TestLib",0,0),  //$NONXXX
-						new TestData("testlibrary",0,0),  //$NONXXX
-						new TestData("traceLookup_287589",0,0),  //$NONXXX
-						new TestData("transf2",0,0),  //$NONXXX
-						new TestData("transf3",0,0),  //$NONXXX
-						new TestData("TransfForAccess",0,0),  //$NONXXX
-						new TestData("transformationWithModuleElements_257055",0,0),  //$NONXXX
-						new TestData("tuples",0,0,1),  //$NONXXX	// 1: preMarked
-						new TestData("twoInputs",0,0),  //$NONXXX
-						new TestData("uml2rdb",0,0),  //$NONXXX
-						new TestData("uml2_stereotypeApplication",0,0),  //$NONXXX
+						new ModelsTestData("resolve_invresolveoneIn",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("resolve_lateresolveoneIn",0,0),  //$NONXXX
+						new ModelsTestData("resolve_lateresolveoneInaccess",0,0),  //$NONXXX
+						new ModelsTestData("resolvenoinput",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("resolve_notype",0,0,1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1: ordering of top level eClassifiers changed
+						new ModelsTestData("resolve_resolveIn",0,0,1+1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1*4: target names in resolve expressions, 1: ordering of top level eClassifiers changed
+						new ModelsTestData("resolve_resolveone",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new ModelsTestData("resolve_resolveoneIn",0,0,1+2),  //$NONXXX	// 1*4: target names in resolve expressions, 1: ordering of top level eClassifiers changed
+						new ModelsTestData("resolve_type",0,0,1+1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1*4: target names in resolve expressions, 1: ordering of top level eClassifiers changed
+						new ModelsTestData("resolve_vardecl",0,0,1+1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1*4: target names in resolve expressions, 1: ordering of top level eClassifiers changed
+						new ModelsTestData("resolve_vardeclcond",0,0,1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1: ordering of top level eClassifiers changed
+						new ModelsTestData("resolve_vardeclcondwithvar",0,0,1+2),  //$NONXXX	// 1*2: implicit set conversion of OCL analyzer, 1: ordering of top level eClassifiers changed
+						new ModelsTestData("returnundefinedfromquery",0,0),  //$NONXXX
+						new ModelsTestData("RootTransfForExtends",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "fqn_noncontextual";  //$NONXXX
+							}
+						},
+						new ModelsTestData("scr17812",0,0),  //$NONXXX
+						new ModelsTestData("scr18514",0,0,2),  //$NONXXX	// 2: preMarked
+						new ModelsTestData("scr18572",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("scr18739",0,0),  //$NONXXX
+						new ModelsTestData("scr18783",0,0),  //$NONXXX
+						new ModelsTestData("scr19364",0,0),  //$NONXXX
+						new ModelsTestData("scr20038",0,0),  //$NONXXX
+						new ModelsTestData("scr20041",0,0),  //$NONXXX
+						new ModelsTestData("scr20469",0,0),  //$NONXXX
+						new ModelsTestData("scr20471",0,0),  //$NONXXX
+						new ModelsTestData("scr20667",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("scr20811",0,0),  //$NONXXX
+						new ModelsTestData("scr21121",0,0),  //$NONXXX
+						new ModelsTestData("scr21329",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("scr23070",0,0),  //$NONXXX
+						new ModelsTestData("scr878",0,0),  //$NONXXX
+						new ModelsTestData("setundefinedtoprimitive",0,0,1),  //$NONXXX	// 1: preMarked
+						new ModelsTestData("simple",0,0),  //$NONXXX
+						new ModelsTestData("simpleconfigproperty",0,0),  //$NONXXX
+						new ModelsTestData("simpleproperty",0,0),  //$NONXXX
+						new ModelsTestData("simplerename",0,0),  //$NONXXX
+						new ModelsTestData("simpleresolve",0,0,1),  //$NONXXX	// 1*4: target names in resolve expressions
+						new ModelsTestData("simplestXCollectShorthand",0,0),  //$NONXXX
+						new ModelsTestData("simpletag",0,0),  //$NONXXX
+						new TestData("Simpleuml_To_Rdb",0,0,2) {  //$NONXXX
+							@Override
+							public String getPluginID() {
+								return "org.eclipse.m2m.qvt.oml.samples";  //$NONXXX
+							}
+							
+							@Override
+							public String getFolder() {
+								return "projects";  //$NONXXX
+							}
+							
+							@Override
+							public String getSubFolder() {
+								return Path.EMPTY.toString();
+							}
+							
+							@Override
+							public String getDir() {
+								return "org.eclipse.m2m.qvt.oml.samples.simpleuml2rdb";  //$NONXXX
+							}
+						},
+						new ModelsTestData("skippopulation",0,0,1),  //$NONXXX	// 1: preMarked
+						new ModelsTestData("slashSingleLineComments_266478",0,0),  //$NONXXX
+						new ModelsTestData("somelib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "bug289982_importless";  //$NONXXX
+							}
+						},
+						new ModelsTestData("stdlibelement",0,0),  //$NONXXX
+						new ModelsTestData("stdlibList",0,0,2),  //$NONXXX	// 1: ordering of top level eClassifiers changed
+						new ModelsTestData("stdlibModel",0,0),  //$NONXXX
+						new ModelsTestData("stdlibString",0,0),  //$NONXXX
+						new ModelsTestData("stringescaping",0,0),  //$NONXXX
+						new ModelsTestData("subobjects",0,0),  //$NONXXX
+						new ExternLibTestData("successLib",0,0),  //$NONXXX
+						new DeployedTestData("T2",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "a";  //$NONXXX
+							}
+						},
+						new ModelsTestData("TestLib",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "stdlibDict";  //$NONXXX
+							}
+						},
+						new ModelsTestData("testlibrary",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "libraryHeaderWithSignature_257575";  //$NONXXX
+							}
+						},
+						new DeployedTestData("traceLookup_287589",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "perf";  //$NONXXX
+							}
+						},
+						new ModelsTestData("transf2",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "importedExtents";  //$NONXXX
+							}
+						},
+						new ModelsTestData("transf3",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "importedExtents";  //$NONXXX
+							}
+						},
+						new ModelsTestData("TransfForAccess",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "operation_override";  //$NONXXX
+							}
+						},
+						new ModelsTestData("transformationWithModuleElements_257055",0,0),  //$NONXXX
+						new ModelsTestData("tuples",0,0,1),  //$NONXXX	// 1: preMarked
+						new ApiTestData("twoInputs",0,0),  //$NONXXX
+						new AntTestData("uml2rdb",0,0),  //$NONXXX
+						new ModelsTestData("uml2_stereotypeApplication",0,0),  //$NONXXX
 						new TestData("UMLFoo",0,0),  //$NONXXX
-						new TestData("urilessModeltype",0,0),  //$NONXXX
-						new TestData("usebooleanprop",0,0),  //$NONXXX
-						new TestData("useresultinsameout",0,0),  //$NONXXX
-						new TestData("util",0,0),  //$NONXXX
-						new TestData("Utils",0,0),  //$NONXXX
-						new TestData("varassign",0,0),  //$NONXXX
-						new TestData("varInitExpWithResult_260985",0,0),  //$NONXXX
-						new TestData("varInitGroup_261841",0,0),  //$NONXXX
-						new TestData("virtscr20707",0,0),  //$NONXXX
-						new TestData("virtualPredefinedTypeOpers",0,0),  //$NONXXX
-						new TestData("voidreturn",0,0),  //$NONXXX
-						new TestData("vutil",0,0),  //$NONXXX
-						new TestData("WarmUp",0,0),  //$NONXXX
-						new TestData("_while",0,0),  //$NONXXX
-						new TestData("_while_261024",0,0)  //$NONXXX
+						new ModelsTestData("urilessModeltype",0,0),  //$NONXXX
+						new ModelsTestData("usebooleanprop",0,0),  //$NONXXX
+						new ModelsTestData("useresultinsameout",0,0),  //$NONXXX
+						new ModelsTestData("util",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "full";  //$NONXXX
+							}
+						},
+						new ModelsTestData("Utils",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "propinit";  //$NONXXX
+							}
+						},
+						new ModelsTestData("varassign",0,0),  //$NONXXX
+						new ModelsTestData("varInitExpWithResult_260985",0,0),  //$NONXXX
+						new ModelsTestData("varInitGroup_261841",0,0),  //$NONXXX
+						new ModelsTestData("virtscr20707",0,0),  //$NONXXX
+						new ModelsTestData("virtualPredefinedTypeOpers",0,0),  //$NONXXX
+						new ModelsTestData("voidreturn",0,0),  //$NONXXX
+						new ModelsTestData("vutil",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "virt";  //$NONXXX
+							}
+						},
+						new DeployedTestData("WarmUp",0,0) {  //$NONXXX
+							@Override
+							public String getDir() {
+								return "perf";  //$NONXXX
+							}
+						},
+						new ModelsTestData("_while",0,0),  //$NONXXX
+						new ModelsTestData("_while_261024",0,0)  //$NONXXX
 						/**/
 				}
 				);
@@ -511,19 +912,21 @@ public class TestQvtUnparser extends TestCase {
 	{
 		File testdataFolder = copyTestdataIntoJunitWorkspace();
 
-		CompiledUnit[] testdataCompiledUnit = compileAndCheckErrors(testdataFolder);
+		CompiledUnit[] testdataCompiledUnit = compileAndCheckErrors(testdataFolder, myData.getName());
 
-		IFile testdataCompiledXMI = loadCompiledXMIFile(testdataFolder);
+		IFile testdataCompiledXMI = loadCompiledXMIFile(testdataFolder, myData.getName());
 
 		File unparseFolder = createUnparseFolder();
+		
+		String unitName = myData.getName() + UNPARSED_SUFFIX;
+		
+		unparseIntoFolder(testdataCompiledUnit[0], unparseFolder, unitName);
 
-		unparseIntoFolder(testdataCompiledUnit[0], unparseFolder, testdataFolder.getName() + UNPARSED_SUFFIX);
+		CompiledUnit[] unparseCompiledUnit = compileAndCheckErrors(unparseFolder, unitName);
 
-		CompiledUnit[] unparseCompiledUnit = compileAndCheckErrors(unparseFolder);
+		IFile unparseCompiledXMI = loadCompiledXMIFile(unparseFolder, unitName);
 
-		IFile unparseCompiledXMI = loadCompiledXMIFile(unparseFolder);
-
-		unparseIntoFolder(unparseCompiledUnit[0], unparseFolder, testdataFolder.getName() + UNPARSED_SUFFIX + UNPARSED_SUFFIX);
+		unparseIntoFolder(unparseCompiledUnit[0], unparseFolder, unitName + UNPARSED_SUFFIX);
 
 		assertErrorCountEquality(testdataCompiledUnit, unparseCompiledUnit);
 
@@ -642,7 +1045,7 @@ public class TestQvtUnparser extends TestCase {
 
 	private File copyTestdataIntoJunitWorkspace() throws Exception
 	{
-		copyData(getOriginalPathSegment(), "unparserTestData/" + getOriginalPathSegment()); //$NON-NLS-1$
+		copyData(getOriginalPathSegment(), new Path(myData.getFolder()).append(getOriginalPathSegment()).toString());
 
 		File folder = getDestinationFolder();
 
@@ -651,9 +1054,9 @@ public class TestQvtUnparser extends TestCase {
 		return folder;
 	}
 
-	private CompiledUnit[] compileAndCheckErrors(File folder) throws Exception
+	private CompiledUnit[] compileAndCheckErrors(File folder, String unitName) throws Exception
 	{
-		CompiledUnit[] compiledUnits = compile(folder);
+		CompiledUnit[] compiledUnits = compile(folder, unitName);
 
 		assertTrue("No results", compiledUnits.length > 0); //$NON-NLS-1$
 
@@ -675,9 +1078,9 @@ public class TestQvtUnparser extends TestCase {
 		return compiledUnits;
 	}
 
-	private CompiledUnit[] compile(File folder) throws Exception
+	private CompiledUnit[] compile(File folder, String unitName) throws Exception
 	{
-		final String topName = folder.getName() + MDAConstants.QVTO_FILE_EXTENSION_WITH_DOT;
+		final String topName = unitName + MDAConstants.QVTO_FILE_EXTENSION_WITH_DOT;
 		getFile(folder, topName);
 		WorkspaceUnitResolver resolver = new WorkspaceUnitResolver(Collections.singletonList(getIFolder(folder)));
 		QVTOCompiler compiler = new QVTOCompiler();
@@ -685,7 +1088,7 @@ public class TestQvtUnparser extends TestCase {
 		QvtCompilerOptions options = new QvtCompilerOptions();
 		options.setGenerateCompletionData(false);
 
-		UnitProxy unit = resolver.resolveUnit(folder.getName());
+		UnitProxy unit = resolver.resolveUnit(unitName);
 		assert unit != null;
 
 		CompiledUnit[] compiledUnits = new CompiledUnit[] { compiler.compile(unit, options, (IProgressMonitor)null) };
@@ -696,11 +1099,14 @@ public class TestQvtUnparser extends TestCase {
 		return compiledUnits;
 	}
 
-	private IFile loadCompiledXMIFile(File folder)
+	private IFile loadCompiledXMIFile(File folder, String unitName)
 	{
-		IFolder sourcesFolder = getSourcesFolder();
-		IFolder resourceFolder = sourcesFolder.getFolder(folder.getName());
-		IFile file = resourceFolder.getFile(folder.getName() + '.' + ExeXMISerializer.COMPILED_XMI_FILE_EXTENSION);
+		IContainer sourcesFolder = getSourcesContainer();
+		IPath sourcesLocation = sourcesFolder.getLocation();
+		IPath folderPath = new Path(folder.getAbsolutePath());
+		IPath relativePath = folderPath.makeRelativeTo(sourcesLocation);
+		IFolder resourceFolder = sourcesFolder.getFolder(relativePath);
+		IFile file = resourceFolder.getFile(unitName + '.' + ExeXMISerializer.COMPILED_XMI_FILE_EXTENSION);
 		return file;
 	}
 
@@ -735,9 +1141,9 @@ public class TestQvtUnparser extends TestCase {
 	private void unparseIntoFolder(CompiledUnit compiledUnit, File unparseFolder, String fileName) throws Exception, EmfException
 	{
 		String copyPath =
-				"/" + myProject.getProject().getName() +
-				"/" + getUnparsePathSegment() +
-				"/" + fileName + MDAConstants.QVTO_FILE_EXTENSION_WITH_DOT;
+				myProject.getProject().getFullPath().
+				append(getUnparsePathSegment()).
+				append(fileName).addFileExtension(MDAConstants.QVTO_FILE_EXTENSION).toString();
 		URI copyURI = URI.createPlatformResourceURI(copyPath,true);
 
 		Resource copyResource = EmfUtil.createResource(copyURI, EmfUtil.getOutputResourceSet());
@@ -778,7 +1184,7 @@ public class TestQvtUnparser extends TestCase {
 
 	private String getOriginalPathSegment()
 	{
-		return "sources/" + myData.getDir();
+		return new Path(myData.getSubFolder()).append(myData.getDir()).toString();
 	}
 
 	private static final String UNPARSED_SUFFIX = "-unparsed";
@@ -789,19 +1195,20 @@ public class TestQvtUnparser extends TestCase {
 
 	private File getDestinationFolder()
 	{
-		return new File(myProject.getProject().getLocation().toString() + "/" + getOriginalPathSegment());
+		return myProject.getProject().getLocation().append(getOriginalPathSegment()).toFile();
 	}
 
-	private IFolder getSourcesFolder()
+	private IContainer getSourcesContainer()
 	{
 		IProject project = myProject.getProject();
-		IFolder sourcesFolder = project.getFolder("sources");
+		IPath path = project.getLocation().append(myData.getSubFolder());
+		IContainer sourcesFolder = project.getWorkspace().getRoot().getContainerForLocation(path);
 		return sourcesFolder;
 	}
 
 	private File getUnparseFolder()
 	{
-		return new File(myProject.getProject().getLocation().toString() + "/" + getUnparsePathSegment());
+		return myProject.getProject().getLocation().append(getUnparsePathSegment()).toFile();
 	}
 
 	private List<QvtMessage> getAllErrors(CompiledUnit[] compiled, boolean concreteSyntaxOnly) {
@@ -832,7 +1239,7 @@ public class TestQvtUnparser extends TestCase {
 
 	private void copyData(String destPath, String srcPath) throws Exception
 	{
-		File sourceFolder = TestUtil.getPluginRelativeFolder(srcPath);
+		File sourceFolder = TestUtil.getPluginRelativeFile(myData.getPluginID(), srcPath);
 		File destFolder = createFolder(destPath);
 		FileUtil.copyFolder(sourceFolder, destFolder);
 		myProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
@@ -840,7 +1247,7 @@ public class TestQvtUnparser extends TestCase {
 
 	private File createFolder(String destPath) throws Exception
 	{
-		File destFolder = new File(myProject.getProject().getLocation().toString() + "/" + destPath); //$NON-NLS-1$
+		File destFolder = myProject.getProject().getLocation().append(destPath).toFile();
 		destFolder.mkdirs();
 		myProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 		return destFolder;

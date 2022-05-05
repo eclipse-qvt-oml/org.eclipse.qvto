@@ -1,8 +1,0 @@
-transformation scr20469;
-modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
-
-mapping main(in model: ecore::EPackage): ecore::EPackage {
-	population {    
-    	object result :  { name := 'foo'; }
-    }
-}

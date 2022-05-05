@@ -1,5 +1,0 @@
-library LibForExtends;
-
-query queryString() : String {
-	return "LibForExtends-queryString";
-}

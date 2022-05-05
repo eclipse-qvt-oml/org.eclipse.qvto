@@ -1,5 +1,0 @@
-library LibForAccess;
-
-query queryString() : String {
-	return "LibForAccess-queryString";
-}

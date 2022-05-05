@@ -1,5 +1,0 @@
-library importedLibrary;
-
-helper ns_importedLibraryHelper()  : Boolean {
-	return false;
-}

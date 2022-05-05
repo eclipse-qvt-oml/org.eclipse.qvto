@@ -1,7 +1,0 @@
-
-transformation exec3();
-
-main() {
-	dump(null);
-}
-

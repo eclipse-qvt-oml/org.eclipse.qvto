@@ -1,9 +1,0 @@
-modeltype Ecore uses ecore('http://www.eclipse.org/emf/2002/Ecore');
-
-transformation bug413130;
-
-mapping Tuple(name:String) :: m() : EClass {
-	var t1 : Tuple(name : String, size : Integer) = Tuple { name = 'bob', size = 10};
-	var t2 := /*<warn>*/Tuple(name : String, size : Integer) = Tuple { name = 'bob', size = 10}/*</warn>*/;
-	var t3 := Tuple { name = 'bob', size = 10.0} = Tuple { name = 'bob', size = 10};
-}

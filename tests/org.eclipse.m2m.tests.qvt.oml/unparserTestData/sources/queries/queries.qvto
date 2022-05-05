@@ -1,9 +1,0 @@
-transformation queries;
-
-configuration property t1:String;
-property a = 'nsp';
-
-
-query getT1() : String {
-	return t1;
-}
