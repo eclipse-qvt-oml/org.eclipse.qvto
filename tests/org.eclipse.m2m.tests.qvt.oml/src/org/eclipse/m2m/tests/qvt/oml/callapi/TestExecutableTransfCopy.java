@@ -58,8 +58,7 @@ public class TestExecutableTransfCopy extends TestCase {
 	// TODO - the following tests redefine virtual operations which are called from imported modules
 	private static final Set<String> BANNED_TASKS = new HashSet<String>(Arrays.asList(
 			"importedvirtuals", //$NON-NLS-1$
-			"virt", //$NON-NLS-1$
-			"bug566236"
+			"virt" //$NON-NLS-1$
 			));
 
     @Parameters(name="{0}")
@@ -88,7 +87,12 @@ public class TestExecutableTransfCopy extends TestCase {
     	URI transformationURI = URI.createFileURI(getDestFile("QVToCopy.qvto").getAbsolutePath());
 
     	List<URI> transfParamURIs = new ArrayList<URI>(2);
-    	transfParamURIs.add(new TransformationExecutorTest.UriCreator(myData.getName()).getTransformationUri());
+    	transfParamURIs.add(new TransformationExecutorTest.UriCreator(myData.getName()) {
+    		@Override
+    		public String getTestDataFolder() {
+    			return myData.getTestDataFolder();
+    		};
+    	}.getTransformationUri());
     	final URI execTransfURI = URI.createFileURI(getDestFile(myData.getName() + '.' + ExeXMISerializer.COMPILED_XMI_FILE_EXTENSION).getAbsolutePath());
     	transfParamURIs.add(execTransfURI);
     	
@@ -149,7 +153,7 @@ public class TestExecutableTransfCopy extends TestCase {
     }
     
     private void copyModelData() throws Exception {
-    	File srcFolder = TestUtil.getPluginRelativeFile(AllTests.BUNDLE_ID, myData.getTestDataFolder() 
+    	File srcFolder = TestUtil.getPluginRelativeFile(AllTests.BUNDLE_ID, ModelTestData.TEST_DATA_FOLDER 
     			+ IPath.SEPARATOR + ModelTestData.MODEL_FOLDER + IPath.SEPARATOR + TEST_DIR_NAME); 
         File destFolder = getDestFolder();
         destFolder.mkdirs();

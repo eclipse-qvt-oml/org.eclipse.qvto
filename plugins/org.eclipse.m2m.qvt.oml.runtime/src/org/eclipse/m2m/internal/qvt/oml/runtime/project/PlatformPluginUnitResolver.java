@@ -89,7 +89,7 @@ public class PlatformPluginUnitResolver extends DelegatingUnitResolver {
 			}
 		
 			IPath unitAbsolutePath = new Path(fBundle.getSymbolicName()).append(unitBundleRelativePath);
-			URI unitURI = URI.createPlatformPluginURI(unitAbsolutePath.toString(), false);
+			URI unitURI = URI.createPlatformPluginURI(unitAbsolutePath.toString(), true);
 			String[] segments = ResolverUtils.getNameSegments(qualifiedName);
 			String namespace = null;
 			if (segments.length > 1) {
