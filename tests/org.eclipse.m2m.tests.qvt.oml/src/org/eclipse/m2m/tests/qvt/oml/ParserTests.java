@@ -22,7 +22,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({QvtLibraryASTTest.class, TestQvtParser.class, Bug577992.class, Bug578265.class})
+@SuiteClasses({QvtLibraryASTTest.class, TestQvtParser.class, Bug577992.class, Bug578265.class, Bug579914.class})
 public class ParserTests {
     
     static class TestData {

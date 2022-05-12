@@ -10,15 +10,11 @@
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml;
 
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.m2m.internal.qvt.oml.compiler.CompiledUnit;
 import org.eclipse.m2m.internal.qvt.oml.compiler.ExeXMISerializer;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QVTOCompiler;
@@ -26,6 +22,7 @@ import org.eclipse.m2m.internal.qvt.oml.compiler.QvtCompilerOptions;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitProxy;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitResolverFactory;
 import org.eclipse.m2m.tests.qvt.oml.ParserTests.TestData;
+import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
@@ -40,16 +37,7 @@ public class Bug578265 extends TestQvtParser {
 	public void setUp() throws Exception {
 		super.setUp();
 		
-		TestProject testProject = getTestProject();
-		
-		testProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
-		
-	    IMarker[] markers = testProject.getProject().findMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
-	    for (IMarker marker : markers) {
-	    	String message = marker.getAttribute(IMarker.MESSAGE).toString();
-	    	Integer severity = (Integer) marker.getAttribute(IMarker.SEVERITY);
-	    	assertTrue(message, severity < IMarker.SEVERITY_ERROR);
-	    }
+		TestUtil.buildProject(getTestProject().getProject());
 	}
 		
 	@Override

@@ -103,8 +103,10 @@ public class ProjectClassLoader extends URLClassLoader {
 	}
 	
 	static synchronized void resetAllProjectClassLoaders() {
-
-		for(IJavaProject javaProject : loadersMap.keySet()) {
+		
+		Iterable<IJavaProject> javaProjects = new ArrayList<>(loadersMap.keySet());
+		
+		for(IJavaProject javaProject : javaProjects) {
 			resetProjectClassLoader(javaProject);
 		}
 	}
