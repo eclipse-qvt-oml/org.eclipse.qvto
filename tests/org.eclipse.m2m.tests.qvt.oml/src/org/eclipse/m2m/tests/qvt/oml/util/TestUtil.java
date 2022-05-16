@@ -446,14 +446,7 @@ public class TestUtil extends Assert {
 				
 			JavaCore.rebuildIndex(null);
 		
-			myProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-			
-			IMarker[] problems = myProject.getProject().findMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
-		    
-			for (IMarker problem : problems) {
-		    	String message = problem.getAttribute(IMarker.MESSAGE).toString();
-		    	fail(message);
-		    }		
+			TestUtil.buildProject(myProject.getProject());		
 		}
 	}
 	
@@ -493,6 +486,7 @@ public class TestUtil extends Assert {
 					element.setName("package");
 					element.setAttribute("uri", ePackage.getNsURI().toString());
 					element.setAttribute("genModel", genmodelPath.removeFirstSegments(1).toString());
+					element.setAttribute("class", "");
 					pluginExtension.add(element);
 
 					URI platformUri = URI.createPlatformResourceURI(relativePath.append(metamodelUri.toString()).toString(), false);
