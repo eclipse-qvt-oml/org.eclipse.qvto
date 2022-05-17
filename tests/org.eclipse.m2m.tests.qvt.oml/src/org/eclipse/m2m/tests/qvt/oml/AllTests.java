@@ -89,7 +89,9 @@ import junit.framework.TestCase;
 	        TestQvtAntScript.class,
 	        SourceContainerTests.class,
 	        
-			ExecutionTimeGuardTest.class
+			ExecutionTimeGuardTest.class,
+			
+			UnparserTests.class
 		}
 )
 public class AllTests extends TestCase {
