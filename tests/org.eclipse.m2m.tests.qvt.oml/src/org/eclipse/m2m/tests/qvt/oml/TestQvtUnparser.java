@@ -37,10 +37,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EPackage.Registry;
@@ -825,8 +822,7 @@ public class TestQvtUnparser extends TestCase {
 
 	private IContainer getIFolder(File folderUnderWorkspace) throws MalformedURLException, URISyntaxException {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPath location = new Path(folderUnderWorkspace.getAbsolutePath());
-		IContainer[] containers = workspace.getRoot().findContainersForLocationURI(URIUtil.toURI(location.makeAbsolute().toFile().toURI().toURL()));
+		IContainer[] containers = workspace.getRoot().findContainersForLocationURI(folderUnderWorkspace.toURI());
 		if(containers == null || containers.length != 1 || containers[0] instanceof IFolder == false) {
 			throw new RuntimeException("Folder not found: " + folderUnderWorkspace); //$NON-NLS-1$
 		}
