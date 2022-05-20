@@ -21,7 +21,7 @@
        <testClass>org.eclipse.m2m.tests.qvt.oml.AllTests</testClass>
        <useUIHarness>true</useUIHarness>
        <useUIThread>true</useUIThread>
-       <argLine>-Xms128m -Xmx1G -ea</argLine>
+       <argLine>-Xms128m -Xmx1G -ea -Dfile.encoding=${project.build.sourceEncoding}</argLine>
      </configuration>
     </plugin>
   </plugins>
