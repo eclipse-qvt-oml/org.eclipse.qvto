@@ -30,16 +30,20 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
+import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtConfiguration;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtEditor;
@@ -49,6 +53,7 @@ import org.eclipse.m2m.internal.qvt.oml.project.builder.QVTOBuilder;
 import org.eclipse.m2m.tests.qvt.oml.TestProject;
 import org.eclipse.m2m.tests.qvt.oml.util.ReaderInputStream;
 import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
+import org.eclipse.ocl.utilities.PredefinedType;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPluginContribution;
 import org.eclipse.ui.IWorkbenchPage;
@@ -65,12 +70,14 @@ import org.osgi.framework.Bundle;
 /**
  * @author vrepeshko
  */
+@SuppressWarnings("restriction")
 public class CompletionTest extends AbstractCompletionTest {
 
 	private static final String EXTENSION_POINT = "javaBlackboxUnits";	//$NON-NLS-1$ -- clone of BundleBlackboxProvider
 	private static final String UNIT_ELEM = "unit";						//$NON-NLS-1$ -- clone of BundleBlackboxProvider
 
 	static {
+		initializeStandardLibrary();
 		enableQVTOCapabilities();
 	}
 
@@ -91,8 +98,9 @@ public class CompletionTest extends AbstractCompletionTest {
 
 	@Override
 	protected void setUp() throws Exception {
+		initializeWorkspace();
+		
 		if (myTestProject == null) {
-			initializeWorkspace();
 			initializeProject();
 		}
 
@@ -131,6 +139,8 @@ public class CompletionTest extends AbstractCompletionTest {
 
 	protected void initializeWorkspace() throws Exception {
 		TestUtil.turnOffAutoBuilding();
+		Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
+		Job.getJobManager().join(ResourcesPlugin.FAMILY_MANUAL_BUILD, null);
 	}
 
 	protected void initializeProject() throws Exception {
@@ -295,7 +305,6 @@ public class CompletionTest extends AbstractCompletionTest {
 		return isModeStrict;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static void enableQVTOCapabilities() {
 		String fakeQvtoPluginContributionId = WorkbenchActivityHelper.createUnifiedId(new IPluginContribution() {
 			public String getLocalId() {
@@ -326,6 +335,15 @@ public class CompletionTest extends AbstractCompletionTest {
 				enabledActivityIdsCopy.add(activityId);
 			}
 			PlatformUI.getWorkbench().getActivitySupport().setEnabledActivityIds(enabledActivityIdsCopy);
+		}
+	}
+	
+	private static void initializeStandardLibrary() {
+		for (EClassifier classifier : QvtOperationalStdLibrary.INSTANCE.getStdLibModule().getEClassifiers()) {
+			if (classifier instanceof PredefinedType) {
+				PredefinedType<?> predefinedType = (PredefinedType<?>) classifier;
+				predefinedType.oclOperations();
+			}
 		}
 	}
 
