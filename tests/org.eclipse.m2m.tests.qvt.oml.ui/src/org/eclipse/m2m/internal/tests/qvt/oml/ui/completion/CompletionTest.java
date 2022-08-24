@@ -49,10 +49,17 @@ import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtConfiguration;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtEditor;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.completion.QvtCompletionProcessor;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.completion.QvtCompletionProposal;
+import org.eclipse.m2m.internal.qvt.oml.expressions.ModelType;
 import org.eclipse.m2m.internal.qvt.oml.project.builder.QVTOBuilder;
+import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.DictionaryType;
+import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.OrderedTupleType;
+import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.Typedef;
 import org.eclipse.m2m.tests.qvt.oml.TestProject;
 import org.eclipse.m2m.tests.qvt.oml.util.ReaderInputStream;
 import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
+import org.eclipse.ocl.ecore.MessageType;
+import org.eclipse.ocl.types.CollectionType;
+import org.eclipse.ocl.types.TupleType;
 import org.eclipse.ocl.utilities.PredefinedType;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPluginContribution;
@@ -343,6 +350,39 @@ public class CompletionTest extends AbstractCompletionTest {
 			if (classifier instanceof PredefinedType) {
 				PredefinedType<?> predefinedType = (PredefinedType<?>) classifier;
 				predefinedType.oclOperations();
+			}
+			if (classifier instanceof CollectionType) {
+				CollectionType<?, ?> collectionType = (org.eclipse.ocl.types.CollectionType<?, ?>) classifier;
+				collectionType.getElementType();
+				collectionType.oclIterators();
+			}
+			if (classifier instanceof MessageType) {
+				MessageType messageType = (MessageType) classifier;
+				messageType.oclProperties();
+				messageType.getReferredOperation();
+				messageType.getReferredSignal();
+			}
+			if (classifier instanceof TupleType) {
+				TupleType<?, ?> tupleType = (TupleType<?, ?>) classifier;
+				tupleType.oclProperties();
+			}
+			if (classifier instanceof OrderedTupleType) {
+				OrderedTupleType orderedTupleType = (OrderedTupleType) classifier;
+				orderedTupleType.getElementType();
+			}
+			if (classifier instanceof ModelType) {
+				ModelType modelType = (ModelType) classifier;
+				modelType.getAdditionalCondition();
+				modelType.getMetamodel();
+			}
+			if (classifier instanceof DictionaryType) {
+				DictionaryType dictionaryType = (DictionaryType) classifier;
+				dictionaryType.getKeyType();
+			}
+			if (classifier instanceof Typedef) {
+				Typedef typedef = (Typedef) classifier;
+				typedef.getBase();
+				typedef.getCondition();
 			}
 		}
 	}
