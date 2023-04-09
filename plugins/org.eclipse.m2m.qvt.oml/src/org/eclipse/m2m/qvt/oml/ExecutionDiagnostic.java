@@ -42,7 +42,9 @@ public interface ExecutionDiagnostic extends Diagnostic, DiagnosticChain {
 	public static final int VALIDATION = 130;
 
 	public static final int MODEL_PARAMETER_MISMATCH = 140;
-
+		
+	public static final int NON_FATAL_ASSERTION = 150;
+	
 	public static final int TRANSFORMATION_LOAD_FAILED = 200;
 
 	public static final String SOURCE = "org.eclipse.m2m.qvt.oml.execution"; //$NON-NLS-1$

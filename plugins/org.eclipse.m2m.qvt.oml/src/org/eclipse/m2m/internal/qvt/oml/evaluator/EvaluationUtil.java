@@ -46,6 +46,7 @@ import org.eclipse.m2m.internal.qvt.oml.library.Context;
 import org.eclipse.m2m.internal.qvt.oml.stdlib.DictionaryImpl;
 import org.eclipse.m2m.internal.qvt.oml.stdlib.MutableListImpl;
 import org.eclipse.m2m.internal.qvt.oml.stdlib.model.ExceptionInstance;
+import org.eclipse.m2m.qvt.oml.ExecutionDiagnostic;
 import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.DictionaryType;
 import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.ListType;
 import org.eclipse.m2m.qvt.oml.util.Dictionary;
@@ -94,7 +95,8 @@ public class EvaluationUtil {
         List<Object> outParamValues = transformation.isIsBlackbox() ? Collections.emptyList() : makeOutParamValues(mainEvalEnv);
 		
 		ModelParameterExtent unboundExtent = mainEvalEnv.getAdapter(InternalEvaluationEnv.class).getUnboundExtent();
-		return new QvtEvaluationResult(extents, unboundExtent.getRootObjects(), outParamValues);
+		ExecutionDiagnostic executionDiagnostic = mainEvalEnv.getContext().getExecutionDiagnostic();
+		return new QvtEvaluationResult(extents, unboundExtent.getRootObjects(), outParamValues, executionDiagnostic);
 	}
 	
 	private static List<Object> makeOutParamValues(QvtOperationalEvaluationEnv mainEvalEnv) {

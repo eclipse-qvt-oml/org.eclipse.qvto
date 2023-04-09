@@ -15,6 +15,7 @@ package org.eclipse.m2m.qvt.oml.util;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.m2m.qvt.oml.ExecutionDiagnostic;
 
 
 /**
@@ -62,5 +63,10 @@ public interface IContext {
     
     Object getConfigProperty(String name);
     
-    ISessionData getSessionData();    
+    ISessionData getSessionData();
+    
+    /**
+	 * @since 3.10
+	 */
+	public ExecutionDiagnostic getExecutionDiagnostic();
 }

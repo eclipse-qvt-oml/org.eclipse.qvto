@@ -15,6 +15,8 @@ package org.eclipse.m2m.internal.qvt.oml.ast.env;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.m2m.internal.qvt.oml.ExecutionDiagnosticImpl;
+import org.eclipse.m2m.qvt.oml.ExecutionDiagnostic;
 
 /**
  * @author sboyko
@@ -22,10 +24,16 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class QvtEvaluationResult {
 	
+	@Deprecated
 	public QvtEvaluationResult(List<ModelExtentContents> modelExtents, List<EObject> unboundedObjects, List<Object> outParamValues) {
+		this(modelExtents, unboundedObjects, outParamValues, ExecutionDiagnosticImpl.createOkInstance());
+	}
+
+	public QvtEvaluationResult(List<ModelExtentContents> modelExtents, List<EObject> unboundedObjects, List<Object> outParamValues, ExecutionDiagnostic executionDiagnostic) {
 		myModelExtents = modelExtents;
 		myUnboundedObjects = unboundedObjects;
 		myOutParamValues = outParamValues;
+		myExecutionDiagnostic = executionDiagnostic;
 	}
 	
 	public List<ModelExtentContents> getModelExtents() {
@@ -40,8 +48,13 @@ public class QvtEvaluationResult {
 		return myOutParamValues;
 	}
 	
+	public ExecutionDiagnostic getExecutionDiagnostic() {
+		return myExecutionDiagnostic;
+	}
+	
 	private final List<ModelExtentContents> myModelExtents;
 	private final List<EObject> myUnboundedObjects;
 	private final List<Object> myOutParamValues;
+	private final ExecutionDiagnostic myExecutionDiagnostic;
 
 }

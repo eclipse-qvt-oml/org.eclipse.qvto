@@ -25,6 +25,7 @@ public class EvaluationMessages extends NLS {
     public static String ExtendedOclEvaluatorVisitorImpl_ModuleNotExecutable;
     public static String ExtendedOclEvaluatorVisitorImpl_ReadOnlyInputModel;
     public static String FatalAssertionFailed;
+    public static String NonFatalAssertionFailed;
 	public static String QvtOperationalEvaluationVisitorImpl_invalidConfigPropertyValue;
 	public static String QvtOperationalEvaluationVisitorImpl_UndefModelParamInTransf;
 	public static String QvtOperationalEvaluationVisitorImpl_unexpectedRuntimeExc;

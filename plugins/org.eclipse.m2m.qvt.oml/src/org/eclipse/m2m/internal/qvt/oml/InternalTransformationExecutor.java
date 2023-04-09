@@ -176,12 +176,13 @@ public class InternalTransformationExecutor {
 			if (!isSuccess(fLoadDiagnostic)) {
 				return fLoadDiagnostic;
 			}
-
+			
+			IContext context = new Context(executionContext, progress.split(1));
+			
 			try {
-				return doExecute(modelParameters,
-						new Context(executionContext, progress.split(1)));
+				return doExecute(modelParameters, context);
 			} catch (QvtRuntimeException e) {
-				return createExecutionFailure(e);
+				return createExecutionFailure(e, context);
 			}
 		} finally {
 			if (monitor != null) {
@@ -244,7 +245,9 @@ public class InternalTransformationExecutor {
 		Trace traces = evaluationEnv.getAdapter(InternalEvaluationEnv.class).getTraces();
 		handleExecutionTraces(traces);
 
-		return ExecutionDiagnosticImpl.createOkInstance();
+		return evalResult instanceof QvtEvaluationResult 
+				? ((QvtEvaluationResult) evalResult).getExecutionDiagnostic()
+				: ExecutionDiagnosticImpl.createOkInstance();
 	}
 
 	protected void handleExecutionTraces(Trace traces) {
@@ -315,7 +318,7 @@ public class InternalTransformationExecutor {
 
 
 	private static ExecutionDiagnostic createExecutionFailure(
-			QvtRuntimeException qvtRuntimeException) {
+			QvtRuntimeException qvtRuntimeException, IContext context) {
 		int code = 0;
 		int severity = Diagnostic.ERROR;
 		String message = qvtRuntimeException.getLocalizedMessage();
@@ -344,7 +347,11 @@ public class InternalTransformationExecutor {
 		ExecutionDiagnosticImpl diagnostic = new ExecutionDiagnosticImpl(severity,
 				code, message, data);
 		diagnostic.setStackTrace(qvtRuntimeException.getQvtStackTrace());
-
+		
+		if (context != null) {
+			diagnostic.addAll(context.getExecutionDiagnostic());
+		}
+		
 		return diagnostic;
 	}
 

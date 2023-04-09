@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
@@ -42,6 +43,7 @@ import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EParameter;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.m2m.internal.qvt.oml.ExecutionDiagnosticImpl;
 import org.eclipse.m2m.internal.qvt.oml.NLS;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.ast.binding.ASTBindingHelper;
@@ -104,6 +106,7 @@ import org.eclipse.m2m.internal.qvt.oml.stdlib.MutableListImpl;
 import org.eclipse.m2m.internal.qvt.oml.stdlib.model.ExceptionInstance;
 import org.eclipse.m2m.internal.qvt.oml.trace.Trace;
 import org.eclipse.m2m.internal.qvt.oml.trace.TraceRecord;
+import org.eclipse.m2m.qvt.oml.ExecutionDiagnostic;
 import org.eclipse.m2m.qvt.oml.blackbox.java.JavaModelExtent;
 import org.eclipse.m2m.qvt.oml.blackbox.java.JavaModelInstance;
 import org.eclipse.m2m.qvt.oml.blackbox.java.JavaModelType;
@@ -1114,7 +1117,7 @@ implements QvtOperationalEvaluationVisitor, InternalEvaluator, DeferredAssignmen
             			Collections.singletonList((EObject) callResult.myResult), null, null);
             	evaluationEnv.addModelExtent(modelParameter);
                 evalResult.getModelExtents().add(modelParameter.getContents());
-            } else {
+            } else if (callResult.myResult != null) {
                 return callResult.myResult;
             }
         }
@@ -1381,11 +1384,11 @@ implements QvtOperationalEvaluationVisitor, InternalEvaluator, DeferredAssignmen
 	}
     
 	public Object visitLogExp(LogExp logExp) {
-		doVisitLogExp(logExp, getContext().getLog(), null);
+		doVisitLogExp(logExp, getContext().getLog(), null, true);
 		return null;
 	}
 	
-	private String doVisitLogExp(LogExp logExp, Log logger, String messagePrefix) {
+	private String doVisitLogExp(LogExp logExp, Log logger, String messagePrefix, boolean diagnose) {
 		if(logExp.getCondition() != null && !Boolean.TRUE.equals(visitExpression(logExp.getCondition()))) {
 			return null;
 		}
@@ -1436,6 +1439,14 @@ implements QvtOperationalEvaluationVisitor, InternalEvaluator, DeferredAssignmen
 			}			
 		}
 		
+		if (diagnose) {
+			ExecutionDiagnostic logDiagnostic = new ExecutionDiagnosticImpl(
+					Diagnostic.OK, 
+					level == null ? 0 : level, 
+					message.toString());
+			getContext().getExecutionDiagnostic().add(logDiagnostic);
+		}
+		
 		return message.toString();
 	}
 	
@@ -1448,7 +1459,7 @@ implements QvtOperationalEvaluationVisitor, InternalEvaluator, DeferredAssignmen
 			
 			String logMessage = null;
 			if(assertExp.getLog() != null) {
-				logMessage = doVisitLogExp(assertExp.getLog(), logger, message);
+				logMessage = doVisitLogExp(assertExp.getLog(), logger, message, false);
 			} else {
 				logger.log(message);				
 			}
@@ -1456,7 +1467,17 @@ implements QvtOperationalEvaluationVisitor, InternalEvaluator, DeferredAssignmen
 			if(SeverityKind.FATAL.equals(assertExp.getSeverity())) {
 				String msg = (logMessage == null ? EvaluationMessages.FatalAssertionFailed : logMessage);
 				throwQVTException(new QvtAssertionFailed(msg));
-			}		
+			}
+			else {
+				int diagnosticSeverity = (assertExp.getSeverity().equals(SeverityKind.WARNING)) ? Diagnostic.WARNING : Diagnostic.ERROR;
+				int diagnosticCode = ExecutionDiagnostic.NON_FATAL_ASSERTION;
+				String diagnosticMessage = (logMessage == null ? EvaluationMessages.NonFatalAssertionFailed : logMessage);
+				
+				ExecutionDiagnostic assertDiagnostic = new ExecutionDiagnosticImpl(
+						diagnosticSeverity, diagnosticCode, diagnosticMessage);
+				
+				getContext().getExecutionDiagnostic().add(assertDiagnostic);
+			}
 				
 		}			
 		

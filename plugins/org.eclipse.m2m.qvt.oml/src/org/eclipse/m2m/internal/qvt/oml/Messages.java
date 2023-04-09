@@ -35,6 +35,8 @@ public class Messages extends NLS {
 	public static String StackTraceOverFlowError;
 
 	public static String UnitNotFoundError;
+	
+	public static String TransformationExecutionCompleted;
 
 	public static String QvtNamesChecker_blankIdentifierError;
 	public static String QvtNamesChecker_illegalCharInIdentifierError;

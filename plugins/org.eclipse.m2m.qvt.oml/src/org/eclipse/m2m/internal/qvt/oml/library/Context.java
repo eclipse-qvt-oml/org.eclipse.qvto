@@ -18,8 +18,13 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.emf.common.util.Diagnostic;
+import org.eclipse.m2m.internal.qvt.oml.ExecutionDiagnosticImpl;
+import org.eclipse.m2m.internal.qvt.oml.Messages;
+import org.eclipse.m2m.internal.qvt.oml.NLS;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.QVTEvaluationOptions;
 import org.eclipse.m2m.qvt.oml.ExecutionContext;
+import org.eclipse.m2m.qvt.oml.ExecutionDiagnostic;
 import org.eclipse.m2m.qvt.oml.util.EvaluationMonitor;
 import org.eclipse.m2m.qvt.oml.util.IContext;
 import org.eclipse.m2m.qvt.oml.util.ISessionData;
@@ -38,6 +43,8 @@ public class Context implements IContext {
     private Log myLog;
     private IProgressMonitor myMonitor;
     private Trace myTrace;
+    private final ExecutionDiagnostic myDiagnostic = new ExecutionDiagnosticImpl(
+			Diagnostic.OK, 0, NLS.bind(Messages.TransformationExecutionCompleted, null));
     
     public Context() {
     	this(Log.NULL_LOG, new NullProgressMonitor());
@@ -132,6 +139,13 @@ public class Context implements IContext {
     	}
     	myConfiguration.put(name, value);
     }
+    
+    /**
+	 * @since 3.10
+	 */
+	public ExecutionDiagnostic getExecutionDiagnostic() {
+		return myDiagnostic;
+	}
     
     
     public static class SessionDataImpl implements ISessionData {
