@@ -213,7 +213,7 @@ public class CstTransformation implements Transformation {
 	}
 	
 	/**
-	 * Attempts to load the transformation referred by this executor and checks
+	 * Attempts to load the transformation and checks
 	 * if it is valid for execution.
 	 * <p>
 	 * <b>Remark:</b></br> Only the first performs the actual transformation

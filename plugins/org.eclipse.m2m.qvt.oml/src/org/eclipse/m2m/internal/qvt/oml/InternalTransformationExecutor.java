@@ -68,8 +68,6 @@ import org.eclipse.ocl.ecore.SendSignalAction;
  */
 public class InternalTransformationExecutor {
 
-	private ExecutionDiagnostic fLoadDiagnostic;
-	private OperationalTransformation fOperationalTransformation;
 	private QvtOperationalEnvFactory fEnvFactory;
 	private Transformation fTransformation;
 
@@ -115,15 +113,13 @@ public class InternalTransformationExecutor {
 	 *
 	 * @return the diagnostic indicating possible problems of the load action
 	 */
-	public Diagnostic loadTransformation(IProgressMonitor monitor) {
+	public ExecutionDiagnostic loadTransformation(IProgressMonitor monitor) {
 		try {
-			if (fLoadDiagnostic == null) {
-				doLoad(monitor);
-			}
-			return fLoadDiagnostic;
+			fTransformation.getTransformation(monitor);
+			return fTransformation.getDiagnostic();
 		}
 		finally {
-			monitor.done();
+			SubMonitor.done(monitor);
 		}
 	}
 
@@ -170,11 +166,11 @@ public class InternalTransformationExecutor {
 			checkLegalModelParams(modelParameters);
 
 			// ensure transformation unit is loaded
-			loadTransformation(progress.split(1));
+			ExecutionDiagnostic loadDiagnostic = loadTransformation(progress.split(1));
 
 			// check if we have successfully loaded the transformation unit
-			if (!isSuccess(fLoadDiagnostic)) {
-				return fLoadDiagnostic;
+			if (!isSuccess(loadDiagnostic)) {
+				return loadDiagnostic;
 			}
 			
 			IContext context = new Context(executionContext, progress.split(1));
@@ -185,9 +181,7 @@ public class InternalTransformationExecutor {
 				return createExecutionFailure(e, context);
 			}
 		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+			SubMonitor.done(monitor);
 		}
 	}
 
@@ -195,8 +189,9 @@ public class InternalTransformationExecutor {
 		QvtOperationalEnvFactory factory = getEnvironmentFactory();
 		QvtOperationalEvaluationEnv evaluationEnv = factory
 				.createEvaluationEnvironment(context, null);
+		OperationalTransformation operationalTransformation = getTransformation();
 
-		ExecutionDiagnostic modelParamsDiagnostic = initArguments(evaluationEnv, fOperationalTransformation, args);
+		ExecutionDiagnostic modelParamsDiagnostic = initArguments(evaluationEnv, operationalTransformation, args);
 		if (!isSuccess(modelParamsDiagnostic)) {
 			return modelParamsDiagnostic;
 		}
@@ -209,13 +204,13 @@ public class InternalTransformationExecutor {
 		assert evaluator instanceof InternalEvaluator : "expecting InternalEvaluator implementation"; //$NON-NLS-1$
 		InternalEvaluator rawEvaluator = (InternalEvaluator) evaluator;
 
-		Object evalResult = rawEvaluator.execute(fOperationalTransformation);
+		Object evalResult = rawEvaluator.execute(operationalTransformation);
 
 		// unpack the internal extents into the passed model parameters
 		if (evalResult instanceof QvtEvaluationResult) {
 			int extentIndex = 0;
-			for (int i = 0; i < fOperationalTransformation.getModelParameter().size(); ++i) {
-				ModelParameter p = fOperationalTransformation.getModelParameter().get(i);
+			for (int i = 0; i < operationalTransformation.getModelParameter().size(); ++i) {
+				ModelParameter p = operationalTransformation.getModelParameter().get(i);
 				if (p.getKind() == DirectionKind.IN) {
 					continue;
 				}
@@ -253,13 +248,7 @@ public class InternalTransformationExecutor {
 	protected void handleExecutionTraces(Trace traces) {
 		// nothing interesting here
 	}
-
-	private void doLoad(IProgressMonitor monitor) {
-		fOperationalTransformation = fTransformation.getTransformation(monitor);
-
-		fLoadDiagnostic = fTransformation.getDiagnostic();
-	}
-
+	
 	private ExecutionDiagnostic initArguments(
 			QvtOperationalEvaluationEnv evalEnv,
 			OperationalTransformation transformationModel, ModelExtent[] args) {
@@ -298,8 +287,7 @@ public class InternalTransformationExecutor {
 	}
 
 	public OperationalTransformation getTransformation() {
-		loadTransformation(new NullProgressMonitor());
-		return fOperationalTransformation;
+		return fTransformation.getTransformation(new NullProgressMonitor());
 	}
 
 	public void setEnvironmentFactory(QvtOperationalEnvFactory factory) {
