@@ -19,5 +19,6 @@
     <module>org.eclipse.m2m.tests.qvto.transformationProject</module>
     <module>org.eclipse.m2m.tests.qvt.oml</module>
     <module>org.eclipse.m2m.tests.qvt.oml.ui</module>
+    <module>org.eclipse.m2m.tests.qvt.oml.buddy</module>
   </modules>
 </project>
