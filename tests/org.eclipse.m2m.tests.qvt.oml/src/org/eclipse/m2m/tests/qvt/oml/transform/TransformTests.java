@@ -614,7 +614,7 @@ public class TransformTests extends TestCase {
         			public void prepare(BlackboxRegistry blackboxRegistry) {
         				blackboxRegistry.registerModule(Bug577992_Library.class);
         			}
-        		},
+        		}.includeMetamodelFile("bug577992.ecore"),
         		new FilesToFilesData("bug507955") { //$NON-NLS-1$
         			@Override
         			public String getBundle() {

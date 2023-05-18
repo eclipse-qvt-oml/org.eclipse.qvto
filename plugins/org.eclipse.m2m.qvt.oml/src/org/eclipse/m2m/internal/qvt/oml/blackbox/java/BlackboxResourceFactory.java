@@ -21,9 +21,9 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.m2m.internal.qvt.oml.ast.binding.ASTBindingHelper;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
+import org.eclipse.m2m.internal.qvt.oml.compiler.CompilerUtils;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitContents.ModelContents;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitProxy;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitResolverFactory;
@@ -46,7 +46,8 @@ public class BlackboxResourceFactory implements Resource.Factory {
 			    if (!isLoaded) {
 					UnitProxy unitProxy = UnitResolverFactory.Registry.INSTANCE.getUnit(uri);
 					if(unitProxy != null) {
-					    getContents().addAll(loadBlackboxUnit(unitProxy, new ResourceSetImpl()));
+						ResourceSet resourceSet = CompilerUtils.cloneRegistrations(getResourceSet());
+					    getContents().addAll(loadBlackboxUnit(unitProxy, resourceSet));
 					}
 
 					setLoaded(true);
