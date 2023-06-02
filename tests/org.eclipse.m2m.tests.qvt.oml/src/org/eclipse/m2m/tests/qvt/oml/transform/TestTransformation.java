@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -197,20 +198,25 @@ public abstract class TestTransformation extends TestCase {
         public void check(ModelTestData data, IProject project) throws Exception {
             IFile transformation = getIFile(data.getTransformation(project));
             
-            List<URI> transfResult = myTransformer.transform(transformation, data.getIn(project), data.getTrace(project), data.getContext());
-        	List<URI> expectedResultURIs = data.getExpected(project);
-        	
-        	ResourceSet rs = data.getResourceSet(project);
-        	int i = 0;
-        	for (URI actualResultURI : transfResult) {
-        		URI expectedURI = expectedResultURIs.get(i++);
-        		
-        		Resource expectedResource = rs.getResource(expectedURI, true);
-        		
-        		List<EObject> actualExtentObjects = rs.getResource(actualResultURI, true).getContents();
-        		List<EObject> expectedExtentObjects = expectedResource.getContents();
-        		ModelTestData.compareWithExpected(data.getName(), expectedExtentObjects, actualExtentObjects);
-			}        	
+            try {
+	            List<URI> transfResult = myTransformer.transform(transformation, data.getIn(project), data.getTrace(project), data.getContext());
+	        	List<URI> expectedResultURIs = data.getExpected(project);
+	        	
+	        	ResourceSet rs = data.getResourceSet(project);
+	        	int i = 0;
+	        	for (URI actualResultURI : transfResult) {
+	        		URI expectedURI = expectedResultURIs.get(i++);
+	        		
+	        		Resource expectedResource = rs.getResource(expectedURI, true);
+	        		
+	        		List<EObject> actualExtentObjects = rs.getResource(actualResultURI, true).getContents();
+	        		List<EObject> expectedExtentObjects = expectedResource.getContents();
+	        		ModelTestData.compareWithExpected(data.getName(), expectedExtentObjects, actualExtentObjects);
+				}
+            } catch (CoreException e) {
+            	assertEquals(data.getExpectedSeverity(), e.getStatus().getSeverity());
+                assertEquals(data.getExpectedCode(), e.getStatus().getCode());
+            }
         }
         
         private final ITransformer myTransformer;

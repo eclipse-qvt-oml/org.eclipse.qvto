@@ -24,6 +24,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.common.util.WrappedException;
 import org.eclipse.emf.ecore.EObject;
@@ -272,6 +273,14 @@ public abstract class ModelTestData {
 		
 		return resSet;
 	}
+    
+    public int getExpectedSeverity() {
+    	return Diagnostic.OK;
+    }
+    
+    public int getExpectedCode() {
+    	return 0;
+    }
     
     
     private final String myName;

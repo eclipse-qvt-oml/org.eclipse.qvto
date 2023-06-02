@@ -36,7 +36,7 @@ public class TestQvtExecutor extends TransformationExecutorTest {
 	private final List<URI> ecoreMetamodels;
 	
 	public TestQvtExecutor(ModelTestData data) {
-		super(data.getName(), getInModels(data), getOutModels(data), QvtLaunchUtil.getConfigProperties(data.getContext()));
+		super(data.getName(), getInModels(data), getOutModels(data), QvtLaunchUtil.getConfigProperties(data.getContext()), data.getExpectedSeverity(), data.getExpectedCode());
 		ecoreMetamodels = data.getEcoreMetamodels();
 		
 		uriCreator = new UriCreator(name) {

@@ -152,8 +152,8 @@ public class DebugExecutorTest extends TestCase {
 		
 		Diagnostic diagnostic = runner.execute(executionContext);
 		
-		if (Diagnostic.OK != diagnostic.getSeverity()
-				|| 0 != diagnostic.getCode()
+		if (myData.getExpectedSeverity() != diagnostic.getSeverity()
+				|| myData.getExpectedCode() != diagnostic.getCode()
 				) {
 			fail(diagnostic.getMessage() + " : " + diagnostic);
 		}

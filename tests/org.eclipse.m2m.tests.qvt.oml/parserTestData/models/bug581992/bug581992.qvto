@@ -1,0 +1,10 @@
+import nested;
+
+transformation bug581992() access nested;
+
+main() {
+	var status = new nested().transform();
+	assert fatal (status.failed());
+	
+	assert warning (false) with log("warn");
+}

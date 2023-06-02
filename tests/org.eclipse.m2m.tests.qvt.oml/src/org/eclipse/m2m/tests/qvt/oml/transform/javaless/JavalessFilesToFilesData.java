@@ -160,6 +160,16 @@ public class JavalessFilesToFilesData extends ModelTestData {
     	return myFileData.getTestDataFolder();
     }
     
+    @Override
+    public int getExpectedSeverity() {
+    	return myFileData.getExpectedSeverity();
+    }
+    
+    @Override
+    public int getExpectedCode() {
+    	return myFileData.getExpectedCode();
+    }
+    
     private final FilesToFilesData myFileData;
     private FilesToFilesData myPatchedData;
 }

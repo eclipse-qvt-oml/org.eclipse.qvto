@@ -1,0 +1,5 @@
+transformation nested();
+
+main() {
+	assert error (false);
+}

@@ -63,6 +63,8 @@ public abstract class TransformationExecutorTest extends TestCase {
 	UriCreator uriCreator;
 	List<DirectionKind> paramKinds;
 	ResourceSet resSet;
+	int severity;
+	int code;
 	
 
 	static class UriCreator extends FileToFileData implements TestUtil.UriProvider {
@@ -100,6 +102,10 @@ public abstract class TransformationExecutorTest extends TestCase {
 	}
 
 	public TransformationExecutorTest(String name, List<String> inModels, List<String> outModels, Map<String, Object> configProps) {
+		this(name, inModels, outModels, configProps, Diagnostic.OK, 0);
+	}
+	
+	public TransformationExecutorTest(String name, List<String> inModels, List<String> outModels, Map<String, Object> configProps, int severity, int code) {
 		super(TransformationExecutorTest.class.getSimpleName() + " : " + name);
 		
 		this.name = name;
@@ -107,6 +113,8 @@ public abstract class TransformationExecutorTest extends TestCase {
 		this.outModels = outModels;
 		this.configProps = configProps;
 		this.uriCreator = new UriCreator(name);
+		this.severity = severity;
+		this.code = code;
 	}
 
 	@Override
@@ -156,8 +164,8 @@ public abstract class TransformationExecutorTest extends TestCase {
 	@Test
 	public void runTest() throws Throwable {
 		ExecutionDiagnostic diagnostic = executor.execute(executionContext, extents.toArray(new ModelExtent[extents.size()]));
-		if (Diagnostic.OK != diagnostic.getSeverity()
-				|| 0 != diagnostic.getCode()
+		if (severity != diagnostic.getSeverity()
+				|| code != diagnostic.getCode()
 				) {
 			fail(diagnostic.getMessage() + " : " + diagnostic.getStackTrace());
 		}
