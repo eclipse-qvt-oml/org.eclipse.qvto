@@ -12,11 +12,16 @@
 
 package org.eclipse.m2m.internal.qvt.oml.stdlib;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.emf.common.util.BasicDiagnostic;
+import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
+import org.eclipse.m2m.internal.qvt.oml.emf.util.StatusUtil;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModuleInstance;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.QvtInterruptedExecutionException;
+import org.eclipse.m2m.internal.qvt.oml.evaluator.QvtOperationalEvaluationVisitorImpl.OperationCallResult;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.QvtRuntimeException;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.TransformationInstance.InternalTransformation;
 import org.eclipse.m2m.internal.qvt.oml.stdlib.model.ExceptionInstance;
@@ -63,7 +68,17 @@ public class TransformationOperations extends AbstractContextualOperations {
 		    	StdlibFactory stdlibFactory = QvtOperationalStdLibrary.INSTANCE.getStdlibFactory();
 		    	// Note: !!!! exception throw from here is captured by MDT OCL and turned into OCLInvalid
 			    try {
-			    	mainHandler.invoke(moduleInstance, source, args, evalEnv);
+			    	Object result = mainHandler.invoke(moduleInstance, source, args, evalEnv);
+			    	
+			    	if (result instanceof OperationCallResult) {
+				    	OperationCallResult callResult = (OperationCallResult) result;			    
+				    	Diagnostic diagnostic = callResult.myEvalEnv.getContext().getExecutionDiagnostic();
+				    	IStatus status = BasicDiagnostic.toIStatus(diagnostic);
+			    		
+			    		if (StatusUtil.isError(status)) {
+			    			return stdlibFactory.createFailure(null);
+			    		}
+				    }
 			    } catch(QvtInterruptedExecutionException e) {
 			    	throw e;
 			    } catch(QvtRuntimeException e) {
