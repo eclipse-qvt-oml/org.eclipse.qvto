@@ -9,7 +9,7 @@
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2m.tests.qvt.oml.buddy.bbox;
+package org.eclipse.m2m.tests.qvt.oml.bbox;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.m2m.qvt.oml.blackbox.java.Module;
