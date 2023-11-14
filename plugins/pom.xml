@@ -36,5 +36,6 @@
     <module>org.eclipse.m2m.qvt.oml.tools.coverage.ui</module>
     <module>org.eclipse.m2m.qvt.oml.trace.edit</module>
     <module>org.eclipse.m2m.qvt.oml.ui</module>
+	<module>org.eclipse.m2m.tests.qvt.oml.buddy</module>
   </modules>
 </project>
