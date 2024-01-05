@@ -19,12 +19,14 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
 import org.eclipse.m2m.tests.qvt.oml.ParserTests.TestData;
 import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.pde.core.project.IBundleProjectDescription;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
@@ -64,13 +66,18 @@ public class Bug579914 extends TestQvtParser {
 				
 		FileUtil.copyFolder(sourceFolder, targetFolder);
 		
+		qvtPluginProject = ResourcesPlugin.getWorkspace().getRoot().getProject(QvtPlugin.ID);		
+		qvtPluginProject.create(null);		
+		qvtPluginProject.open(null);
+				
 		IPath projectDescriptionPath = targetPath.append(IProjectDescription.DESCRIPTION_FILE_NAME);
 		IProjectDescription projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(projectDescriptionPath);
 		
-		qvtPluginProject = ResourcesPlugin.getWorkspace().getRoot().getProject(QvtPlugin.ID);		
-		qvtPluginProject.create(projectDescription, null);
-		qvtPluginProject.open(null);
-
+		// restrict natures to Java and Plugin (bug 582831)
+		String[] natureIDs = {JavaCore.NATURE_ID, IBundleProjectDescription.PLUGIN_NATURE};		
+		projectDescription.setNatureIds(natureIDs);
+		qvtPluginProject.setDescription(projectDescription, null);
+		
 		TestUtil.buildProject(qvtPluginProject);
 		
 		super.setUp();
