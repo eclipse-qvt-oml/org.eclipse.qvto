@@ -65,7 +65,7 @@
     <maven-resources-version>3.3.1</maven-resources-version>
     <maven-site-version>4.0.0-M16</maven-site-version>
     <maven-surefire-version>3.5.2</maven-surefire-version>
-    <tycho-version>4.0.10</tycho-version>
+    <tycho-version>5.0.4</tycho-version>
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <BUILD_ALIAS></BUILD_ALIAS>
@@ -115,8 +115,7 @@
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>target-platform-configuration</artifactId>
         <configuration>
-          <!--resolver>p2<resolver-->
-          <!-->executionEnvironment>JavaSE-1.8</executionEnvironment-->
+          <executionEnvironment>JavaSE-25</executionEnvironment>
           <target>
             <artifact>
               <groupId>org.eclipse.qvto</groupId>
